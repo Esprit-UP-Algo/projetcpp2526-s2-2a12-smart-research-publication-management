@@ -274,8 +274,8 @@ QGroupBox {
     </property>
     <property name="styleSheet">
      <string notr="true">QWidget#widgetBg {
-    background-image: url(:/bachground/background.png);
     background-position: center;
+	background-image: url(:/background/background - Copy.png);
     background-repeat: no-repeat;
     background-color: white;
     border-radius: 12px;
@@ -846,13 +846,13 @@ QPushButton:pressed {
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>30</y>
-        <width>120</width>
-        <height>80</height>
+        <y>20</y>
+        <width>131</width>
+        <height>81</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">border-image: url(:/logoo/plogo.png);</string>
+       <string notr="true">border-image: url(:/plogo/plogo.png);</string>
       </property>
      </widget>
      <widget class="QLabel" name="logoo1">

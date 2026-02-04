@@ -23,10 +23,13 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(design
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        bachground.qrc
+        background.qrc
+        logo.qrc
         statistique.qrc
-        logoo.qrc
-        logo1.qrc
+
+
+
+
 
 
     )
