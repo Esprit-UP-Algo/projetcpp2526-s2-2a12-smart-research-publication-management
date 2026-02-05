@@ -1,0 +1,22 @@
+{
+	"BUILD_DIR" : "C:/Users/MSI/Desktop/design/design/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/design_autogen",
+	"CMAKE_BINARY_DIR" : "C:/Users/MSI/Desktop/design/design/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "C:/Users/MSI/Desktop/design/design/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_SOURCE_DIR" : "C:/Users/MSI/Desktop/design/design/projet_c++",
+	"CMAKE_SOURCE_DIR" : "C:/Users/MSI/Desktop/design/design/projet_c++",
+	"CROSS_CONFIG" : false,
+	"GENERATOR" : "Ninja",
+	"INCLUDE_DIR" : "C:/Users/MSI/Desktop/design/design/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/design_autogen/include",
+	"INPUTS" : [ "C:/Users/MSI/Desktop/design/design/projet_c++/plogo.png" ],
+	"LOCK_FILE" : "C:/Users/MSI/Desktop/design/design/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/design_autogen.dir/AutoRcc_logo_EWIEGA46WW_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "--no-zstd", "-name", "logo" ],
+	"OUTPUT_CHECKSUM" : "EWIEGA46WW",
+	"OUTPUT_NAME" : "qrc_logo.cpp",
+	"RCC_EXECUTABLE" : "C:/Qt/6.7.3/mingw_64/bin/rcc.exe",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "C:/Users/MSI/Desktop/design/design/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/design_autogen.dir/AutoRcc_logo_EWIEGA46WW_Used.txt",
+	"SOURCE" : "C:/Users/MSI/Desktop/design/design/projet_c++/logo.qrc",
+	"USE_BETTER_GRAPH" : false,
+	"VERBOSITY" : 0
+}
