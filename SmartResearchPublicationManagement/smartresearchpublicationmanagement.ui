@@ -1,0 +1,975 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SmartResearchPublicationManagement</class>
+ <widget class="QMainWindow" name="SmartResearchPublicationManagement">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1366</width>
+    <height>768</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Smart Research Lab</string>
+  </property>
+  <widget class="QWidget" name="AppRoot">
+   <layout class="QHBoxLayout" name="rootLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QFrame" name="Sidebar">
+      <property name="minimumSize">
+       <size>
+        <width>250</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>260</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Shape::NoFrame</enum>
+      </property>
+      <layout class="QVBoxLayout" name="sidebarLayout">
+       <property name="spacing">
+        <number>12</number>
+       </property>
+       <property name="leftMargin">
+        <number>18</number>
+       </property>
+       <property name="topMargin">
+        <number>18</number>
+       </property>
+       <property name="rightMargin">
+        <number>18</number>
+       </property>
+       <property name="bottomMargin">
+        <number>18</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="AppLogo">
+         <property name="text">
+          <string>VORTEX</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="BtnEmployee">
+         <property name="text">
+          <string>EMPLOYEE</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="BtnFinance">
+         <property name="text">
+          <string>FINANCE</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="BtnPublication">
+         <property name="text">
+          <string>PUBLICATION</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="BtnLabs">
+         <property name="text">
+          <string>LABS</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="BtnInventory">
+         <property name="text">
+          <string>INVENTORY</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="BtnPlans">
+         <property name="text">
+          <string>PLANS</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="sideSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QToolButton" name="BtnTheme">
+         <property name="toolTip">
+          <string>Changer le thème (Jour/Nuit)</string>
+         </property>
+         <property name="text">
+          <string>MODE</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="BtnLogout">
+         <property name="text">
+          <string>LOG OUT</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QFrame" name="MainArea">
+      <property name="frameShape">
+       <enum>QFrame::Shape::NoFrame</enum>
+      </property>
+      <layout class="QVBoxLayout" name="mainAreaLayout">
+       <property name="spacing">
+        <number>14</number>
+       </property>
+       <property name="leftMargin">
+        <number>18</number>
+       </property>
+       <property name="topMargin">
+        <number>18</number>
+       </property>
+       <property name="rightMargin">
+        <number>18</number>
+       </property>
+       <property name="bottomMargin">
+        <number>18</number>
+       </property>
+       <item>
+        <widget class="QFrame" name="Topbar">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>64</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>64</height>
+          </size>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Shape::NoFrame</enum>
+         </property>
+         <layout class="QHBoxLayout" name="topbarLayout">
+          <property name="leftMargin">
+           <number>16</number>
+          </property>
+          <property name="topMargin">
+           <number>10</number>
+          </property>
+          <property name="rightMargin">
+           <number>16</number>
+          </property>
+          <property name="bottomMargin">
+           <number>10</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="PageTitle">
+            <property name="text">
+             <string>Smart Research</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="topSpacer">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QFrame" name="UserChip">
+            <property name="frameShape">
+             <enum>QFrame::Shape::NoFrame</enum>
+            </property>
+            <layout class="QHBoxLayout" name="userChipLayout">
+             <property name="leftMargin">
+              <number>12</number>
+             </property>
+             <property name="topMargin">
+              <number>8</number>
+             </property>
+             <property name="rightMargin">
+              <number>12</number>
+             </property>
+             <property name="bottomMargin">
+              <number>8</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="UserRole">
+               <property name="text">
+                <string>Admin</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="UserName">
+               <property name="text">
+                <string>Azer</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="userSpacer">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="bodyLayout">
+         <property name="spacing">
+          <number>14</number>
+         </property>
+         <item>
+          <widget class="QStackedWidget" name="Pages">
+           <widget class="QWidget" name="PageFinance">
+            <layout class="QVBoxLayout" name="financeLayout">
+             <property name="spacing">
+              <number>14</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="PageEmployee">
+            <layout class="QVBoxLayout" name="empLayout"/>
+           </widget>
+           <widget class="QWidget" name="PagePublication">
+            <layout class="QVBoxLayout" name="pubLayout"/>
+           </widget>
+           <widget class="QWidget" name="PageLabs">
+            <layout class="QVBoxLayout" name="pageLabsLayout">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QStackedWidget" name="LabsStack">
+               <property name="currentIndex">
+                <number>0</number>
+               </property>
+               <widget class="QWidget" name="LabsContent">
+                <layout class="QVBoxLayout" name="labsLayout">
+                 <property name="spacing">
+                  <number>14</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QFrame" name="LabsCardFilter">
+                   <property name="frameShape">
+                    <enum>QFrame::Shape::NoFrame</enum>
+                   </property>
+                   <layout class="QGridLayout" name="labsFilterGrid">
+                    <property name="leftMargin">
+                     <number>16</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>16</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>16</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>16</number>
+                    </property>
+                    <property name="horizontalSpacing">
+                     <number>12</number>
+                    </property>
+                    <property name="verticalSpacing">
+                     <number>10</number>
+                    </property>
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="LblLabsSearch">
+                      <property name="text">
+                       <string>Recherche</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QLabel" name="LblLabsSpec">
+                      <property name="text">
+                       <string>Spécialité</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="2">
+                     <widget class="QLabel" name="LblLabsCap">
+                      <property name="text">
+                       <string>Capacité</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QLineEdit" name="LabsSearch">
+                      <property name="placeholderText">
+                       <string>nom, responsable, localisation, numéro…</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QComboBox" name="LabsSpec"/>
+                    </item>
+                    <item row="1" column="2">
+                     <widget class="QComboBox" name="LabsCap"/>
+                    </item>
+                    <item row="1" column="3">
+                     <widget class="QPushButton" name="BtnLabsApply">
+                      <property name="text">
+                       <string>Appliquer</string>
+                      </property>
+                      <property name="property" stdset="0">
+                       <string>primary</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QFrame" name="LabsCardTable">
+                   <property name="frameShape">
+                    <enum>QFrame::Shape::NoFrame</enum>
+                   </property>
+                   <layout class="QVBoxLayout" name="labsTableLayout">
+                    <property name="spacing">
+                     <number>10</number>
+                    </property>
+                    <property name="leftMargin">
+                     <number>16</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>16</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>16</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>16</number>
+                    </property>
+                    <item>
+                     <widget class="QLabel" name="LabsTitle">
+                      <property name="text">
+                       <string>Laboratoires</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QTableWidget" name="TableLabs">
+                      <property name="editTriggers">
+                       <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+                      </property>
+                      <property name="alternatingRowColors">
+                       <bool>true</bool>
+                      </property>
+                      <property name="selectionBehavior">
+                       <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+                      </property>
+                      <property name="showGrid">
+                       <bool>false</bool>
+                      </property>
+                      <property name="sortingEnabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="cornerButtonEnabled">
+                       <bool>false</bool>
+                      </property>
+                      <column>
+                       <property name="text">
+                        <string>ID</string>
+                       </property>
+                      </column>
+                      <column>
+                       <property name="text">
+                        <string>Nom</string>
+                       </property>
+                      </column>
+                      <column>
+                       <property name="text">
+                        <string>Responsable</string>
+                       </property>
+                      </column>
+                      <column>
+                       <property name="text">
+                        <string>Localisation</string>
+                       </property>
+                      </column>
+                      <column>
+                       <property name="text">
+                        <string>Numéro</string>
+                       </property>
+                      </column>
+                      <column>
+                       <property name="text">
+                        <string>Spécialité</string>
+                       </property>
+                      </column>
+                      <column>
+                       <property name="text">
+                        <string>Capacité</string>
+                       </property>
+                      </column>
+                     </widget>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="labsActions">
+                      <property name="spacing">
+                       <number>10</number>
+                      </property>
+                      <item>
+                       <widget class="QPushButton" name="BtnLabAdd">
+                        <property name="text">
+                         <string>Ajouter</string>
+                        </property>
+                        <property name="property" stdset="0">
+                         <string>primary</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="BtnLabEdit">
+                        <property name="text">
+                         <string>Modifier</string>
+                        </property>
+                        <property name="property" stdset="0">
+                         <string>ghost</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="BtnLabDelete">
+                        <property name="text">
+                         <string>Supprimer</string>
+                        </property>
+                        <property name="property" stdset="0">
+                         <string>danger</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="labsSpacer">
+                        <property name="orientation">
+                         <enum>Qt::Orientation::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="BtnLabExport">
+                        <property name="text">
+                         <string>Exporter PDF</string>
+                        </property>
+                        <property name="property" stdset="0">
+                         <string>chip</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="LabsPopup">
+                <layout class="QVBoxLayout" name="labsPopupLayout">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QFrame" name="LabsOverlay">
+                   <property name="frameShape">
+                    <enum>QFrame::Shape::NoFrame</enum>
+                   </property>
+                   <layout class="QVBoxLayout" name="labsOverlayLayout">
+                    <property name="leftMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <spacer name="labsOverlayTop">
+                      <property name="orientation">
+                       <enum>Qt::Orientation::Vertical</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>40</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="labsCenterRow">
+                      <item>
+                       <spacer name="labsOverlayLeft">
+                        <property name="orientation">
+                         <enum>Qt::Orientation::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QFrame" name="PopupLabsCard">
+                        <property name="minimumSize">
+                         <size>
+                          <width>760</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="frameShape">
+                         <enum>QFrame::Shape::NoFrame</enum>
+                        </property>
+                        <layout class="QVBoxLayout" name="popupLabsLayout">
+                         <property name="spacing">
+                          <number>12</number>
+                         </property>
+                         <property name="leftMargin">
+                          <number>18</number>
+                         </property>
+                         <property name="topMargin">
+                          <number>18</number>
+                         </property>
+                         <property name="rightMargin">
+                          <number>18</number>
+                         </property>
+                         <property name="bottomMargin">
+                          <number>18</number>
+                         </property>
+                         <item>
+                          <layout class="QHBoxLayout" name="popupLabsHeader">
+                           <item>
+                            <widget class="QLabel" name="PopupTitleLabs">
+                             <property name="text">
+                              <string>Ajouter un laboratoire</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <spacer name="popupLabsHeaderSpacer">
+                             <property name="orientation">
+                              <enum>Qt::Orientation::Horizontal</enum>
+                             </property>
+                             <property name="sizeHint" stdset="0">
+                              <size>
+                               <width>40</width>
+                               <height>20</height>
+                              </size>
+                             </property>
+                            </spacer>
+                           </item>
+                           <item>
+                            <widget class="QToolButton" name="BtnPopupCancelLabs">
+                             <property name="toolTip">
+                              <string>Fermer</string>
+                             </property>
+                             <property name="text">
+                              <string>✕</string>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                         </item>
+                         <item>
+                          <widget class="QFrame" name="PopupLabsForm">
+                           <property name="frameShape">
+                            <enum>QFrame::Shape::NoFrame</enum>
+                           </property>
+                           <layout class="QGridLayout" name="labsFormGrid">
+                            <property name="horizontalSpacing">
+                             <number>12</number>
+                            </property>
+                            <property name="verticalSpacing">
+                             <number>10</number>
+                            </property>
+                            <item row="1" column="1">
+                             <widget class="QLineEdit" name="LabLocation">
+                              <property name="placeholderText">
+                               <string>Bloc B, Salle 204</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="0" column="3">
+                             <widget class="QLineEdit" name="LabResponsible">
+                              <property name="placeholderText">
+                               <string>Nom responsable</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="2" column="1">
+                             <widget class="QComboBox" name="LabSpec"/>
+                            </item>
+                            <item row="2" column="2">
+                             <widget class="QLabel" name="LblLabCap">
+                              <property name="text">
+                               <string>Capacité</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="1" column="0">
+                             <widget class="QLabel" name="LblLabLoc">
+                              <property name="text">
+                               <string>Localisation</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="0" column="0">
+                             <widget class="QLabel" name="LblLabName">
+                              <property name="text">
+                               <string>Nom labo</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="1" column="2">
+                             <widget class="QLabel" name="LblLabNum">
+                              <property name="text">
+                               <string>Numéro</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="0" column="1">
+                             <widget class="QLineEdit" name="LabName">
+                              <property name="placeholderText">
+                               <string>Laboratoire IA</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="1" column="3">
+                             <widget class="QLineEdit" name="LabNumber">
+                              <property name="placeholderText">
+                               <string>204</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="0" column="2">
+                             <widget class="QLabel" name="LblLabResp">
+                              <property name="text">
+                               <string>Responsable</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="2" column="0">
+                             <widget class="QLabel" name="LblLabSpec">
+                              <property name="text">
+                               <string>Spécialité</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item row="2" column="3">
+                             <widget class="QComboBox" name="LabCap"/>
+                            </item>
+                           </layout>
+                          </widget>
+                         </item>
+                         <item>
+                          <layout class="QHBoxLayout" name="popupLabsActions">
+                           <item>
+                            <spacer name="popupLabsActionsLeft">
+                             <property name="orientation">
+                              <enum>Qt::Orientation::Horizontal</enum>
+                             </property>
+                             <property name="sizeHint" stdset="0">
+                              <size>
+                               <width>40</width>
+                               <height>20</height>
+                              </size>
+                             </property>
+                            </spacer>
+                           </item>
+                           <item>
+                            <widget class="QPushButton" name="BtnPopupSaveLabs">
+                             <property name="text">
+                              <string>Enregistrer</string>
+                             </property>
+                             <property name="property" stdset="0">
+                              <string>primary</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QPushButton" name="BtnPopupResetLabs">
+                             <property name="text">
+                              <string>Vider</string>
+                             </property>
+                             <property name="property" stdset="0">
+                              <string>ghost</string>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                         </item>
+                        </layout>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="labsOverlayRight">
+                        <property name="orientation">
+                         <enum>Qt::Orientation::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <spacer name="labsOverlayBottom">
+                      <property name="orientation">
+                       <enum>Qt::Orientation::Vertical</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>40</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="PageInventory">
+            <layout class="QVBoxLayout" name="invRootLayout">
+             <property name="spacing">
+              <number>14</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="PagePlans">
+            <layout class="QVBoxLayout" name="plansLayout"/>
+           </widget>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="RightPanel">
+           <property name="minimumSize">
+            <size>
+             <width>280</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>320</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Shape::NoFrame</enum>
+           </property>
+           <layout class="QVBoxLayout" name="rightPanelLayout">
+            <property name="spacing">
+             <number>14</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QFrame" name="CardStats">
+              <property name="frameShape">
+               <enum>QFrame::Shape::NoFrame</enum>
+              </property>
+              <layout class="QVBoxLayout" name="statsCardLayout">
+               <property name="spacing">
+                <number>10</number>
+               </property>
+               <property name="leftMargin">
+                <number>16</number>
+               </property>
+               <property name="topMargin">
+                <number>16</number>
+               </property>
+               <property name="rightMargin">
+                <number>16</number>
+               </property>
+               <property name="bottomMargin">
+                <number>16</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="StatsTitle">
+                 <property name="text">
+                  <string>Dépenses vs Revenus / mois</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QFrame" name="ChartPlaceholder">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>260</height>
+                  </size>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::Shape::NoFrame</enum>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="rightSpacer">
+              <property name="orientation">
+               <enum>Qt::Orientation::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
