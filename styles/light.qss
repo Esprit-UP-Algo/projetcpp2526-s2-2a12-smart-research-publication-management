@@ -1,0 +1,79 @@
+QWidget#AppRoot { background: #f6fbfb; font-family: "Consolas"; color: #123; }
+
+QFrame#Sidebar { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f6fbfb, stop:1 #e8f5f5); border-right: 1px solid #cfe9e9; }
+QLabel#AppLogo { font-size: 26px; font-weight: 900; color: #004D40; padding: 6px 0; }
+
+QLineEdit#SideSearch { background: white; border: 1px solid #dbeaea; border-radius: 12px; padding: 8px 10px; }
+
+QPushButton#BtnEmployee, QPushButton#BtnFinance, QPushButton#BtnPublication, QPushButton#BtnLabs, QPushButton#BtnInventory, QPushButton#BtnPlans, QPushButton#BtnLogout {
+    background: white; border: 1px solid #dbeaea; border-radius: 14px; padding: 10px 12px; text-align: left;
+}
+QPushButton#BtnEmployee:hover, QPushButton#BtnFinance:hover, QPushButton#BtnPublication:hover, QPushButton#BtnLabs:hover, QPushButton#BtnInventory:hover, QPushButton#BtnPlans:hover {
+    border: 1px solid #00CED1;
+}
+
+QToolButton#BtnTheme { background: #00CED1; color: white; border: none; border-radius: 12px; padding: 10px 12px; }
+
+QFrame#CardFilter, QFrame#CardTable, QFrame#CardStats, QFrame#InvCardFilter, QFrame#InvCardTable, QFrame#InvCardAlerts, QFrame#LabsCardFilter, QFrame#LabsCardTable, QFrame#LabsCardStats {
+    background: white; border: 1px solid rgba(0, 0, 0, 0.06); border-radius: 16px;
+}
+QLabel#TableTitle, QLabel#InvTitle, QLabel#StatsTitle, QLabel#LabsTitle, QLabel#LabsStatsTitle, QLabel#PopupTitleFinance, QLabel#PopupTitleInv, QLabel#PopupTitleLabs { font-weight: 800; color: #004D40; font-size: 16px; }
+
+QLineEdit, QComboBox, QDateEdit { background: white; border: 1px solid #dbeaea; border-radius: 12px; padding: 8px 10px; }
+QLineEdit:focus, QComboBox:focus, QDateEdit:focus { border: 1px solid #00CED1; }
+
+QPushButton#BtnAdd, QPushButton#BtnApply, QPushButton#BtnProdAdd, QPushButton#BtnLabAdd, QPushButton#BtnLabsApply, QPushButton#BtnPopupSaveFinance, QPushButton#BtnPopupSaveInv, QPushButton#BtnPopupSaveLabs {
+    background: #00CED1; color: white; border: none; border-radius: 12px; padding: 8px 12px;
+}
+QPushButton#BtnEdit, QPushButton#BtnReset, QPushButton#BtnExport, QPushButton#BtnProdEdit, QPushButton#BtnProdExport, QPushButton#BtnLabEdit, QPushButton#BtnLabExport, QPushButton#BtnPopupCancelFinance, QPushButton#BtnPopupCancelInv, QPushButton#BtnPopupResetLabs {
+    background: #eef7f7; border: 1px solid #dbeaea; border-radius: 12px; padding: 8px 12px;
+}
+QPushButton#BtnDelete, QPushButton#BtnProdDelete { background: #ffe8e8; border: 1px solid #ffcccc; border-radius: 12px; padding: 8px 12px; }
+
+QHeaderView::section { background: #f3fbfb; border: none; padding: 8px; font-weight: 700; color: #004D40; }
+
+QFrame#OverlayFinance, QFrame#OverlayInv { background: rgba(0,0,0,0.35); }
+QFrame#PopupFinanceCard, QFrame#PopupInvCard, QFrame#PopupLabsCard { background: white; border: 1px solid rgba(0,0,0,0.12); border-radius: 18px; }
+/* ===== Hover for action buttons (Light) ===== */
+QPushButton#BtnAdd:hover,
+QPushButton#BtnApply:hover,
+QPushButton#BtnProdAdd:hover,
+QPushButton#BtnLabAdd:hover,
+QPushButton#BtnLabsApply:hover,
+QPushButton#BtnPopupSaveFinance:hover,
+QPushButton#BtnPopupSaveInv:hover,
+QPushButton#BtnPopupSaveLabs:hover {
+    background: #00b9bd;   /* un peu plus foncé */
+}
+
+QPushButton#BtnEdit:hover,
+QPushButton#BtnReset:hover,
+QPushButton#BtnExport:hover,
+QPushButton#BtnProdEdit:hover,
+QPushButton#BtnProdExport:hover,
+QPushButton#BtnLabEdit:hover,
+QPushButton#BtnLabExport:hover,
+QPushButton#BtnPopupCancelFinance:hover,
+QPushButton#BtnPopupCancelInv:hover,
+QPushButton#BtnPopupResetLabs:hover {
+    background: #dff3f3;
+    border: 1px solid #00CED1;
+}
+
+QPushButton#BtnDelete:hover,
+QPushButton#BtnProdDelete:hover {
+    background: #ffd6d6;
+    border: 1px solid #ff6b6b;
+}
+/* ===== ACTIVE MENU BUTTON (Light) ===== */
+QPushButton#BtnEmployee:checked,
+QPushButton#BtnFinance:checked,
+QPushButton#BtnPublication:checked,
+QPushButton#BtnLabs:checked,
+QPushButton#BtnInventory:checked,
+QPushButton#BtnPlans:checked {
+    background: #e0f7f7;
+    border: 2px solid #00CED1;
+    color: #004D40;
+    font-weight: 700;
+}
