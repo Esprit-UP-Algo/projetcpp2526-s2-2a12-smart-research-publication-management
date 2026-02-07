@@ -1,0 +1,82 @@
+QWidget#AppRoot { background: #0e1214; font-family: "Consolas"; color: #dbeaea; }
+
+QFrame#Sidebar { background: #10181a; border-right: 1px solid #223033; }
+QLabel#AppLogo { font-size: 26px; font-weight: 900; color: #7FFFD4; padding: 6px 0; }
+
+QLineEdit#SideSearch { background: #0f1719; border: 1px solid #223033; border-radius: 12px; padding: 8px 10px; color: #dbeaea; }
+
+QPushButton#BtnEmployee, QPushButton#BtnFinance, QPushButton#BtnPublication, QPushButton#BtnLabs, QPushButton#BtnInventory, QPushButton#BtnPlans, QPushButton#BtnLogout {
+    background: #0f1719; border: 1px solid #223033; border-radius: 14px; padding: 10px 12px; text-align: left; color: #dbeaea;
+}
+QPushButton#BtnEmployee:hover, QPushButton#BtnFinance:hover, QPushButton#BtnPublication:hover, QPushButton#BtnLabs:hover, QPushButton#BtnInventory:hover, QPushButton#BtnPlans:hover {
+    border: 1px solid #00CED1;
+}
+
+QToolButton#BtnTheme { background: #00CED1; color: #0e1214; border: none; border-radius: 12px; padding: 10px 12px; }
+
+QFrame#CardFilter, QFrame#CardTable, QFrame#CardStats, QFrame#InvCardFilter, QFrame#InvCardTable, QFrame#InvCardAlerts, QFrame#LabsCardFilter, QFrame#LabsCardTable, QFrame#LabsCardStats {
+    background: #0f1719; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px;
+}
+QLabel#TableTitle, QLabel#InvTitle, QLabel#StatsTitle, QLabel#LabsTitle, QLabel#LabsStatsTitle, QLabel#PopupTitleFinance, QLabel#PopupTitleInv, QLabel#PopupTitleLabs { font-weight: 800; color: #7FFFD4; font-size: 16px; }
+
+QLineEdit, QComboBox, QDateEdit { background: #0e1214; border: 1px solid #223033; border-radius: 12px; padding: 8px 10px; color: #dbeaea; }
+QLineEdit:focus, QComboBox:focus, QDateEdit:focus { border: 1px solid #00CED1; }
+
+QPushButton#BtnAdd, QPushButton#BtnApply, QPushButton#BtnProdAdd, QPushButton#BtnLabAdd, QPushButton#BtnLabsApply, QPushButton#BtnPopupSaveFinance, QPushButton#BtnPopupSaveInv, QPushButton#BtnPopupSaveLabs {
+    background: #00CED1; color: #0e1214; border: none; border-radius: 12px; padding: 8px 12px;
+}
+QPushButton#BtnEdit, QPushButton#BtnReset, QPushButton#BtnExport, QPushButton#BtnProdEdit, QPushButton#BtnProdExport, QPushButton#BtnLabEdit, QPushButton#BtnLabExport, QPushButton#BtnPopupCancelFinance, QPushButton#BtnPopupCancelInv, QPushButton#BtnPopupResetLabs {
+    background: #132022; border: 1px solid #223033; border-radius: 12px; padding: 8px 12px; color: #dbeaea;
+}
+QPushButton#BtnDelete, QPushButton#BtnProdDelete { background: #2a1414; border: 1px solid #5a2a2a; border-radius: 12px; padding: 8px 12px; color: #ffd4d4; }
+
+QHeaderView::section { background: #10181a; border: none; padding: 8px; font-weight: 700; color: #7FFFD4; }
+
+QFrame#OverlayFinance, QFrame#OverlayInv { background: rgba(0,0,0,0.55); }
+QFrame#PopupFinanceCard, QFrame#PopupInvCard, QFrame#PopupLabsCard { background: #0f1719; border: 1px solid rgba(255,255,255,0.10); border-radius: 18px; }
+/* ===== Hover for action buttons (Dark) ===== */
+QPushButton#BtnAdd:hover,
+QPushButton#BtnApply:hover,
+QPushButton#BtnProdAdd:hover,
+QPushButton#BtnLabAdd:hover,
+QPushButton#BtnLabsApply:hover,
+QPushButton#BtnPopupSaveFinance:hover,
+QPushButton#BtnPopupSaveInv:hover,
+QPushButton#BtnPopupSaveLabs:hover {
+    background: #00b9bd;  /* plus bright */
+    color: #0e1214;
+}
+
+QPushButton#BtnEdit:hover,
+QPushButton#BtnReset:hover,
+QPushButton#BtnExport:hover,
+QPushButton#BtnProdEdit:hover,
+QPushButton#BtnProdExport:hover,
+QPushButton#BtnLabEdit:hover,
+QPushButton#BtnLabExport:hover,
+QPushButton#BtnPopupCancelFinance:hover,
+QPushButton#BtnPopupCancelInv:hover,
+QPushButton#BtnPopupResetLabs:hover {
+    background: #1a2a2d;
+    border: 1px solid #00CED1;
+}
+
+QPushButton#BtnDelete:hover,
+QPushButton#BtnProdDelete:hover {
+    background: #3a1a1a;
+    border: 1px solid #ff6b6b;
+    color: #ffd4d4;
+}
+/* ===== ACTIVE MENU BUTTON (Dark) ===== */
+QPushButton#BtnEmployee:checked,
+QPushButton#BtnFinance:checked,
+QPushButton#BtnPublication:checked,
+QPushButton#BtnLabs:checked,
+QPushButton#BtnInventory:checked,
+QPushButton#BtnPlans:checked {
+    background: #132022;
+    border: 2px solid #00CED1;
+    color: #7FFFD4;
+    font-weight: 700;
+}
+
