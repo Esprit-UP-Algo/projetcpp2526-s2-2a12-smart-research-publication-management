@@ -42,6 +42,34 @@ private slots:
     void on_BtnPopupSaveLabs_clicked();
     void on_BtnPopupResetLabs_clicked();
 
+    void on_pushButton_14_clicked();
+
+    void on_pushButton_13_clicked();
+
+    void on_ADD_user_clicked();
+
+    void on_pushButton_12_clicked();
+
+    void on_pushButton_37_clicked();
+
+    void on_pushButton_36_clicked();
+
+    void on_pushButton_34_clicked();
+
+    void on_pushButton_33_clicked();
+
+    void on_Update_R_clicked();
+
+    void on_pushButton_11_clicked();
+
+    void on_Cancel_clicked();
+
+    void on_Delete_clicked();
+
+    void on_PDF_clicked();
+
+    void on_pushButton_10_clicked();
+
 private:
     void applyTheme(const QString& qssPath);
 

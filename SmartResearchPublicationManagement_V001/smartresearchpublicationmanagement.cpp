@@ -84,3 +84,75 @@ void SmartResearchPublicationManagement::on_BtnPopupSaveFinance_clicked()
 
 
 
+
+void SmartResearchPublicationManagement::on_ADD_user_clicked()
+{
+    ui->Pages->setCurrentWidget(ui->add);
+}
+
+
+void SmartResearchPublicationManagement::on_pushButton_12_clicked()
+{
+     ui->Pages->setCurrentWidget(ui->Update);
+}
+
+
+void SmartResearchPublicationManagement::on_pushButton_37_clicked()
+{
+    QMessageBox::information(this, "OK", "Infos updated");
+}
+
+
+void SmartResearchPublicationManagement::on_pushButton_36_clicked()
+{
+    ui->Pages->setCurrentWidget(ui->PageEmployee);
+}
+
+
+void SmartResearchPublicationManagement::on_pushButton_34_clicked()
+{
+    ui->Pages->setCurrentWidget(ui->PageEmployee);
+}
+
+
+void SmartResearchPublicationManagement::on_pushButton_33_clicked()
+{
+    QMessageBox::information(this, "OK", "user added");
+}
+
+
+void SmartResearchPublicationManagement::on_Update_R_clicked()
+{
+    ui->Pages->setCurrentWidget(ui->Update);
+}
+
+
+void SmartResearchPublicationManagement::on_pushButton_11_clicked()
+{
+    ui->Pages->setCurrentWidget(ui->Read);
+}
+
+
+void SmartResearchPublicationManagement::on_Cancel_clicked()
+{
+    ui->Pages->setCurrentWidget(ui->PageEmployee);
+}
+
+
+void SmartResearchPublicationManagement::on_Delete_clicked()
+{
+    QMessageBox::information(this, "OK", "user deleted");
+}
+
+
+void SmartResearchPublicationManagement::on_PDF_clicked()
+{
+    QMessageBox::information(this, "OK", "Pdf");
+}
+
+
+void SmartResearchPublicationManagement::on_pushButton_10_clicked()
+{
+    QMessageBox::information(this, "OK", "user deleted");
+}
+
