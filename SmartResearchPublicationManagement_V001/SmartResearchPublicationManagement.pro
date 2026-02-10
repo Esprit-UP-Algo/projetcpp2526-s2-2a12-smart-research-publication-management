@@ -6,13 +6,16 @@ TEMPLATE = app
 TARGET = SmartResearchPublicationManagement
 
 SOURCES += \
+    logindialog.cpp \
     main.cpp \
     smartresearchpublicationmanagement.cpp
 
 HEADERS += \
+    logindialog.h \
     smartresearchpublicationmanagement.h
 
 FORMS += \
+    logindialog.ui \
     smartresearchpublicationmanagement.ui
 
 RESOURCES += \

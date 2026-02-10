@@ -2,6 +2,7 @@
 #define SMARTRESEARCHPUBLICATIONMANAGEMENT_H
 
 #include <QMainWindow>
+#include <QMessageBox>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class SmartResearchPublicationManagement; }
@@ -12,12 +13,15 @@ class SmartResearchPublicationManagement : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit SmartResearchPublicationManagement(QWidget *parent = nullptr);
+    SmartResearchPublicationManagement(QWidget *parent = nullptr);
     ~SmartResearchPublicationManagement();
 
 private slots:
+    // --- Système ---
+    void on_btnLoginSubmit_clicked(); // Déclaré UNE SEULE FOIS ici
     void on_BtnTheme_clicked();
 
+    // --- Navigation Principale (Menu Gauche) ---
     void on_BtnEmployee_clicked();
     void on_BtnFinance_clicked();
     void on_BtnPublication_clicked();
@@ -25,56 +29,45 @@ private slots:
     void on_BtnInventory_clicked();
     void on_BtnPlans_clicked();
 
+    // --- Logique Finance ---
     void on_BtnAdd_clicked();
     void on_BtnEdit_clicked();
     void on_BtnPopupCancelFinance_clicked();
     void on_BtnPopupSaveFinance_clicked();
 
-    void on_BtnProdAdd_clicked();
-    void on_BtnProdEdit_clicked();
-    void on_BtnPopupCancelInv_clicked();
-    void on_BtnPopupSaveInv_clicked();
-
-
-    void on_BtnLabAdd_clicked();
-    void on_BtnLabEdit_clicked();
-    void on_BtnPopupCancelLabs_clicked();
-    void on_BtnPopupSaveLabs_clicked();
-    void on_BtnPopupResetLabs_clicked();
-
-    void on_pushButton_14_clicked();
-
+    // --- Logique Gestion Employés ---
+    void on_BtnEmployee_2_clicked();
+    void on_ADD_user_2_clicked();
     void on_pushButton_13_clicked();
-
-    void on_ADD_user_clicked();
-
-    void on_pushButton_12_clicked();
-
-    void on_pushButton_37_clicked();
-
+    void on_pushButton_14_clicked();
+    void on_pushButton_15_clicked();
+    void on_pushButton_34_clicked(); // Retour détails
+    void on_pushButton_35_clicked();
     void on_pushButton_36_clicked();
+    void on_pushButton_37_clicked();
+    void on_pushButton_39_clicked(); // Save update
+    void on_pushButton_40_clicked();
+    void on_Cancel_2_clicked();      // Annuler ajout
+    void on_Update_R_2_clicked();    // Confirmer ajout
+    void on_btnCancelUpdate_clicked();
 
-    void on_pushButton_34_clicked();
+    void on_btnLogin_clicked();
 
-    void on_pushButton_33_clicked();
+    void on_BtnLogout_clicked();
 
-    void on_Update_R_clicked();
 
-    void on_pushButton_11_clicked();
+    void on_pushButton_clicked();
 
-    void on_Cancel_clicked();
-
-    void on_Delete_clicked();
-
-    void on_PDF_clicked();
-
-    void on_pushButton_10_clicked();
+    void on_Quitter_clicked();
 
 private:
-    void applyTheme(const QString& qssPath);
-
     Ui::SmartResearchPublicationManagement *ui;
     bool m_dark = false;
+
+    // Fonctions utilitaires (Méthodes, pas des slots)
+    void applyTheme(const QString& qssPath);
+    void goToUpdatePage();
+    void returnToList();
 };
 
-#endif
+#endif // SMARTRESEARCHPUBLICATIONMANAGEMENT_H

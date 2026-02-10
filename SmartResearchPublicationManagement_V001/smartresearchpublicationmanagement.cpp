@@ -1,9 +1,8 @@
 #include "smartresearchpublicationmanagement.h"
 #include "ui_smartresearchpublicationmanagement.h"
-
 #include <QFile>
-#include <QMessageBox>
 #include <QDate>
+#include <QDebug>
 
 SmartResearchPublicationManagement::SmartResearchPublicationManagement(QWidget *parent)
     : QMainWindow(parent)
@@ -11,26 +10,31 @@ SmartResearchPublicationManagement::SmartResearchPublicationManagement(QWidget *
 {
     ui->setupUi(this);
 
-
+    // Initialisation Thème
     applyTheme(":/styles/light.qss");
 
-    ui->Pages->setCurrentWidget(ui->PageFinance);
-    ui->FinanceStack->setCurrentIndex(0);
+    // 1. DÉMARRAGE : Afficher la page Login (Index 1 selon votre code)
+    ui->Pages->setCurrentIndex(2);
 
+    // 3. INITIALISATION DES AUTRES STACKS
+    if(ui->EmployeeStack) ui->EmployeeStack->setCurrentIndex(0);
+    if(ui->FinanceStack) ui->FinanceStack->setCurrentIndex(0);
+    // Remplissage des ComboBox Finance
     ui->CbType->addItems({"Tous","Dépense","Revenu"});
     ui->CbCategory->addItems({"Toutes","Matériel","Service","Transport","Autre"});
-
     ui->FormType->addItems({"Dépense","Revenu"});
     ui->FormCategory->addItems({"Matériel","Service","Transport","Autre"});
     ui->FormPayMode->addItems({"Cash","Carte","Virement","Chèque"});
-
 }
+
+
 
 SmartResearchPublicationManagement::~SmartResearchPublicationManagement()
 {
     delete ui;
 }
 
+// --- Système de Thème ---
 void SmartResearchPublicationManagement::applyTheme(const QString& qssPath)
 {
     QFile f(qssPath);
@@ -46,6 +50,7 @@ void SmartResearchPublicationManagement::on_BtnTheme_clicked()
     applyTheme(m_dark ? QString(":/styles/dark.qss") : QString(":/styles/light.qss"));
 }
 
+// --- Navigation Menu Principal ---
 void SmartResearchPublicationManagement::on_BtnEmployee_clicked(){ ui->Pages->setCurrentWidget(ui->PageEmployee); }
 void SmartResearchPublicationManagement::on_BtnFinance_clicked(){ ui->Pages->setCurrentWidget(ui->PageFinance); }
 void SmartResearchPublicationManagement::on_BtnPublication_clicked(){ ui->Pages->setCurrentWidget(ui->PagePublication); }
@@ -53,16 +58,14 @@ void SmartResearchPublicationManagement::on_BtnLabs_clicked(){ ui->Pages->setCur
 void SmartResearchPublicationManagement::on_BtnInventory_clicked(){ ui->Pages->setCurrentWidget(ui->PageInventory); }
 void SmartResearchPublicationManagement::on_BtnPlans_clicked(){ ui->Pages->setCurrentWidget(ui->PagePlans); }
 
+// --- Gestion Finance ---
 void SmartResearchPublicationManagement::on_BtnAdd_clicked()
 {
     ui->FinanceStack->setCurrentIndex(1);
     ui->PopupTitleFinance->setText("Ajouter une transaction");
-
     ui->FormCode->clear();
     ui->FormAmount->clear();
-    ui->FormDesc->clear();
     ui->FormDate->setDate(QDate::currentDate());
-    ui->FormCreatedAt->setDate(QDate::currentDate());
 }
 
 void SmartResearchPublicationManagement::on_BtnEdit_clicked()
@@ -71,88 +74,106 @@ void SmartResearchPublicationManagement::on_BtnEdit_clicked()
     ui->PopupTitleFinance->setText("Modifier la transaction");
 }
 
-void SmartResearchPublicationManagement::on_BtnPopupCancelFinance_clicked()
-{
-    ui->FinanceStack->setCurrentIndex(0);
-}
+void SmartResearchPublicationManagement::on_BtnPopupCancelFinance_clicked() { ui->FinanceStack->setCurrentIndex(0); }
 
 void SmartResearchPublicationManagement::on_BtnPopupSaveFinance_clicked()
 {
     ui->FinanceStack->setCurrentIndex(0);
-    QMessageBox::information(this, "OK", "Transaction enregistrée (démo).");
+    QMessageBox::information(this, "OK", "Transaction enregistrée.");
+}
+
+// --- Gestion Employés (Anciennement dans usermang.cpp) ---
+void SmartResearchPublicationManagement::on_BtnEmployee_2_clicked() { returnToList(); }
+
+void SmartResearchPublicationManagement::on_ADD_user_2_clicked() { ui->EmployeeStack->setCurrentIndex(2); }
+
+void SmartResearchPublicationManagement::on_pushButton_13_clicked() // Modifier
+{
+    if (ui->tableWidget_2->currentRow() < 0) {
+        QMessageBox::warning(this, "Erreur", "Sélectionnez un employé.");
+        return;
+    }
+    goToUpdatePage();
+}
+
+void SmartResearchPublicationManagement::on_pushButton_14_clicked() // Détails
+{
+    if (ui->tableWidget_2->currentRow() < 0) {
+        QMessageBox::warning(this, "Erreur", "Sélectionnez un employé.");
+        return;
+    }
+    ui->EmployeeStack->setCurrentIndex(3);
+}
+
+void SmartResearchPublicationManagement::on_pushButton_15_clicked() // Supprimer
+{
+    if (ui->tableWidget_2->currentRow() >= 0) {
+        if (QMessageBox::question(this, "Confirmation", "Supprimer ?", QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes) {
+            ui->tableWidget_2->removeRow(ui->tableWidget_2->currentRow());
+        }
+    }
+}
+
+void SmartResearchPublicationManagement::on_pushButton_39_clicked() // Save update
+{
+    QMessageBox::information(this, "OK", "Modifications enregistrées.");
+    returnToList();
+}
+
+void SmartResearchPublicationManagement::on_Update_R_2_clicked() // Confirmer Ajout
+{
+    QMessageBox::information(this, "OK", "Employé ajouté.");
+    returnToList();
+}
+
+// Fonctions de retour/navigation interne employé
+void SmartResearchPublicationManagement::on_pushButton_34_clicked() { returnToList(); }
+void SmartResearchPublicationManagement::on_Cancel_2_clicked() { returnToList(); }
+
+void SmartResearchPublicationManagement::goToUpdatePage() { ui->EmployeeStack->setCurrentIndex(1); }
+void SmartResearchPublicationManagement::returnToList() { ui->EmployeeStack->setCurrentIndex(0); }
+
+
+
+void SmartResearchPublicationManagement::on_pushButton_35_clicked()
+{
+    QMessageBox::information(this, "Simulation", "Employé ajouté.");
+    returnToList();
+}
+
+
+void SmartResearchPublicationManagement::on_pushButton_40_clicked()
+{
+    returnToList();
+}
+
+
+void SmartResearchPublicationManagement::on_btnCancelUpdate_clicked()
+{
+    returnToList();
+
 }
 
 
 
 
-void SmartResearchPublicationManagement::on_ADD_user_clicked()
+void SmartResearchPublicationManagement::on_BtnLogout_clicked()
 {
-    ui->Pages->setCurrentWidget(ui->add);
+
 }
 
 
-void SmartResearchPublicationManagement::on_pushButton_12_clicked()
+
+void SmartResearchPublicationManagement::on_Quitter_clicked()
 {
-     ui->Pages->setCurrentWidget(ui->Update);
-}
+    // On demande confirmation avant de fermer l'application
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Quitter", "Êtes-vous sûr de vouloir fermer l'application ?",
+                                  QMessageBox::Yes | QMessageBox::No);
 
-
-void SmartResearchPublicationManagement::on_pushButton_37_clicked()
-{
-    QMessageBox::information(this, "OK", "Infos updated");
-}
-
-
-void SmartResearchPublicationManagement::on_pushButton_36_clicked()
-{
-    ui->Pages->setCurrentWidget(ui->PageEmployee);
-}
-
-
-void SmartResearchPublicationManagement::on_pushButton_34_clicked()
-{
-    ui->Pages->setCurrentWidget(ui->PageEmployee);
-}
-
-
-void SmartResearchPublicationManagement::on_pushButton_33_clicked()
-{
-    QMessageBox::information(this, "OK", "user added");
-}
-
-
-void SmartResearchPublicationManagement::on_Update_R_clicked()
-{
-    ui->Pages->setCurrentWidget(ui->Update);
-}
-
-
-void SmartResearchPublicationManagement::on_pushButton_11_clicked()
-{
-    ui->Pages->setCurrentWidget(ui->Read);
-}
-
-
-void SmartResearchPublicationManagement::on_Cancel_clicked()
-{
-    ui->Pages->setCurrentWidget(ui->PageEmployee);
-}
-
-
-void SmartResearchPublicationManagement::on_Delete_clicked()
-{
-    QMessageBox::information(this, "OK", "user deleted");
-}
-
-
-void SmartResearchPublicationManagement::on_PDF_clicked()
-{
-    QMessageBox::information(this, "OK", "Pdf");
-}
-
-
-void SmartResearchPublicationManagement::on_pushButton_10_clicked()
-{
-    QMessageBox::information(this, "OK", "user deleted");
+    if (reply == QMessageBox::Yes) {
+        // Ferme la fenêtre principale et arrête le programme
+        this->close();
+    }
 }
 
