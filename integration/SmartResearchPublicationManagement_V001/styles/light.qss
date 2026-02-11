@@ -35,6 +35,17 @@ QPushButton#BtnEdit, QPushButton#BtnReset, QPushButton#BtnExport, QPushButton#Bt
 QPushButton#BtnDelete, QPushButton#BtnProdDelete {
     background: #ffe8e8; border: 1px solid #ffcccc; border-radius: 12px; padding: 8px 12px; color: #000000;
 }
+QPushButton#BtnDelete:hover, QPushButton#BtnProdDelete:hover {
+    background: #ffcccc;
+}
+
+QPushButton#BtnAdd:hover, QPushButton#BtnApply:hover, QPushButton#BtnProdAdd:hover, QPushButton#BtnLabAdd:hover, QPushButton#BtnLabsApply:hover, QPushButton#BtnPopupSaveFinance:hover, QPushButton#BtnPopupSaveInv:hover, QPushButton#BtnPopupSaveLabs:hover {
+    background: #00b8bb;
+}
+
+QPushButton#BtnEdit:hover, QPushButton#BtnReset:hover, QPushButton#BtnExport:hover, QPushButton#BtnProdEdit:hover, QPushButton#BtnProdExport:hover, QPushButton#BtnLabEdit:hover, QPushButton#BtnLabExport:hover, QPushButton#BtnPopupCancelFinance:hover, QPushButton#BtnPopupCancelInv:hover, QPushButton#BtnPopupResetLabs:hover {
+    background: #dbeaea;
+}
 
 QHeaderView::section {
     background: #f3fbfb; border: none; padding: 8px; font-weight: 700; color: #000000;
