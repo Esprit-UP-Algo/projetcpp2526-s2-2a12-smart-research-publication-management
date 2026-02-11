@@ -60,6 +60,8 @@ private slots:
 
     void on_Quitter_clicked();
 
+    void on_BtnLabAdd_2_clicked();
+
 private:
     Ui::SmartResearchPublicationManagement *ui;
     bool m_dark = false;

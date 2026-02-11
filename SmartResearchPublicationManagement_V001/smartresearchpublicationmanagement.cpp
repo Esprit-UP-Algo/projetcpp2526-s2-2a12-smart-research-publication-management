@@ -176,4 +176,3 @@ void SmartResearchPublicationManagement::on_Quitter_clicked()
         this->close();
     }
 }
-
