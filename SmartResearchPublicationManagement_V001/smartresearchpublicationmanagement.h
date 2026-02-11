@@ -60,7 +60,44 @@ private slots:
 
     void on_Quitter_clicked();
 
+
+    void on_btnAjouter_clicked();
+
+    void on_btnRetour_2_clicked();
+
+    void on_btnAjouter_5_clicked();
+
+    void on_btnmodifier_clicked();
+
+    void on_btnRetour_clicked();
+
+    void on_btnAjouter_2_clicked();
+
     void on_BtnLabAdd_2_clicked();
+
+    void on_BtnLabEdit_2_clicked();
+
+    void on_pushButton_2_clicked();
+
+    void on_annuleL_clicked();
+
+    void on_pushButton_5_clicked();
+
+    void on_BtnInventoryAdd_clicked();
+
+    void on_BtnInventoryEdit_clicked();
+
+    void on_BtnPopupCancelInventory_3_triggered(QAction *arg1);
+
+    void on_BtnPopupCancelInventory_2_triggered(QAction *arg1);
+
+    void on_BtnPopupCancelInventory_3_clicked();
+
+    void on_BtnPopupCancelInventory_2_clicked();
+
+    void on_BtnPopupCancelInventory_4_clicked();
+
+    void on_BtnPopupCancelInventory_5_clicked();
 
 private:
     Ui::SmartResearchPublicationManagement *ui;

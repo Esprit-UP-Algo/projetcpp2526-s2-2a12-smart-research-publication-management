@@ -20,8 +20,6 @@ SmartResearchPublicationManagement::SmartResearchPublicationManagement(QWidget *
     if(ui->EmployeeStack) ui->EmployeeStack->setCurrentIndex(0);
     if(ui->FinanceStack) ui->FinanceStack->setCurrentIndex(0);
     // Remplissage des ComboBox Finance
-    ui->CbType->addItems({"Tous","Dépense","Revenu"});
-    ui->CbCategory->addItems({"Toutes","Matériel","Service","Transport","Autre"});
     ui->FormType->addItems({"Dépense","Revenu"});
     ui->FormCategory->addItems({"Matériel","Service","Transport","Autre"});
     ui->FormPayMode->addItems({"Cash","Carte","Virement","Chèque"});
@@ -176,3 +174,106 @@ void SmartResearchPublicationManagement::on_Quitter_clicked()
         this->close();
     }
 }
+
+
+
+
+void SmartResearchPublicationManagement::on_btnAjouter_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(1);
+}
+
+
+void SmartResearchPublicationManagement::on_btnRetour_2_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+}
+
+
+void SmartResearchPublicationManagement::on_btnAjouter_5_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+}
+
+
+void SmartResearchPublicationManagement::on_btnmodifier_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(2);
+}
+
+
+void SmartResearchPublicationManagement::on_btnRetour_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+}
+
+
+void SmartResearchPublicationManagement::on_btnAjouter_2_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+}
+
+
+
+void SmartResearchPublicationManagement::on_BtnLabAdd_2_clicked()
+{
+    ui->stackedlab->setCurrentIndex(1);
+}
+
+
+void SmartResearchPublicationManagement::on_BtnLabEdit_2_clicked()
+{
+    ui->stackedlab->setCurrentIndex(2);
+}
+
+
+void SmartResearchPublicationManagement::on_annuleL_clicked()
+{
+    ui->stackedlab->setCurrentIndex(0);
+
+}
+
+
+void SmartResearchPublicationManagement::on_pushButton_5_clicked()
+{
+    ui->stackedlab->setCurrentIndex(0);
+}
+
+
+void SmartResearchPublicationManagement::on_BtnInventoryAdd_clicked()
+{
+    ui->InventoryStack->setCurrentIndex(2);
+}
+
+
+void SmartResearchPublicationManagement::on_BtnInventoryEdit_clicked()
+{
+    ui->InventoryStack->setCurrentIndex(1);
+
+}
+
+
+void SmartResearchPublicationManagement::on_BtnPopupCancelInventory_3_clicked()
+{
+    ui->InventoryStack->setCurrentIndex(0);
+}
+
+
+void SmartResearchPublicationManagement::on_BtnPopupCancelInventory_2_clicked()
+{
+    ui->InventoryStack->setCurrentIndex(0);
+
+}
+
+void SmartResearchPublicationManagement::on_BtnPopupCancelInventory_4_clicked()
+{
+    ui->stackedlab->setCurrentIndex(0);
+
+}
+
+
+void SmartResearchPublicationManagement::on_BtnPopupCancelInventory_5_clicked()
+{
+    ui->stackedlab->setCurrentIndex(0);
+}
+
