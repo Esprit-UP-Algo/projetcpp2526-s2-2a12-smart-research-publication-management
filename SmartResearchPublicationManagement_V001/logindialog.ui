@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>1206</width>
+    <height>759</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,11 +16,14 @@
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>10</y>
-     <width>381</width>
-     <height>271</height>
+     <x>10</x>
+     <y>40</y>
+     <width>1241</width>
+     <height>731</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-image: url(:/styles/pn.jpg);</string>
    </property>
    <property name="title">
     <string>GroupBox</string>
@@ -28,10 +31,10 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>-40</x>
-      <y>-30</y>
-      <width>485</width>
-      <height>131</height>
+      <x>320</x>
+      <y>80</y>
+      <width>351</width>
+      <height>91</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -47,8 +50,8 @@
    <widget class="QLineEdit" name="lePassword">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>140</y>
+      <x>480</x>
+      <y>350</y>
       <width>171</width>
       <height>81</height>
      </rect>
@@ -63,8 +66,8 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>180</y>
+      <x>330</x>
+      <y>360</y>
       <width>131</width>
       <height>20</height>
      </rect>
@@ -76,9 +79,9 @@
    <widget class="QPushButton" name="btnLogin">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>240</y>
-      <width>91</width>
+      <x>420</x>
+      <y>500</y>
+      <width>151</width>
       <height>41</height>
      </rect>
     </property>
@@ -89,8 +92,8 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>100</y>
+      <x>340</x>
+      <y>270</y>
       <width>121</width>
       <height>20</height>
      </rect>
@@ -102,8 +105,8 @@
    <widget class="QPushButton" name="Quitter">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>240</y>
+      <x>610</x>
+      <y>500</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -115,8 +118,8 @@
    <widget class="QLineEdit" name="leUsername">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>60</y>
+      <x>490</x>
+      <y>240</y>
       <width>171</width>
       <height>81</height>
      </rect>
