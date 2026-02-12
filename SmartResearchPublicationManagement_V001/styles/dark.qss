@@ -1,0 +1,123 @@
+/* ========= GLOBAL ========= */
+*{
+    font-family: "Consolas";
+    color: #bfffee;
+}
+
+QWidget#AppRoot{
+    background: qlineargradient(x1:0,y1:0,x2:1,y2:1, stop:0 #070b0c, stop:1 #0e1516);
+}
+
+/* ========= PANELS (cards) ========= */
+QFrame, QWidget{
+    background-color: transparent;
+}
+
+/* ========= LABELS ========= */
+QLabel{ color: #bfffee; }
+QLabel[class="muted"]{ color: rgba(191,255,238,160); }
+QLabel[class="title"]{ font-size: 16px; font-weight: 800; color:#7fffe8; }
+
+/* ========= GROUPBOX ========= */
+QGroupBox{
+    background: rgba(14, 22, 24, 180);
+    border: 1px solid rgba(127,255,232,55);
+    border-radius: 16px;
+    margin-top: 18px;
+    padding: 14px;
+}
+QGroupBox::title{
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 14px;
+    top: 6px;
+    padding: 2px 10px;
+    border-radius: 10px;
+    background: rgba(7,11,12,230);
+    color: #7fffe8;
+    font-weight: 900;
+}
+
+/* ========= INPUTS ========= */
+QLineEdit, QComboBox, QDateEdit, QSpinBox{
+    background: rgba(7, 11, 12, 220);
+    border: 1px solid rgba(127,255,232,55);
+    border-radius: 12px;
+    padding: 7px 10px;
+    color: #bfffee;
+}
+QLineEdit:focus, QComboBox:focus, QDateEdit:focus{
+    border: 1px solid rgba(127,255,232,150);
+}
+
+/* Combo arrow */
+QComboBox::drop-down{ border: none; width: 26px; }
+QComboBox::down-arrow{ width: 10px; height: 10px; }
+
+/* ========= BUTTONS ========= */
+QPushButton{
+    background: rgba(255,255,255,10);
+    border: 1px solid rgba(127,255,232,65);
+    border-radius: 12px;
+    padding: 8px 16px;
+    min-height: 34px;
+}
+QPushButton:hover{ background: rgba(127,255,232,14); border-color: rgba(127,255,232,140); }
+QPushButton:pressed{ background: rgba(127,255,232,22); }
+
+/* Primary */
+QPushButton[class="primary"]{
+    background: rgba(24,183,183,220);
+    color: #071010;
+    border: none;
+    font-weight: 900;
+}
+QPushButton[class="primary"]:hover{ background: rgba(24,183,183,255); }
+
+/* Danger */
+QPushButton[class="danger"]{
+    background: rgba(180, 40, 40, 210);
+    color: white;
+    border: none;
+    font-weight: 900;
+}
+QPushButton[class="danger"]:hover{ background: rgba(200, 50, 50, 255); }
+
+/* ========= TABLE ========= */
+QTableWidget, QTableView{
+    background: rgba(7, 11, 12, 210);
+    border: 1px solid rgba(127,255,232,45);
+    border-radius: 16px;
+    gridline-color: rgba(127,255,232,18);
+    selection-background-color: rgba(127,255,232,24);
+    selection-color: #eafffb;
+    outline: 0;
+}
+QTableWidget::item, QTableView::item{
+    padding: 7px 10px;
+    border: none;
+}
+QHeaderView::section{
+    background: rgba(14, 22, 24, 230);
+    color: #7fffe8;
+    font-weight: 900;
+    border: none;
+    border-bottom: 1px solid rgba(127,255,232,45);
+    padding: 9px 10px;
+}
+QTableCornerButton::section{
+    background: rgba(14, 22, 24, 230);
+    border: none;
+    border-bottom: 1px solid rgba(127,255,232,45);
+}
+
+/* ========= SCROLLBARS ========= */
+QScrollBar:vertical{ background: transparent; width: 10px; margin: 8px 3px; }
+QScrollBar::handle:vertical{ background: rgba(127,255,232,55); border-radius: 5px; min-height: 30px; }
+QScrollBar::handle:vertical:hover{ background: rgba(127,255,232,90); }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical{ height:0; background:transparent; }
+
+QScrollBar:horizontal{ background: transparent; height: 10px; margin: 3px 8px; }
+QScrollBar::handle:horizontal{ background: rgba(127,255,232,55); border-radius: 5px; min-width: 30px; }
+QScrollBar::handle:horizontal:hover{ background: rgba(127,255,232,90); }
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal{ width:0; background:transparent; }

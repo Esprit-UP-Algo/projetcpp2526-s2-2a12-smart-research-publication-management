@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LoginDialog</class>
+ <widget class="QDialog" name="LoginDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>716</width>
+    <height>478</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">/* ===== Window ===== */
+QDialog#LoginDialog {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #f4fbfb, stop:1 #e9f7f7);
+    font-family: Consolas;
+}
+
+/* ===== Glass Card ===== */
+QGroupBox#groupBox_2 {
+    background: rgba(255, 255, 255, 190);
+    border: 1px solid rgba(0, 77, 64, 40);
+    border-radius: 18px;
+}
+
+/* Title */
+QLabel#label {
+    color: #004D40;
+    font-size: 22pt;
+    font-weight: 800;
+}
+
+/* Inputs */
+QLineEdit {
+    background: rgba(255,255,255,210);
+    border: 1px solid rgba(0, 206, 209, 90);
+    border-radius: 12px;
+    padding: 10px 12px;
+    color: #123;
+    font-size: 12pt;
+}
+QLineEdit:focus {
+    border: 2px solid rgba(0, 206, 209, 180);
+}
+
+/* Small labels (Username/Password text) */
+QLabel#label_2, QLabel#label_3 {
+    color: #0e4d4d;
+    font-size: 11pt;
+}
+
+/* Buttons */
+QPushButton#btnLogin {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #00CED1, stop:1 #7FFFD4);
+    border: none;
+    border-radius: 14px;
+    padding: 10px 14px;
+    color: #002b2b;
+    font-size: 12pt;
+    font-weight: 700;
+}
+QPushButton#btnLogin:hover { opacity: 0.92; }
+
+QPushButton#Quitter {
+    background: rgba(0, 77, 64, 18);
+    border: 1px solid rgba(0, 77, 64, 60);
+    border-radius: 14px;
+    padding: 10px 14px;
+    color: #004D40;
+    font-size: 12pt;
+    font-weight: 700;
+}
+QPushButton#Quitter:hover { background: rgba(0, 77, 64, 26); }
+
+/* Logo */
+QLabel#LogoLabel {
+    background: transparent;
+}
+</string>
+  </property>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>70</y>
+     <width>431</width>
+     <height>341</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string/>
+   </property>
+   <widget class="QLineEdit" name="lePassword">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>170</y>
+      <width>171</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="echoMode">
+     <enum>QLineEdit::EchoMode::Password</enum>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+    <property name="placeholderText">
+     <string>Password</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>180</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Consolas</family>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Password</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnLogin">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>240</y>
+      <width>131</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Consolas</family>
+      <pointsize>12</pointsize>
+      <italic>true</italic>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Connect</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>100</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Consolas</family>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Username</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="Quitter">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>240</y>
+      <width>141</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Consolas</family>
+      <pointsize>12</pointsize>
+      <italic>true</italic>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Quit</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leUsername">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>90</y>
+      <width>171</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+    <property name="placeholderText">
+     <string>Username</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>0</y>
+     <width>171</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Consolas</family>
+     <pointsize>20</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string>font-size: 20pt; font-weight: bold;</string>
+   </property>
+   <property name="text">
+    <string>Log in</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="logoLabel">
+   <property name="geometry">
+    <rect>
+     <x>489</x>
+     <y>40</y>
+     <width>160</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>140</width>
+     <height>140</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>160</width>
+     <height>160</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">/* ===== Window ===== */
+QDialog#LoginDialog {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #f4fbfb, stop:1 #e9f7f7);
+    font-family: Consolas;
+}
+
+/* ===== Glass Card ===== */
+QGroupBox#groupBox_2 {
+    background: rgba(255, 255, 255, 190);
+    border: 1px solid rgba(0, 77, 64, 40);
+    border-radius: 18px;
+}
+
+/* Title */
+QLabel#label {
+    color: #004D40;
+    font-size: 22pt;
+    font-weight: 800;
+}
+
+/* Inputs */
+QLineEdit {
+    background: rgba(255,255,255,210);
+    border: 1px solid rgba(0, 206, 209, 90);
+    border-radius: 12px;
+    padding: 10px 12px;
+    color: #123;
+    font-size: 12pt;
+}
+QLineEdit:focus {
+    border: 2px solid rgba(0, 206, 209, 180);
+}
+
+/* Small labels (Username/Password text) */
+QLabel#label_2, QLabel#label_3 {
+    color: #0e4d4d;
+    font-size: 11pt;
+}
+
+/* Buttons */
+QPushButton#btnLogin {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #00CED1, stop:1 #7FFFD4);
+    border: none;
+    border-radius: 14px;
+    padding: 10px 14px;
+    color: #002b2b;
+    font-size: 12pt;
+    font-weight: 700;
+}
+QPushButton#btnLogin:hover { opacity: 0.92; }
+
+QPushButton#Quitter {
+    background: rgba(0, 77, 64, 18);
+    border: 1px solid rgba(0, 77, 64, 60);
+    border-radius: 14px;
+    padding: 10px 14px;
+    color: #004D40;
+    font-size: 12pt;
+    font-weight: 700;
+}
+QPushButton#Quitter:hover { background: rgba(0, 77, 64, 26); }
+
+/* Logo */
+QLabel#LogoLabel {
+    background: transparent;
+}
+</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>:/images/styles/images/vortex.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>479</x>
+     <y>40</y>
+     <width>151</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>120</width>
+     <height>120</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>160</width>
+     <height>160</height>
+    </size>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="resources.qrc">:/images/styles/images/logo_off.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <zorder>label</zorder>
+  <zorder>groupBox_2</zorder>
+  <zorder>logoLabel</zorder>
+  <zorder>label_4</zorder>
+ </widget>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

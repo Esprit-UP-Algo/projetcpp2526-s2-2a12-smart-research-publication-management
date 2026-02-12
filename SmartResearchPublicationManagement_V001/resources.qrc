@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/styles">
+        <file>styles/dark.qss</file>
+        <file>styles/light.qss</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file>styles/images/logo_1.png</file>
+        <file>styles/images/logo_off.png</file>
+    </qresource>
+</RCC>
