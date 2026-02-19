@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QPushButton>
+#include <QAction>
+#include <QString>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,6 +20,18 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    // //////////////////////////////////////////////////////////////////////////////////////////////////// //
+    // ===== FINANCE (Hichem) =====
+    void initFinanceUi();      // init combos + table + load
+    void setupTableFinance();
+    void loadFinance();
+    void showFinanceList();
+
+    QString idFinanceToEdit;   // IDFINANCE de la ligne sélectionnée (pour UPDATE)
+    QString idFinanceToDelete; // IDFINANCE de la ligne sélectionnée (pour DELETE)
+    // ///////////////////////////////////////////////////////////////////////////////////////////////// //
+
     void updateTopTitle(int index);
 
     void applyModernStyle();
@@ -81,6 +95,20 @@ private slots:
     void on_BtnPopupCancelLabs_7_clicked();
     void on_BtnPopupCancelLabs_8_clicked();
     void on_btnSaveEmployee_2_clicked();
+    void on_retour_statn_clicked();
+    void on_btnRetourEditProj_clicked();
+    void on_btnRetourAddProj_clicked();
+    void on_btnAjouterProj_clicked();
+    void on_btnModifierProj_clicked();
+    void on_btnVoirStatistiquesProj_clicked();
+    void on_btnFinance_clicked();
+    void on_BtnPopupSaveFinance_2_clicked();
+    void on_BtnDelete_clicked();
+    void on_BtnPopupSaveFinance_clicked();
+    void on_BtnApply_clicked();
+    void on_BtnReset_clicked();
+    void on_BtnExport_clicked();
+
 };
 
 #endif

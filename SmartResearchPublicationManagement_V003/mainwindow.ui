@@ -228,218 +228,154 @@
           <item>
            <widget class="QStackedWidget" name="stack_emp">
             <property name="currentIndex">
-             <number>3</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_Emp">
-             <widget class="QTableWidget" name="TableEmp">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>90</y>
-                <width>921</width>
-                <height>311</height>
-               </rect>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>280</height>
-               </size>
-              </property>
-              <property name="rowCount">
-               <number>9</number>
-              </property>
-              <property name="columnCount">
-               <number>9</number>
-              </property>
-              <row/>
-              <row/>
-              <row/>
-              <row/>
-              <row/>
-              <row/>
-              <row/>
-              <row/>
-              <row/>
-              <column>
-               <property name="text">
-                <string>CIN</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Nom</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Prenom</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Email</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Poste</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Departement</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Date_emb</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Salaire</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Role</string>
-               </property>
-              </column>
-             </widget>
-             <widget class="QLineEdit" name="lineSearchEmp">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>20</y>
-                <width>571</width>
-                <height>41</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="placeholderText">
-               <string>Rechercher (recherche par CIN ou role...)</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnChercher_emp">
-              <property name="geometry">
-               <rect>
-                <x>600</x>
-                <y>10</y>
-                <width>141</width>
-                <height>51</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Chercher</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnTrier_emp">
-              <property name="geometry">
-               <rect>
-                <x>940</x>
-                <y>10</y>
-                <width>201</width>
-                <height>51</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Trier par Date creation</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnExporter_emp_excel">
-              <property name="geometry">
-               <rect>
-                <x>780</x>
-                <y>10</y>
-                <width>131</width>
-                <height>51</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>exporter Excel</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnExporter_emp_excel_3">
-              <property name="geometry">
-               <rect>
-                <x>600</x>
-                <y>430</y>
-                <width>311</width>
-                <height>41</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Supprimer</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnTrier_emp_3">
-              <property name="geometry">
-               <rect>
-                <x>310</x>
-                <y>430</y>
-                <width>261</width>
-                <height>41</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Modifier employé</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnAjouterEmp">
-              <property name="geometry">
-               <rect>
-                <x>20</x>
-                <y>430</y>
-                <width>231</width>
-                <height>41</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Ajouter</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnConge_emp">
-              <property name="geometry">
-               <rect>
-                <x>960</x>
-                <y>220</y>
-                <width>181</width>
-                <height>51</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Congé</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnConge_emp_2">
-              <property name="geometry">
-               <rect>
-                <x>960</x>
-                <y>320</y>
-                <width>171</width>
-                <height>51</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Formations</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnConge_emp_3">
-              <property name="geometry">
-               <rect>
-                <x>960</x>
-                <y>100</y>
-                <width>181</width>
-                <height>61</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Voir statistique</string>
-              </property>
-             </widget>
+             <layout class="QGridLayout" name="gridLayout_4">
+              <item row="0" column="0" colspan="2">
+               <widget class="QLineEdit" name="lineSearchEmp">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="placeholderText">
+                 <string>Rechercher (recherche par CIN ou role...)</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QPushButton" name="btnChercher_emp">
+                <property name="text">
+                 <string>Chercher</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QPushButton" name="btnExporter_emp_excel">
+                <property name="text">
+                 <string>exporter Excel</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="4">
+               <widget class="QPushButton" name="btnTrier_emp">
+                <property name="text">
+                 <string>Trier par Date creation</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" rowspan="3" colspan="4">
+               <widget class="QTableWidget" name="TableEmp">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>280</height>
+                 </size>
+                </property>
+                <property name="rowCount">
+                 <number>9</number>
+                </property>
+                <property name="columnCount">
+                 <number>9</number>
+                </property>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <column>
+                 <property name="text">
+                  <string>CIN</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Nom</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Prenom</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Email</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Poste</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Departement</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Date_emb</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Salaire</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Role</string>
+                 </property>
+                </column>
+               </widget>
+              </item>
+              <item row="1" column="4">
+               <widget class="QPushButton" name="btnConge_emp_3">
+                <property name="text">
+                 <string>Voir statistique</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="4">
+               <widget class="QPushButton" name="btnConge_emp">
+                <property name="text">
+                 <string>Congé</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="4">
+               <widget class="QPushButton" name="btnConge_emp_2">
+                <property name="text">
+                 <string>Formations</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QPushButton" name="btnAjouterEmp">
+                <property name="text">
+                 <string>Ajouter</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QPushButton" name="btnTrier_emp_3">
+                <property name="text">
+                 <string>Modifier employé</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="2" colspan="2">
+               <widget class="QPushButton" name="btnExporter_emp_excel_3">
+                <property name="text">
+                 <string>Supprimer</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
             <widget class="QWidget" name="page_add_Emp">
              <widget class="QGroupBox" name="groupBox_2">
@@ -1606,327 +1542,317 @@
              <number>0</number>
             </property>
             <widget class="QWidget" name="inventory">
-             <widget class="QFrame" name="InventoryCardFilter">
-              <property name="geometry">
-               <rect>
-                <x>70</x>
-                <y>10</y>
-                <width>1101</width>
-                <height>121</height>
-               </rect>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Shape::NoFrame</enum>
-              </property>
-              <layout class="QGridLayout" name="inventoryFilterGrid">
-               <property name="leftMargin">
-                <number>16</number>
-               </property>
-               <property name="topMargin">
-                <number>16</number>
-               </property>
-               <property name="rightMargin">
-                <number>16</number>
-               </property>
-               <property name="bottomMargin">
-                <number>16</number>
-               </property>
-               <property name="horizontalSpacing">
-                <number>12</number>
-               </property>
-               <property name="verticalSpacing">
-                <number>10</number>
-               </property>
-               <item row="0" column="0">
-                <widget class="QLabel" name="LblInventorySearch">
-                 <property name="text">
-                  <string>Recherche</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QLabel" name="LblInventoryType">
-                 <property name="text">
-                  <string>Type</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="2">
-                <widget class="QLabel" name="LblInventoryStatus">
-                 <property name="text">
-                  <string>Statut</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="3">
-                <widget class="QLabel" name="LblInventoryZone">
-                 <property name="text">
-                  <string>Zone</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLineEdit" name="InventorySearch">
-                 <property name="placeholderText">
-                  <string>ID, nom, SKU…</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QComboBox" name="InventoryType"/>
-               </item>
-               <item row="1" column="2">
-                <widget class="QComboBox" name="InventoryStatus">
-                 <item>
-                  <property name="text">
-                   <string>on_hand</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Limited</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>stock_out</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-               <item row="1" column="3">
-                <widget class="QComboBox" name="InventoryZone">
-                 <item>
-                  <property name="text">
-                   <string>A</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>B</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>C</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>D</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-               <item row="1" column="4">
-                <widget class="QPushButton" name="BtnInventoryApply">
-                 <property name="text">
-                  <string>Appliquer</string>
-                 </property>
-                 <property name="property" stdset="0">
-                  <string>primary</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QFrame" name="InventoryCardTable">
-              <property name="geometry">
-               <rect>
-                <x>40</x>
-                <y>140</y>
-                <width>1141</width>
-                <height>461</height>
-               </rect>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Shape::NoFrame</enum>
-              </property>
-              <layout class="QVBoxLayout" name="inventoryTableLayout">
-               <property name="spacing">
-                <number>10</number>
-               </property>
-               <property name="leftMargin">
-                <number>16</number>
-               </property>
-               <property name="topMargin">
-                <number>16</number>
-               </property>
-               <property name="rightMargin">
-                <number>16</number>
-               </property>
-               <property name="bottomMargin">
-                <number>16</number>
-               </property>
-               <item>
-                <widget class="QTableWidget" name="TableInventory">
-                 <property name="editTriggers">
-                  <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
-                 </property>
-                 <property name="alternatingRowColors">
-                  <bool>true</bool>
-                 </property>
-                 <property name="selectionBehavior">
-                  <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-                 </property>
-                 <property name="showGrid">
-                  <bool>false</bool>
-                 </property>
-                 <property name="sortingEnabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="cornerButtonEnabled">
-                  <bool>false</bool>
-                 </property>
-                 <row/>
-                 <row/>
-                 <row/>
-                 <row/>
-                 <row/>
-                 <column>
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>SKU</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Nom</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Type</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Qt Av.</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Qt Rs.</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Seuil</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Unité</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Prix</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Zone</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Étagère</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Statut</string>
-                  </property>
-                 </column>
-                </widget>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="inventoryActions">
+             <layout class="QGridLayout" name="gridLayout_3">
+              <item row="1" column="0">
+               <widget class="QFrame" name="InventoryCardTable">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::NoFrame</enum>
+                </property>
+                <layout class="QVBoxLayout" name="inventoryTableLayout">
                  <property name="spacing">
                   <number>10</number>
                  </property>
+                 <property name="leftMargin">
+                  <number>16</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>16</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>16</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>16</number>
+                 </property>
                  <item>
-                  <widget class="QPushButton" name="BtnInventoryAdd">
+                  <widget class="QTableWidget" name="TableInventory">
+                   <property name="editTriggers">
+                    <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+                   </property>
+                   <property name="alternatingRowColors">
+                    <bool>true</bool>
+                   </property>
+                   <property name="selectionBehavior">
+                    <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+                   </property>
+                   <property name="showGrid">
+                    <bool>false</bool>
+                   </property>
+                   <property name="sortingEnabled">
+                    <bool>true</bool>
+                   </property>
+                   <property name="cornerButtonEnabled">
+                    <bool>false</bool>
+                   </property>
+                   <row/>
+                   <row/>
+                   <row/>
+                   <row/>
+                   <row/>
+                   <column>
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>SKU</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Nom</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Type</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Qt Av.</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Qt Rs.</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Seuil</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Unité</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Prix</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Zone</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Étagère</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Statut</string>
+                    </property>
+                   </column>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="inventoryActions">
+                   <property name="spacing">
+                    <number>10</number>
+                   </property>
+                   <item>
+                    <widget class="QPushButton" name="BtnInventoryAdd">
+                     <property name="text">
+                      <string>Ajouter➕</string>
+                     </property>
+                     <property name="property" stdset="0">
+                      <string>primary</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="BtnInventoryAdd_2">
+                     <property name="text">
+                      <string>Afficher</string>
+                     </property>
+                     <property name="property" stdset="0">
+                      <string>primary</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="BtnInventoryEdit">
+                     <property name="text">
+                      <string>Modifier  🖎</string>
+                     </property>
+                     <property name="property" stdset="0">
+                      <string>ghost</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="BtnInventoryDelete">
+                     <property name="text">
+                      <string>Supprimer❌</string>
+                     </property>
+                     <property name="property" stdset="0">
+                      <string>danger</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="inventorySpacer">
+                     <property name="orientation">
+                      <enum>Qt::Orientation::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="BtnInventoryAdd_5">
+                     <property name="text">
+                      <string>Statistique</string>
+                     </property>
+                     <property name="property" stdset="0">
+                      <string>primary</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="BtnInventoryExport">
+                     <property name="text">
+                      <string>Exporter PDF ⬇️</string>
+                     </property>
+                     <property name="property" stdset="0">
+                      <string>chip</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QFrame" name="InventoryCardFilter">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::NoFrame</enum>
+                </property>
+                <layout class="QGridLayout" name="inventoryFilterGrid">
+                 <property name="leftMargin">
+                  <number>16</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>16</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>16</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>16</number>
+                 </property>
+                 <property name="horizontalSpacing">
+                  <number>12</number>
+                 </property>
+                 <property name="verticalSpacing">
+                  <number>10</number>
+                 </property>
+                 <item row="1" column="0">
+                  <widget class="QLineEdit" name="InventorySearch">
+                   <property name="placeholderText">
+                    <string>ID, nom, SKU…</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QComboBox" name="InventoryStatus">
+                   <item>
+                    <property name="text">
+                     <string>on_hand</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Limited</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>stock_out</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QComboBox" name="InventoryType"/>
+                 </item>
+                 <item row="0" column="2">
+                  <widget class="QLabel" name="LblInventoryStatus">
                    <property name="text">
-                    <string>Ajouter➕</string>
+                    <string>Statut</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="LblInventorySearch">
+                   <property name="text">
+                    <string>Recherche</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="4">
+                  <widget class="QPushButton" name="BtnInventoryApply">
+                   <property name="text">
+                    <string>Appliquer</string>
                    </property>
                    <property name="property" stdset="0">
                     <string>primary</string>
                    </property>
                   </widget>
                  </item>
-                 <item>
-                  <widget class="QPushButton" name="BtnInventoryAdd_2">
+                 <item row="1" column="3">
+                  <widget class="QComboBox" name="InventoryZone">
+                   <item>
+                    <property name="text">
+                     <string>A</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>B</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>C</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>D</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="0" column="3">
+                  <widget class="QLabel" name="LblInventoryZone">
                    <property name="text">
-                    <string>Afficher</string>
-                   </property>
-                   <property name="property" stdset="0">
-                    <string>primary</string>
+                    <string>Zone</string>
                    </property>
                   </widget>
                  </item>
-                 <item>
-                  <widget class="QPushButton" name="BtnInventoryEdit">
+                 <item row="0" column="1">
+                  <widget class="QLabel" name="LblInventoryType">
                    <property name="text">
-                    <string>Modifier  🖎</string>
-                   </property>
-                   <property name="property" stdset="0">
-                    <string>ghost</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="BtnInventoryDelete">
-                   <property name="text">
-                    <string>Supprimer❌</string>
-                   </property>
-                   <property name="property" stdset="0">
-                    <string>danger</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="inventorySpacer">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="BtnInventoryAdd_5">
-                   <property name="text">
-                    <string>Statistique</string>
-                   </property>
-                   <property name="property" stdset="0">
-                    <string>primary</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="BtnInventoryExport">
-                   <property name="text">
-                    <string>Exporter PDF ⬇️</string>
-                   </property>
-                   <property name="property" stdset="0">
-                    <string>chip</string>
+                    <string>Type</string>
                    </property>
                   </widget>
                  </item>
                 </layout>
-               </item>
-              </layout>
-             </widget>
+               </widget>
+              </item>
+             </layout>
             </widget>
             <widget class="QWidget" name="ajouteri">
              <widget class="QFrame" name="PopupInventoryCard">
@@ -2613,7 +2539,7 @@
           <item>
            <widget class="QStackedWidget" name="stack_pub">
             <property name="currentIndex">
-             <number>3</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_pub_list">
              <layout class="QVBoxLayout" name="verticalLayoutPubList">
@@ -3155,709 +3081,695 @@
              <number>0</number>
             </property>
             <widget class="QWidget" name="finance">
-             <widget class="QFrame" name="CardFilter">
-              <property name="geometry">
-               <rect>
-                <x>30</x>
-                <y>20</y>
-                <width>1171</width>
-                <height>171</height>
-               </rect>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Shape::NoFrame</enum>
-              </property>
-              <layout class="QGridLayout" name="filterGrid">
-               <property name="leftMargin">
-                <number>16</number>
-               </property>
-               <property name="topMargin">
-                <number>16</number>
-               </property>
-               <property name="rightMargin">
-                <number>16</number>
-               </property>
-               <property name="bottomMargin">
-                <number>16</number>
-               </property>
-               <property name="horizontalSpacing">
-                <number>12</number>
-               </property>
-               <property name="verticalSpacing">
-                <number>10</number>
-               </property>
-               <item row="1" column="0">
-                <widget class="QComboBox" name="CbType">
-                 <item>
-                  <property name="text">
-                   <string>Choisir le type :</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Dépense</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Revenu</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-               <item row="1" column="2">
-                <widget class="QDateEdit" name="DateFrom">
-                 <property name="calendarPopup">
-                  <bool>true</bool>
+             <layout class="QGridLayout" name="gridLayout">
+              <item row="0" column="0">
+               <widget class="QFrame" name="CardFilter">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::NoFrame</enum>
+                </property>
+                <layout class="QGridLayout" name="filterGrid">
+                 <property name="leftMargin">
+                  <number>16</number>
                  </property>
-                </widget>
-               </item>
-               <item row="2" column="3">
-                <widget class="QPushButton" name="BtnReset">
-                 <property name="text">
-                  <string>Réinitialiser</string>
+                 <property name="topMargin">
+                  <number>16</number>
                  </property>
-                </widget>
-               </item>
-               <item row="0" column="3">
-                <widget class="QLabel" name="LblTo">
-                 <property name="text">
-                  <string>Au</string>
+                 <property name="rightMargin">
+                  <number>16</number>
                  </property>
-                 <property name="alignment">
-                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 <property name="bottomMargin">
+                  <number>16</number>
                  </property>
-                </widget>
-               </item>
-               <item row="0" column="2">
-                <widget class="QLabel" name="LblFrom">
-                 <property name="text">
-                  <string>Période (du)</string>
+                 <property name="horizontalSpacing">
+                  <number>12</number>
                  </property>
-                 <property name="alignment">
-                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 <property name="verticalSpacing">
+                  <number>10</number>
                  </property>
-                </widget>
-               </item>
-               <item row="2" column="2">
-                <widget class="QPushButton" name="BtnApply">
-                 <property name="text">
-                  <string>Appliquer</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0" colspan="2">
-                <widget class="QLineEdit" name="EdSearch">
-                 <property name="placeholderText">
-                  <string>Rechercher (code, catégorie, description...)</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="3">
-                <widget class="QDateEdit" name="DateTo">
-                 <property name="calendarPopup">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0">
-                <widget class="QLabel" name="LblType">
-                 <property name="text">
-                  <string>Type</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QFrame" name="CardTable">
-              <property name="geometry">
-               <rect>
-                <x>30</x>
-                <y>190</y>
-                <width>1181</width>
-                <height>421</height>
-               </rect>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Shape::NoFrame</enum>
-              </property>
-              <layout class="QVBoxLayout" name="tableCardLayout">
-               <property name="spacing">
-                <number>10</number>
-               </property>
-               <property name="leftMargin">
-                <number>16</number>
-               </property>
-               <property name="topMargin">
-                <number>16</number>
-               </property>
-               <property name="rightMargin">
-                <number>16</number>
-               </property>
-               <property name="bottomMargin">
-                <number>16</number>
-               </property>
-               <item>
-                <widget class="QLabel" name="TableTitle">
-                 <property name="text">
-                  <string>Transactions</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QTableWidget" name="TableFinance">
-                 <property name="editTriggers">
-                  <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
-                 </property>
-                 <property name="alternatingRowColors">
-                  <bool>true</bool>
-                 </property>
-                 <property name="selectionBehavior">
-                  <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-                 </property>
-                 <property name="showGrid">
-                  <bool>false</bool>
-                 </property>
-                 <property name="sortingEnabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="cornerButtonEnabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="rowCount">
-                  <number>3</number>
-                 </property>
-                 <property name="columnCount">
-                  <number>8</number>
-                 </property>
-                 <row>
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </row>
-                 <column>
-                  <property name="text">
-                   <string>CODETRANSA</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Type</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Montant en Dt</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Catégorie</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Description</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Date transaction</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Mode paiement</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Date création</string>
-                  </property>
-                 </column>
-                 <item row="0" column="0">
-                  <property name="text">
-                   <string>TRX001</string>
-                  </property>
-                 </item>
-                 <item row="0" column="1">
-                  <property name="text">
-                   <string>Dépense</string>
-                  </property>
-                 </item>
-                 <item row="0" column="2">
-                  <property name="text">
-                   <string>120.50</string>
-                  </property>
-                 </item>
-                 <item row="0" column="3">
-                  <property name="text">
-                   <string>Fournitures</string>
-                  </property>
-                 </item>
-                 <item row="0" column="4">
-                  <property name="text">
-                   <string>Achat de papier et cartouches d’encre</string>
-                  </property>
-                 </item>
-                 <item row="0" column="5">
-                  <property name="text">
-                   <string>2026-02-15</string>
-                  </property>
-                 </item>
-                 <item row="0" column="6">
-                  <property name="text">
-                   <string>carte bancaire</string>
-                  </property>
-                 </item>
-                 <item row="0" column="7">
-                  <property name="text">
-                   <string>2026-02-15</string>
-                  </property>
-                 </item>
                  <item row="1" column="0">
-                  <property name="text">
-                   <string>TRX002</string>
-                  </property>
-                 </item>
-                 <item row="1" column="1">
-                  <property name="text">
-                   <string>Revenu</string>
-                  </property>
+                  <widget class="QComboBox" name="CbType">
+                   <item>
+                    <property name="text">
+                     <string>Choisir le type :</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Dépense</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Revenu</string>
+                    </property>
+                   </item>
+                  </widget>
                  </item>
                  <item row="1" column="2">
-                  <property name="text">
-                   <string>850.00</string>
-                  </property>
-                 </item>
-                 <item row="1" column="3">
-                  <property name="text">
-                   <string>Salaire</string>
-                  </property>
-                 </item>
-                 <item row="1" column="4">
-                  <property name="text">
-                   <string>Paiement mission freelance</string>
-                  </property>
-                 </item>
-                 <item row="1" column="5">
-                  <property name="text">
-                   <string>2026-02-10</string>
-                  </property>
-                 </item>
-                 <item row="1" column="6">
-                  <property name="text">
-                   <string>virement</string>
-                  </property>
-                 </item>
-                 <item row="1" column="7">
-                  <property name="text">
-                   <string>2026-02-10</string>
-                  </property>
-                 </item>
-                 <item row="2" column="0">
-                  <property name="text">
-                   <string>TRX003</string>
-                  </property>
-                 </item>
-                 <item row="2" column="1">
-                  <property name="text">
-                   <string>Dépense</string>
-                  </property>
-                 </item>
-                 <item row="2" column="2">
-                  <property name="text">
-                   <string>60.00</string>
-                  </property>
+                  <widget class="QDateEdit" name="DateFrom">
+                   <property name="calendarPopup">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
                  </item>
                  <item row="2" column="3">
-                  <property name="text">
-                   <string>Transport</string>
-                  </property>
+                  <widget class="QPushButton" name="BtnReset">
+                   <property name="text">
+                    <string>Réinitialiser</string>
+                   </property>
+                  </widget>
                  </item>
-                 <item row="2" column="4">
-                  <property name="text">
-                   <string>Frais déplacement client</string>
-                  </property>
+                 <item row="0" column="3">
+                  <widget class="QLabel" name="LblTo">
+                   <property name="text">
+                    <string>Au</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
+                   </property>
+                  </widget>
                  </item>
-                 <item row="2" column="5">
-                  <property name="text">
-                   <string>2026-02-18</string>
-                  </property>
+                 <item row="0" column="2">
+                  <widget class="QLabel" name="LblFrom">
+                   <property name="text">
+                    <string>Période (du)</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
+                   </property>
+                  </widget>
                  </item>
-                 <item row="2" column="6">
-                  <property name="text">
-                   <string>especes</string>
-                  </property>
+                 <item row="2" column="2">
+                  <widget class="QPushButton" name="BtnApply">
+                   <property name="text">
+                    <string>Appliquer</string>
+                   </property>
+                  </widget>
                  </item>
-                 <item row="2" column="7">
-                  <property name="text">
-                   <string>2026-02-18</string>
-                  </property>
+                 <item row="2" column="0" colspan="2">
+                  <widget class="QLineEdit" name="EdSearch">
+                   <property name="placeholderText">
+                    <string>Rechercher (code, catégorie, description...)</string>
+                   </property>
+                  </widget>
                  </item>
-                </widget>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="tableActions">
+                 <item row="1" column="3">
+                  <widget class="QDateEdit" name="DateTo">
+                   <property name="calendarPopup">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="LblType">
+                   <property name="text">
+                    <string>Type</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QFrame" name="CardTable">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::NoFrame</enum>
+                </property>
+                <layout class="QVBoxLayout" name="tableCardLayout">
                  <property name="spacing">
                   <number>10</number>
                  </property>
+                 <property name="leftMargin">
+                  <number>16</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>16</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>16</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>16</number>
+                 </property>
                  <item>
-                  <widget class="QPushButton" name="BtnAdd">
+                  <widget class="QLabel" name="TableTitle">
                    <property name="text">
-                    <string>Ajouter</string>
+                    <string>Transactions</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="BtnEdit">
-                   <property name="text">
-                    <string>Modifier</string>
+                  <widget class="QTableWidget" name="TableFinance">
+                   <property name="editTriggers">
+                    <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
                    </property>
+                   <property name="alternatingRowColors">
+                    <bool>true</bool>
+                   </property>
+                   <property name="selectionBehavior">
+                    <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+                   </property>
+                   <property name="showGrid">
+                    <bool>false</bool>
+                   </property>
+                   <property name="sortingEnabled">
+                    <bool>true</bool>
+                   </property>
+                   <property name="cornerButtonEnabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="rowCount">
+                    <number>3</number>
+                   </property>
+                   <property name="columnCount">
+                    <number>8</number>
+                   </property>
+                   <row>
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </row>
+                   <row>
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </row>
+                   <row>
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </row>
+                   <column>
+                    <property name="text">
+                     <string>CODETRANSA</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Type</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Montant en Dt</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Catégorie</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Description</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Date transaction</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Mode paiement</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Date création</string>
+                    </property>
+                   </column>
+                   <item row="0" column="0">
+                    <property name="text">
+                     <string>TRX001</string>
+                    </property>
+                   </item>
+                   <item row="0" column="1">
+                    <property name="text">
+                     <string>Dépense</string>
+                    </property>
+                   </item>
+                   <item row="0" column="2">
+                    <property name="text">
+                     <string>120.50</string>
+                    </property>
+                   </item>
+                   <item row="0" column="3">
+                    <property name="text">
+                     <string>Fournitures</string>
+                    </property>
+                   </item>
+                   <item row="0" column="4">
+                    <property name="text">
+                     <string>Achat de papier et cartouches d’encre</string>
+                    </property>
+                   </item>
+                   <item row="0" column="5">
+                    <property name="text">
+                     <string>2026-02-15</string>
+                    </property>
+                   </item>
+                   <item row="0" column="6">
+                    <property name="text">
+                     <string>carte bancaire</string>
+                    </property>
+                   </item>
+                   <item row="0" column="7">
+                    <property name="text">
+                     <string>2026-02-15</string>
+                    </property>
+                   </item>
+                   <item row="1" column="0">
+                    <property name="text">
+                     <string>TRX002</string>
+                    </property>
+                   </item>
+                   <item row="1" column="1">
+                    <property name="text">
+                     <string>Revenu</string>
+                    </property>
+                   </item>
+                   <item row="1" column="2">
+                    <property name="text">
+                     <string>850.00</string>
+                    </property>
+                   </item>
+                   <item row="1" column="3">
+                    <property name="text">
+                     <string>Salaire</string>
+                    </property>
+                   </item>
+                   <item row="1" column="4">
+                    <property name="text">
+                     <string>Paiement mission freelance</string>
+                    </property>
+                   </item>
+                   <item row="1" column="5">
+                    <property name="text">
+                     <string>2026-02-10</string>
+                    </property>
+                   </item>
+                   <item row="1" column="6">
+                    <property name="text">
+                     <string>virement</string>
+                    </property>
+                   </item>
+                   <item row="1" column="7">
+                    <property name="text">
+                     <string>2026-02-10</string>
+                    </property>
+                   </item>
+                   <item row="2" column="0">
+                    <property name="text">
+                     <string>TRX003</string>
+                    </property>
+                   </item>
+                   <item row="2" column="1">
+                    <property name="text">
+                     <string>Dépense</string>
+                    </property>
+                   </item>
+                   <item row="2" column="2">
+                    <property name="text">
+                     <string>60.00</string>
+                    </property>
+                   </item>
+                   <item row="2" column="3">
+                    <property name="text">
+                     <string>Transport</string>
+                    </property>
+                   </item>
+                   <item row="2" column="4">
+                    <property name="text">
+                     <string>Frais déplacement client</string>
+                    </property>
+                   </item>
+                   <item row="2" column="5">
+                    <property name="text">
+                     <string>2026-02-18</string>
+                    </property>
+                   </item>
+                   <item row="2" column="6">
+                    <property name="text">
+                     <string>especes</string>
+                    </property>
+                   </item>
+                   <item row="2" column="7">
+                    <property name="text">
+                     <string>2026-02-18</string>
+                    </property>
+                   </item>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="BtnDelete">
-                   <property name="text">
-                    <string>Supprimer</string>
+                  <layout class="QHBoxLayout" name="tableActions">
+                   <property name="spacing">
+                    <number>10</number>
                    </property>
-                  </widget>
+                   <item>
+                    <widget class="QPushButton" name="BtnAdd">
+                     <property name="text">
+                      <string>Ajouter</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="BtnEdit">
+                     <property name="text">
+                      <string>Modifier</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="BtnDelete">
+                     <property name="text">
+                      <string>Supprimer</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="tableActionsSpacer">
+                     <property name="orientation">
+                      <enum>Qt::Orientation::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="BtnAdd_4">
+                     <property name="text">
+                      <string>Statistique</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="BtnExport">
+                     <property name="text">
+                      <string>Exporter</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="ajouterF">
+             <layout class="QGridLayout" name="gridLayout_2">
+              <item row="0" column="0">
+               <widget class="QFrame" name="OverlayFinance">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::NoFrame</enum>
+                </property>
+                <layout class="QVBoxLayout" name="overlayFinanceLayout">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
                  <item>
-                  <spacer name="tableActionsSpacer">
+                  <spacer name="ovTop">
                    <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
+                    <enum>Qt::Orientation::Vertical</enum>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
-                     <width>40</width>
-                     <height>20</height>
+                     <width>20</width>
+                     <height>40</height>
                     </size>
                    </property>
                   </spacer>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="BtnAdd_4">
-                   <property name="text">
-                    <string>Statistique</string>
+                  <widget class="QFrame" name="PopupFinanceCard">
+                   <property name="minimumSize">
+                    <size>
+                     <width>760</width>
+                     <height>260</height>
+                    </size>
                    </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="BtnExport">
-                   <property name="text">
-                    <string>Exporter</string>
+                   <property name="maximumSize">
+                    <size>
+                     <width>900</width>
+                     <height>400</height>
+                    </size>
                    </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-            </widget>
-            <widget class="QWidget" name="ajouterF">
-             <widget class="QFrame" name="OverlayFinance">
-              <property name="geometry">
-               <rect>
-                <x>130</x>
-                <y>0</y>
-                <width>1041</width>
-                <height>581</height>
-               </rect>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Shape::NoFrame</enum>
-              </property>
-              <layout class="QVBoxLayout" name="overlayFinanceLayout">
-               <property name="leftMargin">
-                <number>0</number>
-               </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>0</number>
-               </property>
-               <property name="bottomMargin">
-                <number>0</number>
-               </property>
-               <item>
-                <spacer name="ovTop">
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Vertical</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>40</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QFrame" name="PopupFinanceCard">
-                 <property name="minimumSize">
-                  <size>
-                   <width>760</width>
-                   <height>260</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>900</width>
-                   <height>400</height>
-                  </size>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::Shape::NoFrame</enum>
-                 </property>
-                 <layout class="QVBoxLayout" name="popupFinanceCardLayout">
-                  <property name="spacing">
-                   <number>12</number>
-                  </property>
-                  <property name="leftMargin">
-                   <number>16</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>16</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>16</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>16</number>
-                  </property>
-                  <item>
-                   <widget class="QLabel" name="PopupTitleFinance">
-                    <property name="text">
-                     <string>Ajouter une transaction</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <layout class="QGridLayout" name="popupFinanceGrid">
-                    <property name="horizontalSpacing">
+                   <property name="frameShape">
+                    <enum>QFrame::Shape::NoFrame</enum>
+                   </property>
+                   <layout class="QVBoxLayout" name="popupFinanceCardLayout">
+                    <property name="spacing">
                      <number>12</number>
                     </property>
-                    <property name="verticalSpacing">
-                     <number>10</number>
+                    <property name="leftMargin">
+                     <number>16</number>
                     </property>
-                    <item row="1" column="0">
-                     <widget class="QLabel" name="LblAmount">
+                    <property name="topMargin">
+                     <number>16</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>16</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>16</number>
+                    </property>
+                    <item>
+                     <widget class="QLabel" name="PopupTitleFinance">
                       <property name="text">
-                       <string>Montant</string>
+                       <string>Ajouter une transaction</string>
                       </property>
                      </widget>
                     </item>
-                    <item row="3" column="3">
-                     <widget class="QComboBox" name="FormPayMode">
-                      <item>
-                       <property name="text">
-                        <string>Especes</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>Cheque</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>Virement</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>Carte bancaire</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>Facture</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>Remboursement</string>
-                       </property>
-                      </item>
-                     </widget>
-                    </item>
-                    <item row="1" column="2">
-                     <widget class="QLabel" name="LblCat2">
-                      <property name="text">
-                       <string>Catégorie</string>
+                    <item>
+                     <layout class="QGridLayout" name="popupFinanceGrid">
+                      <property name="horizontalSpacing">
+                       <number>12</number>
                       </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="0">
-                     <widget class="QLabel" name="LblCode">
-                      <property name="text">
-                       <string>Code transaction</string>
+                      <property name="verticalSpacing">
+                       <number>10</number>
                       </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="1" colspan="3">
-                     <widget class="QLineEdit" name="FormDesc">
-                      <property name="placeholderText">
-                       <string>Détails…</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="3" column="1">
-                     <widget class="QDateEdit" name="FormDate">
-                      <property name="calendarPopup">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="0">
-                     <widget class="QLabel" name="LblDesc">
-                      <property name="text">
-                       <string>Description</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="4" column="1">
-                     <widget class="QDateEdit" name="FormCreatedAt">
-                      <property name="enabled">
-                       <bool>false</bool>
-                      </property>
-                      <property name="calendarPopup">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="3" column="0">
-                     <widget class="QLabel" name="LblDate2">
-                      <property name="text">
-                       <string>Date transaction</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="3">
-                     <widget class="QComboBox" name="FormType">
-                      <item>
-                       <property name="text">
-                        <string>Dépense</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>Revenu</string>
-                       </property>
-                      </item>
-                     </widget>
-                    </item>
-                    <item row="4" column="2" colspan="2">
-                     <layout class="QHBoxLayout" name="popupFinanceButtons">
-                      <item>
-                       <spacer name="pfSpacer">
-                        <property name="orientation">
-                         <enum>Qt::Orientation::Horizontal</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>40</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                       </spacer>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="BtnPopupSaveFinance">
+                      <item row="1" column="0">
+                       <widget class="QLabel" name="LblAmount">
                         <property name="text">
-                         <string>Enregistrer</string>
+                         <string>Montant</string>
                         </property>
                        </widget>
                       </item>
-                      <item>
-                       <widget class="QPushButton" name="BtnPopupCancelFinance">
+                      <item row="3" column="3">
+                       <widget class="QComboBox" name="FormPayMode">
+                        <item>
+                         <property name="text">
+                          <string>Especes</string>
+                         </property>
+                        </item>
+                        <item>
+                         <property name="text">
+                          <string>Cheque</string>
+                         </property>
+                        </item>
+                        <item>
+                         <property name="text">
+                          <string>Virement</string>
+                         </property>
+                        </item>
+                        <item>
+                         <property name="text">
+                          <string>Carte bancaire</string>
+                         </property>
+                        </item>
+                        <item>
+                         <property name="text">
+                          <string>Facture</string>
+                         </property>
+                        </item>
+                        <item>
+                         <property name="text">
+                          <string>Remboursement</string>
+                         </property>
+                        </item>
+                       </widget>
+                      </item>
+                      <item row="1" column="2">
+                       <widget class="QLabel" name="LblCat2">
                         <property name="text">
-                         <string>Annuler</string>
+                         <string>Catégorie</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="0" column="0">
+                       <widget class="QLabel" name="LblCode">
+                        <property name="text">
+                         <string>Code transaction</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="2" column="1" colspan="3">
+                       <widget class="QLineEdit" name="FormDesc">
+                        <property name="placeholderText">
+                         <string>Détails…</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="3" column="1">
+                       <widget class="QDateEdit" name="FormDate">
+                        <property name="calendarPopup">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="2" column="0">
+                       <widget class="QLabel" name="LblDesc">
+                        <property name="text">
+                         <string>Description</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="4" column="1">
+                       <widget class="QDateEdit" name="FormCreatedAt">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
+                        <property name="calendarPopup">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="3" column="0">
+                       <widget class="QLabel" name="LblDate2">
+                        <property name="text">
+                         <string>Date transaction</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="0" column="3">
+                       <widget class="QComboBox" name="FormType">
+                        <item>
+                         <property name="text">
+                          <string>Dépense</string>
+                         </property>
+                        </item>
+                        <item>
+                         <property name="text">
+                          <string>Revenu</string>
+                         </property>
+                        </item>
+                       </widget>
+                      </item>
+                      <item row="4" column="2" colspan="2">
+                       <layout class="QHBoxLayout" name="popupFinanceButtons">
+                        <item>
+                         <spacer name="pfSpacer">
+                          <property name="orientation">
+                           <enum>Qt::Orientation::Horizontal</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>40</width>
+                            <height>20</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                        <item>
+                         <widget class="QPushButton" name="BtnPopupSaveFinance">
+                          <property name="text">
+                           <string>Enregistrer</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QPushButton" name="BtnPopupCancelFinance">
+                          <property name="text">
+                           <string>Annuler</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                      <item row="0" column="2">
+                       <widget class="QLabel" name="LblFType">
+                        <property name="text">
+                         <string>Type</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="4" column="0">
+                       <widget class="QLabel" name="LblCreated">
+                        <property name="text">
+                         <string>Date création</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="0" column="1">
+                       <widget class="QLineEdit" name="FormCode">
+                        <property name="placeholderText">
+                         <string>ex: TRX-2026-001</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="3" column="2">
+                       <widget class="QLabel" name="LblPay">
+                        <property name="text">
+                         <string>Mode paiement</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="1">
+                       <widget class="QLineEdit" name="FormAmount">
+                        <property name="placeholderText">
+                         <string>ex: 2500</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="3">
+                       <widget class="QLineEdit" name="FormCategory">
+                        <property name="maximumSize">
+                         <size>
+                          <width>150</width>
+                          <height>16777215</height>
+                         </size>
+                        </property>
+                        <property name="placeholderText">
+                         <string/>
                         </property>
                        </widget>
                       </item>
                      </layout>
                     </item>
-                    <item row="0" column="2">
-                     <widget class="QLabel" name="LblFType">
-                      <property name="text">
-                       <string>Type</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="4" column="0">
-                     <widget class="QLabel" name="LblCreated">
-                      <property name="text">
-                       <string>Date création</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="1">
-                     <widget class="QLineEdit" name="FormCode">
-                      <property name="placeholderText">
-                       <string>ex: TRX-2026-001</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="3" column="2">
-                     <widget class="QLabel" name="LblPay">
-                      <property name="text">
-                       <string>Mode paiement</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="1">
-                     <widget class="QLineEdit" name="FormAmount">
-                      <property name="placeholderText">
-                       <string>ex: 2500</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="3">
-                     <widget class="QLineEdit" name="FormCategory">
-                      <property name="maximumSize">
-                       <size>
-                        <width>150</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                      <property name="placeholderText">
-                       <string/>
-                      </property>
-                     </widget>
-                    </item>
                    </layout>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <spacer name="ovBottom">
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Vertical</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>40</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </widget>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="ovBottom">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
             </widget>
             <widget class="QWidget" name="modifierF">
              <widget class="QFrame" name="OverlayFinance_2">
@@ -3946,87 +3858,10 @@
                     <property name="verticalSpacing">
                      <number>10</number>
                     </property>
-                    <item row="0" column="0">
-                     <widget class="QLabel" name="LblCode_2">
-                      <property name="text">
-                       <string>Code transaction</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="1">
-                     <widget class="QLineEdit" name="FormCode_2">
-                      <property name="placeholderText">
-                       <string>ex: TRX-2026-001</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="2">
-                     <widget class="QLabel" name="LblFType_2">
-                      <property name="text">
-                       <string>Type</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="3">
-                     <widget class="QComboBox" name="FormType_2">
-                      <item>
-                       <property name="text">
-                        <string>Dépense</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>Revenu</string>
-                       </property>
-                      </item>
-                     </widget>
-                    </item>
-                    <item row="1" column="0">
-                     <widget class="QLabel" name="LblAmount_2">
-                      <property name="text">
-                       <string>Montant</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="2">
-                     <widget class="QLabel" name="LblCat2_2">
-                      <property name="text">
-                       <string>Catégorie</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="0">
-                     <widget class="QLabel" name="LblDesc_2">
-                      <property name="text">
-                       <string>Description</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="1" colspan="3">
-                     <widget class="QLineEdit" name="FormDesc_2">
-                      <property name="placeholderText">
-                       <string>Détails…</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="3" column="0">
-                     <widget class="QLabel" name="LblDate2_2">
-                      <property name="text">
-                       <string>Date transaction</string>
-                      </property>
-                     </widget>
-                    </item>
                     <item row="3" column="1">
                      <widget class="QDateEdit" name="FormDate_2">
                       <property name="calendarPopup">
                        <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="3" column="2">
-                     <widget class="QLabel" name="LblPay_2">
-                      <property name="text">
-                       <string>Mode paiement</string>
                       </property>
                      </widget>
                     </item>
@@ -4064,6 +3899,40 @@
                       </item>
                      </widget>
                     </item>
+                    <item row="1" column="3">
+                     <widget class="QLineEdit" name="FormCategory_2">
+                      <property name="maximumSize">
+                       <size>
+                        <width>150</width>
+                        <height>16777215</height>
+                       </size>
+                      </property>
+                      <property name="placeholderText">
+                       <string/>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="LblCode_2">
+                      <property name="text">
+                       <string>Code transaction</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="3">
+                     <widget class="QComboBox" name="FormType_2">
+                      <item>
+                       <property name="text">
+                        <string>Dépense</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string>Revenu</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
                     <item row="4" column="0">
                      <widget class="QLabel" name="LblCreated_2">
                       <property name="text">
@@ -4071,13 +3940,45 @@
                       </property>
                      </widget>
                     </item>
-                    <item row="4" column="1">
-                     <widget class="QDateEdit" name="FormCreatedAt_2">
-                      <property name="enabled">
-                       <bool>false</bool>
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="LblAmount_2">
+                      <property name="text">
+                       <string>Montant</string>
                       </property>
-                      <property name="calendarPopup">
-                       <bool>true</bool>
+                     </widget>
+                    </item>
+                    <item row="2" column="0">
+                     <widget class="QLabel" name="LblDesc_2">
+                      <property name="text">
+                       <string>Description</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QLineEdit" name="FormCode_2">
+                      <property name="placeholderText">
+                       <string>ex: TRX-2026-001</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="2">
+                     <widget class="QLabel" name="LblPay_2">
+                      <property name="text">
+                       <string>Mode paiement</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="2">
+                     <widget class="QLabel" name="LblCat2_2">
+                      <property name="text">
+                       <string>Catégorie</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="0">
+                     <widget class="QLabel" name="LblDate2_2">
+                      <property name="text">
+                       <string>Date transaction</string>
                       </property>
                      </widget>
                     </item>
@@ -4112,14 +4013,32 @@
                       </item>
                      </layout>
                     </item>
-                    <item row="1" column="3">
-                     <widget class="QLineEdit" name="FormCategory_2">
-                      <property name="maximumSize">
-                       <size>
-                        <width>150</width>
-                        <height>16777215</height>
-                       </size>
+                    <item row="2" column="1" colspan="3">
+                     <widget class="QLineEdit" name="FormDesc_2">
+                      <property name="placeholderText">
+                       <string>Détails…</string>
                       </property>
+                     </widget>
+                    </item>
+                    <item row="4" column="1">
+                     <widget class="QDateEdit" name="FormCreatedAt_2">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
+                      <property name="calendarPopup">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="2">
+                     <widget class="QLabel" name="LblFType_2">
+                      <property name="text">
+                       <string>Type</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QLineEdit" name="FormAmount_2">
                       <property name="placeholderText">
                        <string/>
                       </property>
@@ -4239,315 +4158,217 @@
              <number>0</number>
             </property>
             <widget class="QWidget" name="Lab">
-             <widget class="QPushButton" name="btnVoirStatistiquesPub_2">
-              <property name="geometry">
-               <rect>
-                <x>1040</x>
-                <y>310</y>
-                <width>181</width>
-                <height>45</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>voir statistiques</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnSupprimerPub_2">
-              <property name="geometry">
-               <rect>
-                <x>780</x>
-                <y>540</y>
-                <width>150</width>
-                <height>45</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Supprimer</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnAjouterPub_2">
-              <property name="geometry">
-               <rect>
-                <x>380</x>
-                <y>540</y>
-                <width>150</width>
-                <height>45</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Ajouter</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnExporterPub_2">
-              <property name="geometry">
-               <rect>
-                <x>1040</x>
-                <y>220</y>
-                <width>171</width>
-                <height>45</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Exporter PDF</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnModifierPub_2">
-              <property name="geometry">
-               <rect>
-                <x>580</x>
-                <y>540</y>
-                <width>150</width>
-                <height>45</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Modifier</string>
-              </property>
-             </widget>
-             <widget class="QFrame" name="LabsCardFilter_2">
-              <property name="geometry">
-               <rect>
-                <x>100</x>
-                <y>10</y>
-                <width>1131</width>
-                <height>141</height>
-               </rect>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Shape::NoFrame</enum>
-              </property>
-              <widget class="QComboBox" name="LabsCap_2">
-               <property name="geometry">
-                <rect>
-                 <x>600</x>
-                 <y>80</y>
-                 <width>181</width>
-                 <height>31</height>
-                </rect>
-               </property>
-               <item>
-                <property name="text">
-                 <string>choisir disponibilite</string>
+             <layout class="QGridLayout" name="gridLayout_6">
+              <item row="0" column="0" rowspan="2" colspan="4">
+               <widget class="QTableWidget" name="TableLabs_2">
+                <property name="editTriggers">
+                 <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
                 </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>disponible</string>
+                <property name="alternatingRowColors">
+                 <bool>true</bool>
                 </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>occupe</string>
+                <property name="selectionBehavior">
+                 <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
                 </property>
-               </item>
-              </widget>
-              <widget class="QComboBox" name="LabsSpec_2">
-               <property name="geometry">
-                <rect>
-                 <x>350</x>
-                 <y>80</y>
-                 <width>181</width>
-                 <height>31</height>
-                </rect>
-               </property>
-               <item>
-                <property name="text">
-                 <string>choisir un specialite</string>
+                <property name="showGrid">
+                 <bool>false</bool>
                 </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>interieur</string>
+                <property name="sortingEnabled">
+                 <bool>true</bool>
                 </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>exterieur</string>
+                <property name="cornerButtonEnabled">
+                 <bool>false</bool>
                 </property>
-               </item>
-              </widget>
-              <widget class="QLabel" name="LblLabsCap_2">
-               <property name="geometry">
-                <rect>
-                 <x>600</x>
-                 <y>10</y>
-                 <width>111</width>
-                 <height>41</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>disponibilite</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="LblLabsSpec_2">
-               <property name="geometry">
-                <rect>
-                 <x>350</x>
-                 <y>10</y>
-                 <width>141</width>
-                 <height>31</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Spécialité</string>
-               </property>
-              </widget>
-              <widget class="QLineEdit" name="LabsSearch_2">
-               <property name="geometry">
-                <rect>
-                 <x>15</x>
-                 <y>80</y>
-                 <width>301</width>
-                 <height>28</height>
-                </rect>
-               </property>
-               <property name="placeholderText">
-                <string>nom, responsable, localisation, numéro…</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="LblLabsSearch_2">
-               <property name="geometry">
-                <rect>
-                 <x>15</x>
-                 <y>10</y>
-                 <width>131</width>
-                 <height>31</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Recherche</string>
-               </property>
-              </widget>
-              <widget class="QPushButton" name="btnReinitialiserPub_3">
-               <property name="geometry">
-                <rect>
-                 <x>950</x>
-                 <y>80</y>
-                 <width>151</width>
-                 <height>45</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Réinitialiser</string>
-               </property>
-              </widget>
-              <widget class="QPushButton" name="btnAppliquerPub_3">
-               <property name="geometry">
-                <rect>
-                 <x>950</x>
-                 <y>10</y>
-                 <width>151</width>
-                 <height>45</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Appliquer</string>
-               </property>
-              </widget>
-             </widget>
-             <widget class="QTableWidget" name="TableLabs_2">
-              <property name="geometry">
-               <rect>
-                <x>100</x>
-                <y>160</y>
-                <width>931</width>
-                <height>363</height>
-               </rect>
-              </property>
-              <property name="editTriggers">
-               <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
-              </property>
-              <property name="alternatingRowColors">
-               <bool>true</bool>
-              </property>
-              <property name="selectionBehavior">
-               <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-              </property>
-              <property name="showGrid">
-               <bool>false</bool>
-              </property>
-              <property name="sortingEnabled">
-               <bool>true</bool>
-              </property>
-              <property name="cornerButtonEnabled">
-               <bool>false</bool>
-              </property>
-              <row/>
-              <row/>
-              <row/>
-              <row/>
-              <column>
-               <property name="text">
-                <string/>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Nom Labo</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Responsable</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Numéro</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Localisation</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>disponibilite</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Spécialité</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Capacité</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>QR Code</string>
-               </property>
-              </column>
-             </widget>
-             <widget class="QPushButton" name="btnAjouterPub_3">
-              <property name="geometry">
-               <rect>
-                <x>180</x>
-                <y>540</y>
-                <width>150</width>
-                <height>45</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Afficher</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnAjouterPub_4">
-              <property name="geometry">
-               <rect>
-                <x>1050</x>
-                <y>420</y>
-                <width>150</width>
-                <height>45</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Maps</string>
-              </property>
-             </widget>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <column>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Nom Labo</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Responsable</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Numéro</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Localisation</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>disponibilite</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Spécialité</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Capacité</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>QR Code</string>
+                 </property>
+                </column>
+               </widget>
+              </item>
+              <item row="0" column="4">
+               <widget class="QPushButton" name="btnExporterPub_2">
+                <property name="text">
+                 <string>Exporter PDF</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="4">
+               <widget class="QPushButton" name="btnVoirStatistiquesPub_2">
+                <property name="text">
+                 <string>voir statistiques</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="4">
+               <widget class="QPushButton" name="btnAjouterPub_4">
+                <property name="text">
+                 <string>Maps</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QPushButton" name="btnAjouterPub_3">
+                <property name="text">
+                 <string>Afficher</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QPushButton" name="btnAjouterPub_2">
+                <property name="text">
+                 <string>Ajouter</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="2">
+               <widget class="QPushButton" name="btnModifierPub_2">
+                <property name="text">
+                 <string>Modifier</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="3">
+               <widget class="QPushButton" name="btnSupprimerPub_2">
+                <property name="text">
+                 <string>Supprimer</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0" colspan="4">
+               <widget class="QFrame" name="LabsCardFilter_2">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::NoFrame</enum>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_5">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="LblLabsSearch_2">
+                   <property name="text">
+                    <string>Recherche</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLabel" name="LblLabsSpec_2">
+                   <property name="text">
+                    <string>Spécialité</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="2">
+                  <widget class="QLabel" name="LblLabsCap_2">
+                   <property name="text">
+                    <string>disponibilite</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="3">
+                  <widget class="QPushButton" name="btnAppliquerPub_3">
+                   <property name="text">
+                    <string>Appliquer</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLineEdit" name="LabsSearch_2">
+                   <property name="placeholderText">
+                    <string>nom, responsable, localisation, numéro…</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QComboBox" name="LabsSpec_2">
+                   <item>
+                    <property name="text">
+                     <string>choisir un specialite</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>interieur</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>exterieur</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QComboBox" name="LabsCap_2">
+                   <item>
+                    <property name="text">
+                     <string>choisir disponibilite</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>disponible</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>occupe</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="1" column="3">
+                  <widget class="QPushButton" name="btnReinitialiserPub_3">
+                   <property name="text">
+                    <string>Réinitialiser</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
             </widget>
             <widget class="QWidget" name="modifierL">
              <widget class="QFrame" name="PopupLabsCard_4">
@@ -5164,15 +4985,507 @@
          </layout>
         </widget>
         <widget class="QWidget" name="pageProjets">
-         <layout class="QVBoxLayout" name="verticalLayoutPage5">
+         <layout class="QVBoxLayout" name="verticalLayoutProjRoot">
           <item>
-           <widget class="QLabel" name="labelProjets">
-            <property name="text">
-             <string>Projets Page</string>
+           <widget class="QStackedWidget" name="stack_proj">
+            <property name="currentIndex">
+             <number>0</number>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignCenter</set>
-            </property>
+            <widget class="QWidget" name="page_proj_list">
+             <layout class="QVBoxLayout" name="verticalLayoutProjList">
+              <property name="spacing">
+               <number>12</number>
+              </property>
+              <item>
+               <widget class="QLineEdit" name="lineSearchProj">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="placeholderText">
+                 <string>Rechercher (recherche par DOI...)</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QGridLayout" name="gridLayoutProjFilters">
+                <property name="horizontalSpacing">
+                 <number>14</number>
+                </property>
+                <property name="verticalSpacing">
+                 <number>10</number>
+                </property>
+                <item row="1" column="1">
+                 <widget class="QDateEdit" name="dateDuProj">
+                  <property name="calendarPopup">
+                   <bool>true</bool>
+                  </property>
+                  <property name="date">
+                   <date>
+                    <year>2000</year>
+                    <month>1</month>
+                    <day>1</day>
+                   </date>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QComboBox" name="comboCategorieProj">
+                  <item>
+                   <property name="text">
+                    <string>date</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>titre</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QPushButton" name="btnAppliquerProj">
+                  <property name="text">
+                   <string>Appliquer</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="lblCategorieProj">
+                  <property name="text">
+                   <string>TRIER PAR :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="lblPeriodeDuProj">
+                  <property name="text">
+                   <string>DATE</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QTableWidget" name="tableProjets">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>280</height>
+                 </size>
+                </property>
+                <property name="rowCount">
+                 <number>9</number>
+                </property>
+                <property name="columnCount">
+                 <number>8</number>
+                </property>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <column>
+                 <property name="text">
+                  <string>nom_Projet </string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>description</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>objectifs  </string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>date_Début    </string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>date_Fin_Prevue  </string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>date_Fin_Reelle  </string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>statut  </string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>priorite </string>
+                 </property>
+                </column>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayoutProjBottom">
+                <property name="spacing">
+                 <number>12</number>
+                </property>
+                <item>
+                 <widget class="QPushButton" name="btnAjouterProj">
+                  <property name="text">
+                   <string>Ajouter</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btnModifierProj">
+                  <property name="text">
+                   <string>Modifier</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btnSupprimerProj">
+                  <property name="text">
+                   <string>Supprimer</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacerProjBottom">
+                  <property name="orientation">
+                   <enum>Qt::Orientation::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>360</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btnVoirStatistiquesProj">
+                  <property name="text">
+                   <string>voir statistiques</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="page_proj_add">
+             <layout class="QGridLayout" name="gridLayoutProjAdd">
+              <property name="leftMargin">
+               <number>60</number>
+              </property>
+              <property name="topMargin">
+               <number>28</number>
+              </property>
+              <property name="rightMargin">
+               <number>60</number>
+              </property>
+              <property name="bottomMargin">
+               <number>28</number>
+              </property>
+              <property name="horizontalSpacing">
+               <number>40</number>
+              </property>
+              <property name="verticalSpacing">
+               <number>20</number>
+              </property>
+              <item row="6" column="0" colspan="4">
+               <layout class="QHBoxLayout" name="hLayoutAddButtons">
+                <item>
+                 <spacer name="spacerAddButtons">
+                  <property name="orientation">
+                   <enum>Qt::Orientation::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>480</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btnAddProj">
+                  <property name="text">
+                   <string>Ajouter</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btnRetourAddProj">
+                  <property name="text">
+                   <string>retour</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="1" column="3">
+               <widget class="QLineEdit" name="lineResumeAdd"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="lblTypeBrevetAdd">
+                <property name="text">
+                 <string>objectifs  </string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="comboTypeBrevetAdd"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="lblDomaineAdd">
+                <property name="text">
+                 <string>description  </string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="lblStatusBrevetAdd">
+                <property name="text">
+                 <string>date_Fin_Reelle  </string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="QLabel" name="lblResumeAdd">
+                <property name="text">
+                 <string>priorite </string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QDateEdit" name="dateDepotAdd">
+                <property name="calendarPopup">
+                 <bool>true</bool>
+                </property>
+                <property name="date">
+                 <date>
+                  <year>2000</year>
+                  <month>1</month>
+                  <day>1</day>
+                 </date>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="lineNumeroBrevetAdd"/>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="lblDateDepotAdd">
+                <property name="text">
+                 <string>date_Fin_Prevue  </string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="lineTitreAdd"/>
+              </item>
+              <item row="5" column="1">
+               <widget class="QComboBox" name="comboStatusBrevetAdd"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="lblNumeroBrevetAdd">
+                <property name="text">
+                 <string>date_Début    </string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="lineDomaineAdd"/>
+              </item>
+              <item row="0" column="3">
+               <widget class="QLineEdit" name="lineInventeursAdd"/>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="lblTitreAdd">
+                <property name="text">
+                 <string>nom_Projet </string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QLabel" name="lblInventeursAdd">
+                <property name="text">
+                 <string>statut  </string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="page_proj_edit">
+             <layout class="QGridLayout" name="gridLayoutProjEdit">
+              <property name="leftMargin">
+               <number>60</number>
+              </property>
+              <property name="topMargin">
+               <number>28</number>
+              </property>
+              <property name="rightMargin">
+               <number>60</number>
+              </property>
+              <property name="bottomMargin">
+               <number>28</number>
+              </property>
+              <property name="horizontalSpacing">
+               <number>40</number>
+              </property>
+              <property name="verticalSpacing">
+               <number>20</number>
+              </property>
+              <item row="2" column="2">
+               <widget class="QLabel" name="lblInventeursEdit">
+                <property name="text">
+                 <string>statut  </string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="lineTitreEdit"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="lblTypeBrevetEdit">
+                <property name="text">
+                 <string>objectifs  </string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="3">
+               <widget class="QLineEdit" name="lineResumeEdit"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="lblDomaineEdit">
+                <property name="text">
+                 <string>description  </string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="comboTypeBrevetEdit"/>
+              </item>
+              <item row="3" column="2">
+               <widget class="QLabel" name="lblResumeEdit">
+                <property name="text">
+                 <string>priorite </string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="3">
+               <widget class="QComboBox" name="comboStatusBrevetEdit"/>
+              </item>
+              <item row="0" column="3">
+               <widget class="QDateEdit" name="dateDepotEdit">
+                <property name="calendarPopup">
+                 <bool>true</bool>
+                </property>
+                <property name="date">
+                 <date>
+                  <year>2000</year>
+                  <month>1</month>
+                  <day>1</day>
+                 </date>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0" colspan="4">
+               <layout class="QHBoxLayout" name="hLayoutEditButtons">
+                <item>
+                 <spacer name="spacerEditButtons">
+                  <property name="orientation">
+                   <enum>Qt::Orientation::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>480</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btnConfirmEditProj">
+                  <property name="text">
+                   <string>confirmer</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btnRetourEditProj">
+                  <property name="text">
+                   <string>retour</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="2" column="3">
+               <widget class="QLineEdit" name="lineInventeursEdit"/>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="lineNumeroBrevetEdit"/>
+              </item>
+              <item row="0" column="2">
+               <widget class="QLabel" name="lblDateDepotEdit">
+                <property name="text">
+                 <string>date_Début    </string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="lblTitreEdit">
+                <property name="text">
+                 <string>nom_Projet </string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="QLabel" name="lblStatusBrevetEdit">
+                <property name="text">
+                 <string>date_Fin_Reelle  </string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="lineDomaineEdit"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="lblNumeroBrevetEdit">
+                <property name="text">
+                 <string>date_Fin_Prevue  </string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="page_proj_empty">
+             <layout class="QVBoxLayout" name="verticalLayoutProjEmpty">
+              <item>
+               <widget class="QLabel" name="stat_pub">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="retour_statn">
+                <property name="text">
+                 <string>retour</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
            </widget>
           </item>
          </layout>

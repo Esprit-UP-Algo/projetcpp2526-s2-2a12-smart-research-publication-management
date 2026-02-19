@@ -1,44 +1,47 @@
 #include "mainwindow.h"
 #include "logindialog.h"
 #include <QApplication>
-#include <QTextStream>
-#include <QFile>
 #include <QMessageBox>
+#include <QSqlDatabase>
 #include "connection.h"
-
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    Connection& c = Connection::createInstance();
-    bool test = c.createConnection();
-        if (test) {
-        QMessageBox::information(
-            nullptr,
-            QObject::tr("Basededonnées"),
-            QObject::tr("Connexion réussite.\nCliquez sur Annuler pour  quitter."),
-            QMessageBox::Cancel
-            );
+
+    Connection* c = Connection::instance();
+    bool test = c->createConnect();
+
+    if (test) {
+        QMessageBox::information(nullptr,
+                                 QObject::tr("Base de données"),
+                                 QObject::tr("Connexion réussie."),
+                                 QMessageBox::Ok);
+    } else {
+        QMessageBox::critical(nullptr,
+                              QObject::tr("Erreur"),
+                              QObject::tr("Connexion à la base impossible !"),
+                              QMessageBox::Ok);
+        // si tu veux arrêter direct:
+        // return 0;
     }
-    else
-    {
-        QMessageBox::critical(
-            nullptr,
-            QObject::tr("Erreur"),
-            QObject::tr("Connexion à la base impossible !"),
-            QMessageBox::Cancel
-            );
-    }
+
+    int ret = 0;
+
     LoginDialog login;
-    // On lance le popup. exec() bloque la suite tant que le popup est ouvert.
     if (login.exec() == QDialog::Accepted) {
-        // Si la connexion est réussie, on ouvre la fenêtre principale
         MainWindow w;
         w.show();
-        return a.exec();
+        ret = a.exec();     // ✅ pas de return ici
+    } else {
+        ret = 0;
     }
 
-    // Si on ferme le popup sans se connecter, le programme s'arrête ici
-    return 0;
-}
+    // ✅ IMPORTANT: fermer puis removeDatabase AVANT de sortir
+    c->closeConnection();
 
+    // Si ta connexion est "default" (addDatabase sans nom)
+    QSqlDatabase::removeDatabase(QSqlDatabase::defaultConnection);
+
+    return ret;
+}

@@ -5,6 +5,38 @@
 #include <QMessageBox>
 #include <QGraphicsDropShadowEffect>
 #include <QStyle>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QSqlRecord>
+#include <QTableWidgetItem>
+#include <QDate>
+#include <QDebug>
+#include <QSqlDatabase>
+#include <QHeaderView>
+
+
+
+static void setupTable(QTableWidget* t)
+{
+    if (!t) return;
+
+    t->setShowGrid(true);
+    t->setGridStyle(Qt::SolidLine);
+    t->setAlternatingRowColors(false);
+
+    auto h = t->horizontalHeader();
+    h->setSectionResizeMode(QHeaderView::Stretch);
+    h->setStretchLastSection(false);
+    h->setDefaultAlignment(Qt::AlignCenter);
+
+    t->verticalHeader()->setVisible(false);
+    t->setSelectionBehavior(QAbstractItemView::SelectRows);
+    t->setSelectionMode(QAbstractItemView::SingleSelection);
+    t->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    t->setWordWrap(false);
+    t->setSortingEnabled(true);
+}
+
 
 
 
@@ -21,6 +53,21 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+
+    // ===== INIT FINANCE =====
+    initFinanceUi();
+
+    setupTable(ui->tablePublication);
+    setupTable(ui->TableEmp);
+    setupTable(ui->TableCongeEmp);
+    setupTable(ui->TableFormations_Emp);
+    setupTable(ui->TableInventory);
+    setupTable(ui->TableFinance);
+    setupTable(ui->TableLabs_2);
+    setupTable(ui->tableProjets);
+
+
 
     // ===== Table Publication : lignes séparatrices + alignement =====
     ui->tablePublication->setShowGrid(true);
@@ -327,7 +374,11 @@ QStackedWidget QWidget {
 /* Les labels dans les pages */
 QLabel {
     color: #0F172A;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
 }
+
 
 /* Si tu veux que les gros titres des pages soient plus grands :
    -> Donne objectName aux labels (ex: labelEmployee, labelFinance...) */
@@ -457,22 +508,31 @@ QMessageBox QPushButton {
    FIN
    ========================================================= */
 /* =========================================================
-   PUBLICATION (stack_pub) : TABLE BLANCHE + BORDURES VERTES
-   + BOUTONS VERT MODERNE
+   MODULES (Publication + Employee + Inventaire + Finance + Labs)
+   TABLE BLANCHE + BORDURES VERTES + INPUTS VERTS + BOUTONS VERTS
    ========================================================= */
 
-/* ---- TABLE (uniquement celle de Publication) ---- */
+/* ---- TABLES ---- */
 QStackedWidget#stack_pub QTableWidget,
-QStackedWidget#stack_pub QTableView {
+QStackedWidget#stack_emp QTableWidget,
+QStackedWidget#stacked_I QTableWidget,
+QStackedWidget#stacked_F QTableWidget,
+QStackedWidget#stack_proj QTableWidget,
+QStackedWidget#stacked_L QTableWidget {
     background: #FFFFFF;
-    border: 2px solid #18A06A;      /* vert moderne */
+    border: 2px solid #18A06A;
     border-radius: 12px;
     gridline-color: #18A06A;
     selection-background-color: rgba(24,160,106,35);
     selection-color: #0B2E1F;
 }
 
-QStackedWidget#stack_pub QHeaderView::section {
+QStackedWidget#stack_pub QHeaderView::section,
+QStackedWidget#stack_emp QHeaderView::section,
+QStackedWidget#stacked_I QHeaderView::section,
+QStackedWidget#stacked_F QHeaderView::section,
+QStackedWidget#stack_proj QHeaderView::section,
+QStackedWidget#stacked_L QHeaderView::section {
     background: #FFFFFF;
     color: #0B2E1F;
     border: 1px solid #18A06A;
@@ -480,22 +540,37 @@ QStackedWidget#stack_pub QHeaderView::section {
     font-weight: 800;
 }
 
-QStackedWidget#stack_pub QTableCornerButton::section {
+QStackedWidget#stack_pub QTableCornerButton::section,
+QStackedWidget#stack_emp QTableCornerButton::section,
+QStackedWidget#stacked_I QTableCornerButton::section,
+QStackedWidget#stacked_F QTableCornerButton::section,
+QStackedWidget#stack_proj QTableCornerButton::section,
+QStackedWidget#stacked_L QTableCornerButton::section {
     background: #FFFFFF;
     border: 1px solid #18A06A;
 }
 
-/* (optionnel) scrollbars du tableau */
-QStackedWidget#stack_pub QScrollBar::handle:vertical,
-QStackedWidget#stack_pub QScrollBar::handle:horizontal {
-    background: rgba(24,160,106,140);
-    border: 1px solid rgba(15,127,85,140);
-}
-
-/* ---- INPUTS de Publication (search/combobox/date) en blanc bord vert ---- */
+/* ---- INPUTS ---- */
 QStackedWidget#stack_pub QLineEdit,
+QStackedWidget#stack_emp QLineEdit,
+QStackedWidget#stacked_I QLineEdit,
+QStackedWidget#stacked_F QLineEdit,
+QStackedWidget#stacked_L QLineEdit,
+QStackedWidget#stack_proj QLineEdit,
+
 QStackedWidget#stack_pub QComboBox,
-QStackedWidget#stack_pub QDateEdit {
+QStackedWidget#stack_emp QComboBox,
+QStackedWidget#stacked_I QComboBox,
+QStackedWidget#stacked_F QComboBox,
+QStackedWidget#stacked_L QComboBox,
+QStackedWidget#stack_proj QComboBox,
+
+QStackedWidget#stack_pub QDateEdit,
+QStackedWidget#stack_emp QDateEdit,
+QStackedWidget#stacked_I QDateEdit,
+QStackedWidget#stack_proj QDateEdit,
+QStackedWidget#stacked_F QDateEdit,
+QStackedWidget#stacked_L QDateEdit {
     background: #FFFFFF;
     border: 2px solid #18A06A;
     border-radius: 10px;
@@ -504,19 +579,50 @@ QStackedWidget#stack_pub QDateEdit {
 }
 
 QStackedWidget#stack_pub QLineEdit:focus,
+QStackedWidget#stack_emp QLineEdit:focus,
+QStackedWidget#stacked_I QLineEdit:focus,
+QStackedWidget#stacked_F QLineEdit:focus,
+QStackedWidget#stacked_L QLineEdit:focus,
+QStackedWidget#stack_proj QLineEdit:focus,
+
 QStackedWidget#stack_pub QComboBox:focus,
-QStackedWidget#stack_pub QDateEdit:focus {
+QStackedWidget#stack_emp QComboBox:focus,
+QStackedWidget#stacked_I QComboBox:focus,
+QStackedWidget#stacked_F QComboBox:focus,
+QStackedWidget#stacked_L QComboBox:focus,
+QStackedWidget#stack_proj QComboBox:focus,
+
+QStackedWidget#stack_pub QDateEdit:focus,
+QStackedWidget#stack_emp QDateEdit:focus,
+QStackedWidget#stacked_I QDateEdit:focus,
+QStackedWidget#stack_proj QDateEdit:focus,
+QStackedWidget#stacked_F QDateEdit:focus,
+QStackedWidget#stacked_L QDateEdit:focus {
     border: 2px solid #0F7F55;
 }
 
 QStackedWidget#stack_pub QComboBox::drop-down,
-QStackedWidget#stack_pub QDateEdit::drop-down {
+QStackedWidget#stack_emp QComboBox::drop-down,
+QStackedWidget#stacked_I QComboBox::drop-down,
+QStackedWidget#stacked_F QComboBox::drop-down,
+QStackedWidget#stacked_L QComboBox::drop-down,
+
+QStackedWidget#stack_pub QDateEdit::drop-down,
+QStackedWidget#stack_emp QDateEdit::drop-down,
+QStackedWidget#stacked_I QDateEdit::drop-down,
+QStackedWidget#stacked_F QDateEdit::drop-down,
+QStackedWidget#stacked_L QDateEdit::drop-down {
     border-left: 2px solid #18A06A;
     width: 28px;
 }
 
-/* ---- BOUTONS dans stack_pub (vert moderne) ---- */
-QStackedWidget#stack_pub QPushButton {
+/* ---- BOUTONS DANS LES MODULES ---- */
+QStackedWidget#stack_pub QPushButton,
+QStackedWidget#stack_emp QPushButton,
+QStackedWidget#stacked_I QPushButton,
+QStackedWidget#stack_proj QPushButton,
+QStackedWidget#stacked_F QPushButton,
+QStackedWidget#stacked_L QPushButton {
     min-height: 42px;
     padding: 10px 18px;
     margin: 6px 10px;
@@ -537,7 +643,12 @@ QStackedWidget#stack_pub QPushButton {
     );
 }
 
-QStackedWidget#stack_pub QPushButton:hover {
+QStackedWidget#stack_pub QPushButton:hover,
+QStackedWidget#stack_emp QPushButton:hover,
+QStackedWidget#stacked_I QPushButton:hover,
+QStackedWidget#stack_proj QPushButton:hover,
+QStackedWidget#stacked_F QPushButton:hover,
+QStackedWidget#stacked_L QPushButton:hover {
     background: qlineargradient(
         x1:0, y1:0, x2:1, y2:0,
         stop:0 #1BBE7B,
@@ -545,7 +656,11 @@ QStackedWidget#stack_pub QPushButton:hover {
     );
 }
 
-QStackedWidget#stack_pub QPushButton:pressed {
+QStackedWidget#stack_pub QPushButton:pressed,
+QStackedWidget#stack_emp QPushButton:pressed,
+QStackedWidget#stacked_I QPushButton:pressed,
+QStackedWidget#stacked_F QPushButton:pressed,
+QStackedWidget#stacked_L QPushButton:pressed {
     background: qlineargradient(
         x1:0, y1:0, x2:1, y2:0,
         stop:0 #0F7F55,
@@ -553,19 +668,8 @@ QStackedWidget#stack_pub QPushButton:pressed {
     );
 }
 
-/* (optionnel) si tu veux que "Supprimer" soit rouge même dans stack_pub, commente ce bloc */
-/*
-QStackedWidget#stack_pub QPushButton#btnSupprimerPub {
-    background: qlineargradient(x1:0,y1:0,x2:1,y2:0, stop:0 #EF4444, stop:1 #DC2626);
-    border: 2px solid #991B1B;
-}
-QStackedWidget#stack_pub QPushButton#btnSupprimerPub:hover {
-    background: qlineargradient(x1:0,y1:0,x2:1,y2:0, stop:0 #F87171, stop:1 #EF4444);
-}
-QStackedWidget#stack_pub QPushButton#btnSupprimerPub:pressed {
-    background: qlineargradient(x1:0,y1:0,x2:1,y2:0, stop:0 #B91C1C, stop:1 #991B1B);
-}
-*/
+
+
 
 
 
@@ -735,6 +839,11 @@ void MainWindow::on_btnTrier_emp_3_clicked()
       ui->stack_emp->setCurrentIndex(2);
 }
 
+void MainWindow::on_BtnPopupCancelInventory_2_triggered(QAction *action)
+{
+    Q_UNUSED(action);
+    // TODO: ton comportement (ex: fermer popup, reset champs, etc.)
+}
 
 void MainWindow::on_btnConge_emp_3_clicked()
 {
@@ -765,18 +874,20 @@ void MainWindow::on_btnChercher_emp_clicked()
 
 void MainWindow::on_btnExporter_emp_excel_3_clicked()
 {
-    // Vérifier si une ligne est sélectionnée
-
-
-    // Confirmation
-    QMessageBox::StandardButton reply = QMessageBox::question(
+    auto reply = QMessageBox::question(
         this,
         "Confirmation",
         "Voulez-vous vraiment supprimer cette employee ?",
         QMessageBox::Yes | QMessageBox::No
         );
 
+    if (reply == QMessageBox::Yes) {
+        qDebug() << "YES cliqué";   // provisoire
+        // TODO: ton export / suppression ici
+    }
 }
+
+
 
 
 void MainWindow::on_btnTrier_emp_clicked()
@@ -899,16 +1010,7 @@ void MainWindow::on_retour_stat_4_clicked()
 }
 
 
-void MainWindow::on_BtnPopupCancelFinance_2_clicked()
-{
-    ui->stacked_F->setCurrentIndex(0);
-}
 
-
-void MainWindow::on_BtnPopupCancelFinance_clicked()
-{
-    ui->stacked_F->setCurrentIndex(0);
-}
 
 
 void MainWindow::on_retour_stat_5_clicked()
@@ -917,16 +1019,7 @@ void MainWindow::on_retour_stat_5_clicked()
 }
 
 
-void MainWindow::on_BtnAdd_clicked()
-{
-    ui->stacked_F->setCurrentIndex(1);
-}
 
-
-void MainWindow::on_BtnEdit_clicked()
-{
-    ui->stacked_F->setCurrentIndex(2);
-}
 
 
 void MainWindow::on_BtnAdd_3_clicked()
@@ -982,3 +1075,377 @@ void MainWindow::on_btnSaveEmployee_2_clicked()
     ui->stack_emp->setCurrentIndex(0);
 }
 
+
+void MainWindow::on_retour_statn_clicked()
+{
+    ui->stack_proj->setCurrentIndex(0);
+}
+
+
+void MainWindow::on_btnRetourEditProj_clicked()
+{
+    ui->stack_proj->setCurrentIndex(0);
+}
+
+
+void MainWindow::on_btnRetourAddProj_clicked()
+{
+    ui->stack_proj->setCurrentIndex(0);
+}
+
+
+void MainWindow::on_btnAjouterProj_clicked()
+{
+    ui->stack_proj->setCurrentIndex(1);
+}
+
+
+void MainWindow::on_btnModifierProj_clicked()
+{
+    ui->stack_proj->setCurrentIndex(2);
+}
+
+
+void MainWindow::on_btnVoirStatistiquesProj_clicked()
+{
+    ui->stack_proj->setCurrentIndex(3);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ============================================================================
+/****************************************************
+ *                 FINANCE MODULE
+ *  - UI init (combos)
+ *  - Table setup/load
+ *  - CRUD: Add / Edit / Delete
+ *  - Filters: Apply / Reset / Export  : not completed.
+ ****************************************************/
+// ============================================================================
+
+// ---------- FINANCE: init combos ----------
+
+void MainWindow::initFinanceUi()
+{
+    // --- ComboBox (AJOUT) : valeurs DB via currentData() ---
+    ui->FormType->clear();
+    ui->FormType->addItem("Dépense", "Dépense");
+    ui->FormType->addItem("Revenu",  "Revenu");
+
+    ui->FormPayMode->clear();
+    ui->FormPayMode->addItem("Espèces",        "especes");
+    ui->FormPayMode->addItem("Chèque",         "cheque");
+    ui->FormPayMode->addItem("Virement",       "virement");
+    ui->FormPayMode->addItem("Carte bancaire", "carte_bancaire");
+    ui->FormPayMode->addItem("Facture",        "facture");
+    ui->FormPayMode->addItem("Remboursement",  "remboursement");
+
+    // --- ComboBox (MODIF) : mêmes valeurs DB ---
+    ui->FormType_2->clear();
+    ui->FormType_2->addItem("Dépense", "Dépense");
+    ui->FormType_2->addItem("Revenu",  "Revenu");
+
+    ui->FormPayMode_2->clear();
+    ui->FormPayMode_2->addItem("Espèces",        "especes");
+    ui->FormPayMode_2->addItem("Chèque",         "cheque");
+    ui->FormPayMode_2->addItem("Virement",       "virement");
+    ui->FormPayMode_2->addItem("Carte bancaire", "carte_bancaire");
+    ui->FormPayMode_2->addItem("Facture",        "facture");
+    ui->FormPayMode_2->addItem("Remboursement",  "remboursement");
+
+    // --- Table ---
+    setupTableFinance();
+
+    // --- Page Finance (liste) ---
+    ui->stacked_F->setCurrentIndex(0);
+
+    // --- 1er chargement ---
+    loadFinance();
+}
+
+void MainWindow::setupTableFinance()
+{
+    ui->TableFinance->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->TableFinance->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->TableFinance->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->TableFinance->verticalHeader()->setVisible(false);
+    ui->TableFinance->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    // 8 colonnes visibles (ID caché dans UserRole col 0)
+    ui->TableFinance->setColumnCount(8);
+    ui->TableFinance->setHorizontalHeaderLabels({
+        "Code", "Type", "Montant", "Catégorie",
+        "Description", "Date", "Mode", "Création"
+    });
+}
+
+void MainWindow::loadFinance()
+{
+    ui->TableFinance->setRowCount(0);
+
+    QSqlQuery q;
+    q.prepare(
+        "SELECT IDFINANCE, CODETRANSA, TYPETRANSACTION, MONTANT, CATEGORIE, "
+        "       DESCRIPTION, TO_CHAR(DATETRANSACTION,'YYYY-MM-DD'), "
+        "       MODEPAIEMENT, TO_CHAR(DATECREATION,'YYYY-MM-DD') "
+        "FROM HICHEM.FINANCE "
+        "ORDER BY DATETRANSACTION DESC"
+        );
+
+    if (!q.exec()) {
+        QMessageBox::critical(this, "SQL Error", q.lastError().text());
+        return;
+    }
+
+    int row = 0;
+    while (q.next()) {
+        ui->TableFinance->insertRow(row);
+
+        const QString id   = q.value(0).toString(); // caché
+        const QString code = q.value(1).toString();
+
+        auto *itCode = new QTableWidgetItem(code);
+        itCode->setData(Qt::UserRole, id); // ID caché
+        ui->TableFinance->setItem(row, 0, itCode);
+
+        ui->TableFinance->setItem(row, 1, new QTableWidgetItem(q.value(2).toString()));
+        ui->TableFinance->setItem(row, 2, new QTableWidgetItem(q.value(3).toString()));
+        ui->TableFinance->setItem(row, 3, new QTableWidgetItem(q.value(4).toString()));
+        ui->TableFinance->setItem(row, 4, new QTableWidgetItem(q.value(5).toString()));
+        ui->TableFinance->setItem(row, 5, new QTableWidgetItem(q.value(6).toString()));
+        ui->TableFinance->setItem(row, 6, new QTableWidgetItem(q.value(7).toString()));
+        ui->TableFinance->setItem(row, 7, new QTableWidgetItem(q.value(8).toString()));
+
+        row++;
+    }
+}
+
+void MainWindow::showFinanceList()
+{
+    ui->stackedWidget->setCurrentIndex(3);  // page Finance
+    ui->stacked_F->setCurrentIndex(0);      // sous-page liste
+    setActiveButton(ui->btnFinance);
+    loadFinance();
+}
+
+// ---------------------------
+// NAV FINANCE
+// ---------------------------
+void MainWindow::on_btnFinance_clicked()
+{
+    showFinanceList();
+}
+
+// ---------------------------
+// ADD (ouvrir)
+// ---------------------------
+void MainWindow::on_BtnAdd_clicked()
+{
+    ui->stacked_F->setCurrentIndex(1); // ajouterF
+
+    ui->FormCode->clear();
+    ui->FormAmount->clear();
+    ui->FormCategory->clear();
+    ui->FormDesc->clear();
+
+    ui->FormType->setCurrentIndex(0);
+    ui->FormPayMode->setCurrentIndex(0);
+
+    ui->FormDate->setDate(QDate::currentDate());
+    ui->FormCreatedAt->setDate(QDate::currentDate());
+}
+
+void MainWindow::on_BtnPopupCancelFinance_clicked()
+{
+    ui->stacked_F->setCurrentIndex(0);
+}
+
+// ---------------------------
+// ADD (save)
+// ---------------------------
+void MainWindow::on_BtnPopupSaveFinance_clicked()
+{
+    const QString code = ui->FormCode->text().trimmed();
+    const QString type = ui->FormType->currentData().toString();       // DB value
+    const QString mode = ui->FormPayMode->currentData().toString();    // DB value
+    const double  montant = ui->FormAmount->text().toDouble();
+    const QString cat  = ui->FormCategory->text().trimmed();
+    const QString desc = ui->FormDesc->text().trimmed();
+    const QDate   dt   = ui->FormDate->date();
+    const QDate   dc   = ui->FormCreatedAt->date();
+
+    if (code.isEmpty() || cat.isEmpty()) {
+        QMessageBox::warning(this, "Ajout", "Code et Catégorie obligatoires.");
+        return;
+    }
+
+    // IDFINANCE = MAX+1
+    QSqlQuery qid;
+    if (!qid.exec("SELECT NVL(MAX(IDFINANCE),0)+1 FROM HICHEM.FINANCE")) {
+        QMessageBox::critical(this, "SQL Error", qid.lastError().text());
+        return;
+    }
+    qid.next();
+    const int newId = qid.value(0).toInt();
+
+    // IMPORTANT: CINEMP doit exister dans EMPLOYE (FK)
+    const QString cinemp = "1234"; // mets un CIN existant
+
+    QSqlQuery q;
+    q.prepare(
+        "INSERT INTO HICHEM.FINANCE "
+        "(IDFINANCE, CODETRANSA, TYPETRANSACTION, MONTANT, CATEGORIE, DESCRIPTION, "
+        " DATETRANSACTION, MODEPAIEMENT, DATECREATION, CINEMP) "
+        "VALUES (:id, :code, :type, :montant, :cat, :desc, :dt, :mode, :dc, :cin)"
+        );
+
+    q.bindValue(":id", newId);
+    q.bindValue(":code", code);
+    q.bindValue(":type", type);
+    q.bindValue(":montant", montant);
+    q.bindValue(":cat", cat);
+    q.bindValue(":desc", desc);
+    q.bindValue(":dt", dt);
+    q.bindValue(":mode", mode);
+    q.bindValue(":dc", dc);
+    q.bindValue(":cin", cinemp);
+
+    if (!q.exec()) {
+        QMessageBox::critical(this, "SQL Error", q.lastError().text());
+        return;
+    }
+
+    ui->stacked_F->setCurrentIndex(0);
+    loadFinance();
+}
+
+// ---------------------------
+// EDIT (ouvrir)
+// ---------------------------
+void MainWindow::on_BtnEdit_clicked()
+{
+    const int r = ui->TableFinance->currentRow();
+    if (r < 0) {
+        QMessageBox::warning(this, "Modifier", "Sélectionne une transaction.");
+        return;
+    }
+
+    idFinanceToEdit = ui->TableFinance->item(r, 0)->data(Qt::UserRole).toString();
+    if (idFinanceToEdit.isEmpty()) {
+        QMessageBox::warning(this, "Modifier", "ID introuvable.");
+        return;
+    }
+
+    ui->FormCode_2->setText(ui->TableFinance->item(r,0)->text());
+    ui->FormType_2->setCurrentText(ui->TableFinance->item(r,1)->text());
+    ui->FormAmount_2->setText(ui->TableFinance->item(r,2)->text());
+    ui->FormCategory_2->setText(ui->TableFinance->item(r,3)->text());
+    ui->FormDesc_2->setText(ui->TableFinance->item(r,4)->text());
+    ui->FormDate_2->setDate(QDate::fromString(ui->TableFinance->item(r,5)->text(), "yyyy-MM-dd"));
+    ui->FormPayMode_2->setCurrentText(ui->TableFinance->item(r,6)->text());
+    ui->FormCreatedAt_2->setDate(QDate::fromString(ui->TableFinance->item(r,7)->text(), "yyyy-MM-dd"));
+
+    ui->stacked_F->setCurrentIndex(2); // modifierF
+}
+
+void MainWindow::on_BtnPopupCancelFinance_2_clicked()
+{
+    idFinanceToEdit.clear();
+    ui->stacked_F->setCurrentIndex(0);
+}
+
+// ---------------------------
+// EDIT (save)
+// ---------------------------
+void MainWindow::on_BtnPopupSaveFinance_2_clicked()
+{
+    if (idFinanceToEdit.isEmpty()) {
+        QMessageBox::warning(this, "Modifier", "ID manquant. Re-sélectionne.");
+        return;
+    }
+
+    QSqlQuery q;
+    q.prepare(
+        "UPDATE HICHEM.FINANCE SET "
+        "CODETRANSA=:code, "
+        "TYPETRANSACTION=:type, "
+        "MONTANT=:montant, "
+        "CATEGORIE=:cat, "
+        "DESCRIPTION=:desc, "
+        "DATETRANSACTION=:dt, "
+        "MODEPAIEMENT=:mode, "
+        "DATECREATION=:dc "
+        "WHERE IDFINANCE=:id"
+        );
+
+    q.bindValue(":code", ui->FormCode_2->text().trimmed());
+    q.bindValue(":type", ui->FormType_2->currentData().toString());       // DB value
+    q.bindValue(":montant", ui->FormAmount_2->text().toDouble());
+    q.bindValue(":cat", ui->FormCategory_2->text().trimmed());
+    q.bindValue(":desc", ui->FormDesc_2->text().trimmed());
+    q.bindValue(":dt", ui->FormDate_2->date());
+    q.bindValue(":mode", ui->FormPayMode_2->currentData().toString());    // DB value
+    q.bindValue(":dc", ui->FormCreatedAt_2->date());
+    q.bindValue(":id", idFinanceToEdit);
+
+    if (!q.exec()) {
+        QMessageBox::critical(this, "SQL Error", q.lastError().text());
+        return;
+    }
+
+    idFinanceToEdit.clear();
+    ui->stacked_F->setCurrentIndex(0);
+    loadFinance();
+}
+
+// ---------------------------
+// DELETE
+// ---------------------------
+void MainWindow::on_BtnDelete_clicked()
+{
+    const int r = ui->TableFinance->currentRow();
+    if (r < 0) {
+        QMessageBox::warning(this, "Supprimer", "Sélectionne une transaction.");
+        return;
+    }
+
+    const QString id = ui->TableFinance->item(r,0)->data(Qt::UserRole).toString();
+
+    auto rep = QMessageBox::question(this, "Suppression",
+                                     "Confirmer la suppression ?",
+                                     QMessageBox::Yes | QMessageBox::No);
+    if (rep != QMessageBox::Yes) return;
+
+    QSqlQuery q;
+    q.prepare("DELETE FROM HICHEM.FINANCE WHERE IDFINANCE=:id");
+    q.bindValue(":id", id);
+
+    if (!q.exec()) {
+        QMessageBox::critical(this, "SQL Error", q.lastError().text());
+        return;
+    }
+
+    loadFinance();
+}
+void MainWindow::on_BtnApply_clicked()
+{
+
+}
+
+
+void MainWindow::on_BtnReset_clicked()
+{
+
+}
+
+
+void MainWindow::on_BtnExport_clicked()
+{
+
+}
+
+// ///////////////////////////////////////////////END FINANCE////////////////////////////////////////////////////////////////////////////////////// //
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
