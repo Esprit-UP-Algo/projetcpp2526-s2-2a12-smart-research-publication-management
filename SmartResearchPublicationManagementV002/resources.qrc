@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/img">
+        <file>images/sidebar_bg.png</file>
+        <file>images/background.png</file>
+        <file>images/logoLabel.png</file>
+        <file>images/stat_pub.png</file>
+    </qresource>
+</RCC>
