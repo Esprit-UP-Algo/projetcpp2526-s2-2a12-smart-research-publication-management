@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-3c45ad58720171dada5f.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "SmartResearchPublicationManagement",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "SmartResearchPublicationManagement::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SmartResearchPublicationManagement-Debug-15801aab672e306f83b7.json",
+					"name" : "SmartResearchPublicationManagement",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SmartResearchPublicationManagement_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SmartResearchPublicationManagement_autogen-Debug-f0dd4d1da138dd2d7dfd.json",
+					"name" : "SmartResearchPublicationManagement_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SmartResearchPublicationManagement_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SmartResearchPublicationManagement_autogen_timestamp_deps-Debug-4af6179e133d914502f7.json",
+					"name" : "SmartResearchPublicationManagement_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/MSI/Desktop/mon projet c++/SmartResearchPublicationManagement_V003/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+		"source" : "C:/Users/MSI/Desktop/mon projet c++/SmartResearchPublicationManagement_V003"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

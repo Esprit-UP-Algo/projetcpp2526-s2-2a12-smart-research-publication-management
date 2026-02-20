@@ -5,6 +5,8 @@
 #include <QPushButton>
 #include <QAction>
 #include <QString>
+#include "finance.h"
+#include "publication.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,22 +22,29 @@ public:
 
 private:
     Ui::MainWindow *ui;
-
-    // //////////////////////////////////////////////////////////////////////////////////////////////////// //
-    // ===== FINANCE (Hichem) =====
-    void initFinanceUi();      // init combos + table + load
+    Finance::Row selectedFinanceRowFromTable(bool *ok=nullptr) const;
+    bool exportInternalInvoicePdf_19(const QString& filePath, const Finance::Row& row);
+    // ===== FINANCE =====
+    void initFinanceUi();
     void setupTableFinance();
     void loadFinance();
     void showFinanceList();
 
-    QString idFinanceToEdit;   // IDFINANCE de la ligne sélectionnée (pour UPDATE)
-    QString idFinanceToDelete; // IDFINANCE de la ligne sélectionnée (pour DELETE)
-    // ///////////////////////////////////////////////////////////////////////////////////////////////// //
-
+    QString selectedFinanceId() const;
+    QString idFinanceToEdit;   // seulement pour UPDATE
+    // ==================== //
     void updateTopTitle(int index);
 
     void applyModernStyle();
     void setActiveButton(QPushButton *btn);
+
+    // ===== PUBLICATION =====
+    void initPublicationUi();
+    void setupTablePublication();
+    void loadPublications();
+    QString selectedPublicationId() const;
+    QString idPublicationToEdit;
+    // =======================
 
 private slots:
     void goEmployee();
@@ -108,6 +117,8 @@ private slots:
     void on_BtnApply_clicked();
     void on_BtnReset_clicked();
     void on_BtnExport_clicked();
+    void on_btnAddPub_clicked();
+    void on_btnConfirmEditPub_clicked();
 
 };
 
