@@ -1,11 +1,10 @@
 #include "logindialog.h"
 #include "ui_logindialog.h"
-#include "employe.h"
+#include "employe.h"           // ← ta classe Employe (avec verifierLogin)
 #include <QMessageBox>
 #include <QGraphicsDropShadowEffect>
-#include <QCryptographicHash>  // Pour le hash SHA256
-#include <QSqlQuery>
-#include <QSqlError>
+#include <QCryptographicHash>  // SHA256
+#include <QDebug>
 
 LoginDialog::LoginDialog(QWidget *parent) :
     QDialog(parent),
@@ -22,28 +21,24 @@ LoginDialog::LoginDialog(QWidget *parent) :
 
     this->setWindowTitle("Connexion - Smart Research");
 
-    // Application du STYLE CSS (QSS)
+    // STYLE CSS (QSS) – exactement comme le tien
     this->setStyleSheet(R"(
-        /* Dialog */
         QDialog#LoginDialog{
             background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
                 stop:0 #f2fbfb,
                 stop:1 #e6f7f7);
             font-family: Consolas;
         }
-        /* Card */
         QGroupBox#groupBox_2{
             background: rgba(255,255,255,220);
             border-radius: 22px;
             border: 1px solid rgba(0,206,209,90);
         }
-        /* Title */
         QLabel#label{
             color:#004D40;
             font-size:24pt;
             font-weight:900;
         }
-        /* Inputs */
         QLineEdit{
             background: white;
             border: 1.5px solid rgba(0,206,209,120);
@@ -54,7 +49,6 @@ LoginDialog::LoginDialog(QWidget *parent) :
         QLineEdit:focus{
             border: 2px solid #00CED1;
         }
-        /* Buttons */
         QPushButton#btnLogin{
             background: qlineargradient(x1:0,y1:0,x2:1,y2:0,
                 stop:0 #00CED1,
@@ -76,7 +70,7 @@ LoginDialog::LoginDialog(QWidget *parent) :
         }
     )");
 
-    // Ajout ombre portée
+    // Ombre portée pour effet moderne
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
     shadow->setBlurRadius(20);
     shadow->setXOffset(0);
@@ -84,7 +78,7 @@ LoginDialog::LoginDialog(QWidget *parent) :
     shadow->setColor(QColor(0, 0, 0, 60));
     this->setGraphicsEffect(shadow);
 
-    // Fenêtre propre
+    // Fenêtre propre (pas de bouton maximize/minimize inutile)
     this->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
 }
 
@@ -99,32 +93,20 @@ void LoginDialog::on_btnLogin_clicked()
     QString password = ui->lePassword->text();
 
     if (username.isEmpty() || password.isEmpty()) {
-        QMessageBox::warning(this, "Champs manquants", "Veuillez entrer votre nom d'utilisateur et mot de passe.");
+        QMessageBox::warning(this, "Erreur", "Remplissez tous les champs");
         ui->leUsername->setFocus();
         return;
     }
 
-    // Hash du password saisi
     QString passwordHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256).toHex();
 
-    // Vérification en base via Employe
-    QSqlQuery query;
-    query.prepare("SELECT 1 FROM EMPLOYES WHERE USERNAME = :username AND PASSWORD_HASH = :passwordHash");
-    query.bindValue(":username", username);
-    query.bindValue(":passwordHash", passwordHash);
-
-    if (!query.exec()) {
-        QString error = query.lastError().text();
-        qDebug() << "Erreur login SQL :" << error;
-        QMessageBox::critical(this, "Erreur base", "Impossible de vérifier les identifiants :\n" + error);
-        return;
-    }
-
-    if (query.next()) {
-        // Login OK
-        accept();  // Ferme le dialog avec succès
+    QString id, role, err;
+    if (Employe::verifierLogin(username, passwordHash, id, role, &err)) {
+        m_idEmploye = id;
+        m_role = role;
+        accept();
     } else {
-        QMessageBox::critical(this, "Accès Refusé", "Nom d'utilisateur ou mot de passe incorrect.");
+        QMessageBox::critical(this, "Erreur", err.isEmpty() ? "Identifiants incorrects" : err);
         ui->lePassword->clear();
         ui->lePassword->setFocus();
     }
@@ -132,5 +114,5 @@ void LoginDialog::on_btnLogin_clicked()
 
 void LoginDialog::on_Quitter_clicked()
 {
-    qApp->exit(0);
+    reject();  // Ferme le dialog sans succès (QDialog::Rejected)
 }

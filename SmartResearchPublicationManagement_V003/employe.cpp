@@ -78,6 +78,7 @@ bool Employe::ajouter(QString *err) const
     return true;
 }
 
+
 bool Employe::modifier(
     const QString& idEmploye,
     const QString& cin,
@@ -190,4 +191,40 @@ bool Employe::usernameExiste(const QString &username)
 
     if (!query.exec()) return false;
     return query.next();
+}
+
+
+bool Employe::verifierLogin(
+    const QString &username,
+    const QString &passwordHash,
+    QString &idEmployeOut,
+    QString &roleOut,
+    QString *err)
+{
+    QSqlQuery query;
+    query.prepare(
+        "SELECT ID_EMPLOYE, ROLE "
+        "FROM EMPLOYES "
+        "WHERE USERNAME = :username AND PASSWORD_HASH = :passwordHash"
+        );
+
+    query.bindValue(":username", username);
+    query.bindValue(":passwordHash", passwordHash);
+
+    if (!query.exec()) {
+        QString error = query.lastError().text();
+        qDebug() << "Erreur SQL login :" << error;
+        if (err) *err = "Erreur base de données : " + error;
+        return false;
+    }
+
+    if (query.next()) {
+        idEmployeOut = query.value("ID_EMPLOYE").toString();
+        roleOut      = query.value("ROLE").toString();
+        return true;
+    }
+
+    // Pas trouvé → identifiants incorrects
+    if (err) *err = "Nom d'utilisateur ou mot de passe incorrect";
+    return false;
 }

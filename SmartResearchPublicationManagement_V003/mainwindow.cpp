@@ -22,13 +22,6 @@
 #include <QTime>
 #include <QCryptographicHash>
 
-
-
-
-
-
-
-
 static void setupTable(QTableWidget* t)
 {
     if (!t) return;
@@ -82,9 +75,11 @@ static QString makeQrLabs(const QString& nom, const QString& num)
     return s.left(30); // QRLABS varchar(30)
 }
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(const QString &idEmploye, const QString &role, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_idEmployeConnecte(idEmploye)
+    , m_roleConnecte(role)
 {
     ui->setupUi(this);
     ui->TableEmp->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -96,7 +91,6 @@ MainWindow::MainWindow(QWidget *parent)
     initPublicationUi();
     // ===== INIT LABS =====
     initLabsUi();
-
 
     setupTable(ui->tablePublication);
     setupTable(ui->TableEmp);
@@ -1147,18 +1141,22 @@ void MainWindow::on_BtnPopupSaveFinance_clicked()
         return;
     }
 
-    // --- IDEMP placeholder (à remplacer quand Employe intégré) ---
-    const QString IDEMP = "1234"; // placeholder "technique"
-
-    Finance f(code, type, montant, cat, desc, dt, mode, dc, IDEMP);
-
-    QString err;
-    if (!f.ajouter(&err)) {
-        QMessageBox::critical(this, "SQL Error", err);
+    if (m_idEmployeConnecte.isEmpty()) {
+        QMessageBox::critical(this, "Erreur", "Aucun employé connecté !");
         return;
     }
 
-    ui->stacked_F->setCurrentIndex(0);
+    qDebug() << "Finance → IDEMP =" << m_idEmployeConnecte;
+
+    Finance f(code, type, montant, cat, desc, dt, mode, dc, m_idEmployeConnecte);
+
+    QString err;
+    if (!f.ajouter(&err)) {
+        QMessageBox::critical(this, "Erreur", err);
+        return;
+    }
+
+    QMessageBox::information(this, "Succès", "Transaction enregistrée");
     loadFinance();
 }
 
@@ -1625,13 +1623,15 @@ void MainWindow::on_btnSaveEmployee_clicked()
 
     QString passwordHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256).toHex();
 
-    Employe e(cin, nom, prenom, username, passwordHash, email,
-              poste, departement, dateEmb, salaire, role);
+    Employe e(cin, nom, prenom, username, passwordHash, email, poste, departement, dateEmb, salaire, role);
 
-    QString errMsg;
-    if (!e.ajouter(&errMsg)) {
-        QMessageBox::critical(this, "Échec ajout", errMsg);
-        return;
+    QString err;
+    if (e.ajouter(&err)) {
+        QMessageBox::information(this, "Succès", "Employé ajouté");
+        loadEmployees();
+        ui->stackedWidget->setCurrentIndex(0);  // retour liste
+    } else {
+        QMessageBox::critical(this, "Erreur", err);
     }
 
     QMessageBox::information(this, "Succès", "Employé ajouté.");

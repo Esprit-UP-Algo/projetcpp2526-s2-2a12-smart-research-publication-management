@@ -13,6 +13,8 @@ class LoginDialog : public QDialog
 
 public:
     explicit LoginDialog(QWidget *parent = nullptr);
+    QString getIdEmploye() const { return m_idEmploye; }
+    QString getRole() const { return m_role; }
     ~LoginDialog();
 
 private slots:
@@ -23,6 +25,8 @@ private slots:
 
 private:
     Ui::LoginDialog *ui;
+    QString m_idEmploye;
+    QString m_role;
 };
 
 #endif // LOGINDIALOG_H

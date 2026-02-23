@@ -22,10 +22,11 @@ int main(int argc, char *argv[])
         c->closeConnection();
         return 0;
     }
-
+    QString idEmployeConnecte = login.getIdEmploye();
+    QString roleConnecte      = login.getRole();
 
     // 3) MainWindow
-    MainWindow w;
+MainWindow w(idEmployeConnecte, roleConnecte);
     w.show();
 
     int ret = a.exec();

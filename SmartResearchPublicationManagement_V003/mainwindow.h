@@ -20,10 +20,13 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(const QString &idEmploye = "", const QString &role = "", QWidget *parent = nullptr);
     ~MainWindow();
 
 private:
     Ui::MainWindow *ui;
+    QString m_idEmployeConnecte;
+    QString m_roleConnecte;
 
     // ===== FINANCE =====
     Finance::Row selectedFinanceRowFromTable(bool *ok=nullptr) const;

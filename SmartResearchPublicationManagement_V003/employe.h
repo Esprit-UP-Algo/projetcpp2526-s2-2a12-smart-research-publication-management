@@ -36,6 +36,10 @@ public:
         QString heureArrivee;
         QString heureDepart;
         QString statutJournalier;
+
+
+
+
     };
 
     Employe() = default;
@@ -87,6 +91,13 @@ public:
     static bool chargerTout(QVector<Row> &out, QString *err = nullptr);
 
     static bool usernameExiste(const QString &username);
+    static bool verifierLogin(
+        const QString &username,
+        const QString &passwordHash,
+        QString &idEmployeOut,
+        QString &roleOut,
+        QString *err = nullptr
+        );
 
 private:
     static bool nextId(int &outId, QString *err = nullptr);
