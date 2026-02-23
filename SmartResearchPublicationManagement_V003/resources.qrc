@@ -4,5 +4,6 @@
         <file>images/background.png</file>
         <file>images/logoLabel.png</file>
         <file>images/stat_pub.png</file>
+        <file>images/logo_off.png</file>
     </qresource>
 </RCC>

@@ -1,3 +1,4 @@
+
 cmake_minimum_required(VERSION 3.16)
 
 project(SmartResearchPublicationManagement VERSION 0.1 LANGUAGES CXX)
@@ -9,14 +10,16 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql)
 
 set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        finance.cpp
+        finance.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -24,6 +27,15 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         resources.qrc
+        logindialog.h logindialog.cpp logindialog.ui
+        connection.h connection.cpp
+        finance.h finance.cpp
+        publication.h publication.cpp
+
+
+        employe.h employe.cpp
+        labs.h
+        labs.cpp
 
 
 
@@ -46,7 +58,9 @@ else()
     endif()
 endif()
 
-target_link_libraries(SmartResearchPublicationManagement PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(SmartResearchPublicationManagement
+    PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql
+)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
