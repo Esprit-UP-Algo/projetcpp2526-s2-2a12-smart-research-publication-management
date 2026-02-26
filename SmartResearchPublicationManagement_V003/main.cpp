@@ -1,44 +1,40 @@
 #include "mainwindow.h"
 #include "logindialog.h"
 #include <QApplication>
-#include <QTextStream>
-#include <QFile>
 #include <QMessageBox>
 #include "connection.h"
-
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    Connection& c = Connection::createInstance();
-    bool test = c.createConnection();
-        if (test) {
-        QMessageBox::information(
-            nullptr,
-            QObject::tr("Basededonnées"),
-            QObject::tr("Connexion réussite.\nCliquez sur Annuler pour  quitter."),
-            QMessageBox::Cancel
-            );
+
+
+    // 1) Connexion DB (avant tout CRUD)
+    Connection* c = Connection::instance();
+    if (!c->createConnect()) {
+        QMessageBox::critical(nullptr, "Erreur", "Connexion à la base impossible !");
+        return 0;
     }
-    else
-    {
-        QMessageBox::critical(
-            nullptr,
-            QObject::tr("Erreur"),
-            QObject::tr("Connexion à la base impossible !"),
-            QMessageBox::Cancel
-            );
-    }
+
+    // 2) Login
     LoginDialog login;
-    // On lance le popup. exec() bloque la suite tant que le popup est ouvert.
-    if (login.exec() == QDialog::Accepted) {
-        // Si la connexion est réussie, on ouvre la fenêtre principale
-        MainWindow w;
-        w.show();
-        return a.exec();
+    if (login.exec() != QDialog::Accepted) {
+        c->closeConnection();
+        return 0;
     }
 
-    // Si on ferme le popup sans se connecter, le programme s'arrête ici
-    return 0;
-}
 
+    // 3) MainWindow
+    MainWindow w(login.empId());
+    w.show();
+
+    int ret = a.exec();
+
+    // 4) Fermeture DB
+    c->closeConnection();
+
+    // ⚠️ Optionnel (souvent je conseille de le supprimer pour éviter warning "still in use")
+    // QSqlDatabase::removeDatabase(QSqlDatabase::defaultConnection);
+
+    return ret;
+}
