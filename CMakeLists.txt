@@ -1,3 +1,4 @@
+
 cmake_minimum_required(VERSION 3.16)
 
 project(SmartResearchPublicationManagement VERSION 0.1 LANGUAGES CXX)
@@ -17,6 +18,8 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        finance.cpp
+        finance.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -26,6 +29,15 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         resources.qrc
         logindialog.h logindialog.cpp logindialog.ui
         connection.h connection.cpp
+        finance.h finance.cpp
+        publication.h publication.cpp
+
+
+        employe.h employe.cpp
+        labs.h
+        labs.cpp
+        inventory.h inventory.cpp
+
 
 
 
