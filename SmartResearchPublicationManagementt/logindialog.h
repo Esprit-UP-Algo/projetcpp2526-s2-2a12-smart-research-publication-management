@@ -2,7 +2,7 @@
 #define LOGINDIALOG_H
 
 #include <QDialog>
-
+#include "faceauth.h" // Ajoute ça en haut
 namespace Ui {
 class LoginDialog;
 }
@@ -13,20 +13,17 @@ class LoginDialog : public QDialog
 
 public:
     explicit LoginDialog(QWidget *parent = nullptr);
-    QString getIdEmploye() const { return m_idEmploye; }
-    QString getRole() const { return m_role; }
     ~LoginDialog();
 
 private slots:
     void on_btnLogin_clicked();
 
     void on_Quitter_clicked();
+    void on_btnFaceID_clicked();
 
 
 private:
     Ui::LoginDialog *ui;
-    QString m_idEmploye;
-    QString m_role;
 };
 
 #endif // LOGINDIALOG_H

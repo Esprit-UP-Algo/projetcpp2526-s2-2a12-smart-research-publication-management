@@ -2,7 +2,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
-
+#include "session.h"
 Employe::Employe(
     QString cin, QString nom, QString prenom, QString username, QString passwordHash,
     QString email, QString poste, QString departement,
@@ -77,7 +77,6 @@ bool Employe::ajouter(QString *err) const
 
     return true;
 }
-
 
 bool Employe::modifier(
     const QString& idEmploye,
@@ -194,37 +193,65 @@ bool Employe::usernameExiste(const QString &username)
 }
 
 
-bool Employe::verifierLogin(
-    const QString &username,
-    const QString &passwordHash,
-    QString &idEmployeOut,
-    QString &roleOut,
-    QString *err)
+bool Employe::authentifier(const QString &username, const QString &passwordHash, QString *err)
 {
     QSqlQuery query;
-    query.prepare(
-        "SELECT ID_EMPLOYE, ROLE "
-        "FROM EMPLOYES "
-        "WHERE USERNAME = :username AND PASSWORD_HASH = :passwordHash"
-        );
 
-    query.bindValue(":username", username);
-    query.bindValue(":passwordHash", passwordHash);
+    // On récupère les infos essentielles de l'employé
+    query.prepare("SELECT ID_EMPLOYE, NOM, PRENOM, ROLE FROM EMPLOYES "
+                  "WHERE USERNAME = :user AND PASSWORD_HASH = :pass");
+
+    query.bindValue(":user", username);
+    query.bindValue(":pass", passwordHash);
 
     if (!query.exec()) {
-        QString error = query.lastError().text();
-        qDebug() << "Erreur SQL login :" << error;
-        if (err) *err = "Erreur base de données : " + error;
+        if (err) *err = "Erreur base de données : " + query.lastError().text();
         return false;
     }
 
     if (query.next()) {
-        idEmployeOut = query.value("ID_EMPLOYE").toString();
-        roleOut      = query.value("ROLE").toString();
+        // 1. On récupère les données de la requête
+        QString id   = query.value("ID_EMPLOYE").toString();
+        QString nom  = query.value("NOM").toString() + " " + query.value("PRENOM").toString();
+        QString role = query.value("ROLE").toString();
+
+        // 2. On remplit la SESSION (Le Singleton)
+        // Maintenant, n'importe quelle fenêtre pourra savoir qui est connecté
+        Session::instance().login(id, nom, role);
+
+        return true; // Connexion réussie
+    }
+
+    // Si on arrive ici, c'est que l'utilisateur n'existe pas ou mauvais mot de passe
+    if (err) *err = "Nom d'utilisateur ou mot de passe incorrect.";
+    return false;
+}
+
+bool Employe::authentifierFaceID(const QString &username, QString *err)
+{
+    QSqlQuery query;
+    // On récupère les colonnes exactes pour ta méthode login()
+    query.prepare("SELECT id_employe, nom, prenom, role FROM employes WHERE username = :user");
+    query.bindValue(":user", username);
+
+    if (!query.exec()) {
+        if (err) *err = "Erreur SQL : " + query.lastError().text();
+        return false;
+    }
+
+    if (query.next()) {
+        QString id = query.value("id_employe").toString();
+        QString nomComplet = query.value("nom").toString() + " " + query.value("prenom").toString();
+        QString role = query.value("role").toString();
+
+        // --- REMPLISSAGE DE LA SESSION ---
+        // On utilise TA méthode login()
+        Session::instance().login(id, nomComplet, role);
+
+        qDebug() << "Session FaceID initialisée pour :" << nomComplet << "| Rôle :" << role;
         return true;
     }
 
-    // Pas trouvé → identifiants incorrects
-    if (err) *err = "Nom d'utilisateur ou mot de passe incorrect";
+    if (err) *err = "Identifiant reconnu par FaceID mais introuvable en base.";
     return false;
 }

@@ -3,6 +3,9 @@
 #include "finance.h"
 #include "labs.h"
 #include "employe.h"
+#include "inventory.h"
+#include <QSpinBox>
+#include <QDoubleSpinBox>
 #include <QApplication>
 #include <QMessageBox>
 #include <QGraphicsDropShadowEffect>
@@ -12,6 +15,7 @@
 #include <QDebug>
 #include <QHeaderView>
 #include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QPdfWriter>
 #include <QPainter>
 #include <QFileDialog>
@@ -21,6 +25,13 @@
 #include <QUrl>
 #include <QTime>
 #include <QCryptographicHash>
+#include "session.h"
+
+
+
+
+
+
 
 static void setupTable(QTableWidget* t)
 {
@@ -75,94 +86,82 @@ static QString makeQrLabs(const QString& nom, const QString& num)
     return s.left(30); // QRLABS varchar(30)
 }
 
-MainWindow::MainWindow(const QString &idEmploye, const QString &role, QWidget *parent)
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include "session.h"  // <--- INDISPENSABLE pour lire le rôle
+#include <QGraphicsDropShadowEffect>
+
+MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , m_idEmployeConnecte(idEmploye)
-    , m_roleConnecte(role)
 {
     ui->setupUi(this);
+
+    // --- Configuration des Tables ---
     ui->TableEmp->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->TableEmp->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    // ===== INIT FINANCE =====
-    initFinanceUi();
-    // ===== INIT PUBLICATION =====
-    initPublicationUi();
-    // ===== INIT LABS =====
-    initLabsUi();
-
     setupTable(ui->tablePublication);
     setupTable(ui->TableEmp);
-    loadEmployees();   // ← Charge les employés présents dans la BD au démarrage
     setupTable(ui->TableCongeEmp);
     setupTable(ui->TableFormations_Emp);
     setupTable(ui->TableInventory);
     setupTable(ui->TableFinance);
     setupTable(ui->TableLabs_2);
     setupTable(ui->tableProjets);
-    connect(ui->lineSearchEmp, &QLineEdit::textChanged,
-            this, &MainWindow::filterEmployees);
-    connect(ui->btnTrier_emp, &QPushButton::clicked,   // ← adapte le nom du bouton
-            this, &MainWindow::sortByEmbaucheDate);
 
-    // ===== Table Publication : lignes séparatrices + alignement =====
+    // --- Initialisation des Modules ---
+    initFinanceUi();
+    initPublicationUi();
+    loadPublications();
+    initLabsUi();
+    initInventoryUi();
+    loadEmployees();
+
+    // --- Connexions Signaux/Slots ---
+    connect(ui->lineSearchEmp, &QLineEdit::textChanged, this, &MainWindow::filterEmployees);
+    connect(ui->btnTrier_emp, &QPushButton::clicked, this, &MainWindow::sortByEmbaucheDate);
+    connect(ui->stackedWidget, &QStackedWidget::currentChanged, this, &MainWindow::updateTopTitle);
+
+    // --- Style Table Publication ---
     ui->tablePublication->setShowGrid(true);
     ui->tablePublication->setGridStyle(Qt::SolidLine);
-    ui->tablePublication->setAlternatingRowColors(false);
-
     auto header = ui->tablePublication->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::Stretch);
-    header->setStretchLastSection(false);
     header->setDefaultAlignment(Qt::AlignCenter);
-
     ui->tablePublication->verticalHeader()->setVisible(false);
-    ui->tablePublication->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->tablePublication->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tablePublication->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->tablePublication->setWordWrap(false);
     ui->tablePublication->setSortingEnabled(true);
 
+    // --- Design & Branding ---
     updateTopTitle(ui->stackedWidget->currentIndex());
-    connect(ui->stackedWidget, &QStackedWidget::currentChanged,
-            this, &MainWindow::updateTopTitle);
-
-    ui->lblBrand->setText(R"(
-    <span style="color:#0B1220; font-weight:900;">Smart</span>
-    <span style="color:#1F8E95; font-weight:900;">ResearchLab</span>
-    )");
+    ui->lblBrand->setText(R"(<span style="color:#0B1220; font-weight:900;">Smart</span><span style="color:#1F8E95; font-weight:900;">ResearchLab</span>)");
     ui->lblBrand->setTextFormat(Qt::RichText);
 
-    // Boutons checkables
-    ui->btnEmployee->setCheckable(true);
-    ui->btnInventaire->setCheckable(true);
-    ui->btnPublication->setCheckable(true);
-    ui->btnFinance->setCheckable(true);
-    ui->btnLaboratoires->setCheckable(true);
-    ui->btnProjets->setCheckable(true);
+    // --- Configuration des Boutons Sidebar ---
+    QList<QPushButton*> navButtons = {
+        ui->btnEmployee, ui->btnInventaire, ui->btnPublication,
+        ui->btnFinance, ui->btnLaboratoires, ui->btnProjets
+    };
 
-    ui->btnEmployee->setFocusPolicy(Qt::NoFocus);
-    ui->btnInventaire->setFocusPolicy(Qt::NoFocus);
-    ui->btnPublication->setFocusPolicy(Qt::NoFocus);
-    ui->btnFinance->setFocusPolicy(Qt::NoFocus);
-    ui->btnLaboratoires->setFocusPolicy(Qt::NoFocus);
-    ui->btnProjets->setFocusPolicy(Qt::NoFocus);
+    for(auto btn : navButtons) {
+        btn->setCheckable(true);
+        btn->setFocusPolicy(Qt::NoFocus);
+    }
     ui->btnDeconnecter->setFocusPolicy(Qt::NoFocus);
 
     applyModernStyle();
 
+    // --- Navigation Sidebar ---
     connect(ui->btnEmployee,     &QPushButton::clicked, this, &MainWindow::goEmployee);
-    connect(ui->btnInventaire,   &QPushButton::clicked, this, &MainWindow::goInventaire);
-    connect(ui->btnPublication,  &QPushButton::clicked, this, &MainWindow::goPublication);
+    connect(ui->btnInventaire,    &QPushButton::clicked, this, &MainWindow::goInventaire);
+    connect(ui->btnPublication,   &QPushButton::clicked, this, &MainWindow::goPublication);
     connect(ui->btnFinance,      &QPushButton::clicked, this, &MainWindow::goFinance);
-    connect(ui->btnLaboratoires, &QPushButton::clicked, this, &MainWindow::goLaboratoires);
-    connect(ui->btnProjets,      &QPushButton::clicked, this, &MainWindow::goProjets);
+    connect(ui->btnLaboratoires,  &QPushButton::clicked, this, &MainWindow::goLaboratoires);
+    connect(ui->btnProjets,       &QPushButton::clicked, this, &MainWindow::goProjets);
+    connect(ui->btnDeconnecter,   &QPushButton::clicked, this, &MainWindow::onDeconnecter);
 
-    connect(ui->btnDeconnecter,  &QPushButton::clicked, this, &MainWindow::onDeconnecter);
-
-    ui->stackedWidget->setCurrentIndex(0);
-    setActiveButton(ui->btnEmployee);
-
+    // --- Effets Visuels (Ombres) ---
     auto shadowSidebar = new QGraphicsDropShadowEffect(this);
     shadowSidebar->setBlurRadius(22);
     shadowSidebar->setOffset(0, 6);
@@ -174,7 +173,82 @@ MainWindow::MainWindow(const QString &idEmploye, const QString &role, QWidget *p
     shadowStack->setOffset(0, 6);
     shadowStack->setColor(QColor(0, 0, 0, 60));
     ui->stackedWidget->setGraphicsEffect(shadowStack);
+
+    // ==========================================
+    //    GESTION DES RÔLES (Session)
+    // ==========================================
+    configurerPermissions();
 }
+
+
+
+
+//fct userper
+
+
+
+
+void MainWindow::configurerPermissions() {
+    Session& session = Session::instance();
+    QString role = session.getRole();
+
+    // --- ÉTAPE 1 : Nettoyage (On cache tout la sidebar) ---
+    ui->btnEmployee->hide();
+    ui->btnInventaire->hide();
+    ui->btnPublication->hide();
+    ui->btnFinance->hide();
+    ui->btnLaboratoires->hide();
+    ui->btnProjets->hide();
+
+    // --- ÉTAPE 2 : Attribution de l'Environnement ---
+
+    if (role == "RH") {
+        // Environnement RH : Gestion du personnel et congés
+        ui->btnEmployee->show();
+        ui->stackedWidget->setCurrentIndex(0); // Index de la page Employés
+        setActiveButton(ui->btnEmployee);
+    }
+    else if (role == "Responsable_financier") {
+        // Environnement Finance : Salaires et budgets
+        ui->btnFinance->show();
+        ui->stackedWidget->setCurrentIndex(3); // Index de la page Finance
+        setActiveButton(ui->btnFinance);
+    }
+    else if (role == "Responsable_de_stock") {
+        // Environnement Stock : Inventaire et matériel
+        ui->btnInventaire->show();
+        ui->stackedWidget->setCurrentIndex(1); // Index de la page Inventaire
+        setActiveButton(ui->btnInventaire);
+    }
+    else if (role == "Responsable_Labos") {
+        // Environnement Laboratoire
+        ui->btnLaboratoires->show();
+        ui->stackedWidget->setCurrentIndex(4); // Index de la page Labos
+        setActiveButton(ui->btnLaboratoires);
+    }
+    else if (role == "Chercheur") {
+        // Environnement Recherche : Publications seulement
+        ui->btnPublication->show();
+        ui->stackedWidget->setCurrentIndex(2); // Index Publications
+        setActiveButton(ui->btnPublication);
+    }
+    else if (role == "Directeur_de_projet") {
+        // Environnement Management : Projets et Publications
+        ui->btnProjets->show();
+        ui->btnPublication->show();
+        ui->stackedWidget->setCurrentIndex(5); // Index Projets
+        setActiveButton(ui->btnProjets);
+    }
+
+    // Mise à jour du titre en haut de l'écran
+    updateTopTitle(ui->stackedWidget->currentIndex());
+}
+
+
+
+
+//fin fct
+
 
 MainWindow::~MainWindow()
 {
@@ -508,6 +582,94 @@ QStackedWidget#stacked_L QPushButton:pressed {
     );
 }
 
+/* =========================================================
+   INVENTORY DETAIL VIEW (AFFICHÉ) - FLUENT BRANDED
+   ========================================================= */
+
+/* Main page background - Soft Teal Gradient instead of solid white */
+QWidget#afficheri {
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 #F0FDF4,
+        stop:1 #FFFFFF
+    );
+}
+
+QFrame#CardGeneral, QFrame#CardStock, QFrame#CardDescription {
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 15px;
+    /* Soft shadow effect */
+    border-bottom: 2px solid #CBD5E1;
+}
+
+/* Card Accent Border (Brand Green) */
+QFrame#CardGeneral, QFrame#CardStock, QFrame#CardDescription {
+    border-top: 4px solid #18A06A;
+}
+
+/* Key Labels - Subtle but clear */
+QLabel#lbl_g1, QLabel#lbl_g2, QLabel#lbl_g3, QLabel#lbl_g4, QLabel#lbl_g5, QLabel#lbl_g6,
+QLabel#lbl_s1, QLabel#lbl_s2, QLabel#lbl_s3, QLabel#lbl_s4, QLabel#lbl_s5, QLabel#lbl_s6,
+QLabel#lbl_d1 {
+    color: #64748B;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-right: 15px;
+}
+
+/* Value Labels - High contrast brand colors */
+QLabel#aff_id, QLabel#aff_sku, QLabel#aff_name, QLabel#aff_type, QLabel#aff_price, QLabel#aff_status,
+QLabel#aff_qtav, QLabel#aff_qtrs, QLabel#aff_threshold, QLabel#aff_zone, QLabel#aff_shelf, QLabel#aff_unit,
+QLabel#aff_description {
+    color: #0B2E1F;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 2px 8px;
+    background: rgba(24, 160, 106, 0.05); /* Very light green tint for value background */
+    border-radius: 4px;
+}
+
+/* Price specific - make it stand out */
+QLabel#aff_price {
+    color: #18A06A;
+    font-size: 18px;
+}
+
+/* Description - readable and clean */
+QLabel#aff_description {
+    font-weight: 400;
+    line-height: 1.6;
+    color: #334155;
+    background: transparent;
+    padding: 10px 0px;
+}
+
+/* Header Text */
+QLabel#aff_header_title {
+    color: #0F7F55;
+    font-size: 26px;
+    font-weight: 900;
+    margin-bottom: 5px;
+}
+
+/* Back Button - Rounded and Subtle */
+QPushButton#retour_stat_6 {
+    background: #FFFFFF;
+    color: #0F7F55;
+    border: 2px solid #0F7F55;
+    border-radius: 20px;
+    padding: 8px 20px;
+}
+
+QPushButton#retour_stat_6:hover {
+    background: #F0FDF4;
+    border-color: #1BBE7B;
+}
+
 )";
 
     qApp->setStyleSheet(qss);
@@ -654,8 +816,52 @@ void MainWindow::on_retour_stat_8_clicked() { ui->stacked_L->setCurrentIndex(0);
 
 // Inventory - Navigation
 void MainWindow::on_BtnInventoryAdd_clicked() { ui->stacked_I->setCurrentIndex(1); }
-void MainWindow::on_BtnInventoryAdd_2_clicked() { ui->stacked_I->setCurrentIndex(4); }
-void MainWindow::on_BtnInventoryEdit_clicked() { ui->stacked_I->setCurrentIndex(2); }
+void MainWindow::on_BtnInventoryAdd_2_clicked()
+{
+    const int r = ui->TableInventory->currentRow();
+    if (r < 0) {
+        QMessageBox::warning(this, "Afficher", "Sélectionnez un produit.");
+        return;
+    }
+
+    QTableWidgetItem *it = ui->TableInventory->item(r, 0);
+    if (!it) return;
+
+    // Read from basic columns
+    const QString sku    = ui->TableInventory->item(r, 1)->text();
+    const QString name   = ui->TableInventory->item(r, 2)->text();
+    const QString price  = ui->TableInventory->item(r, 3)->text();
+    const QString qtAv   = ui->TableInventory->item(r, 4)->text();
+    const QString status = ui->TableInventory->item(r, 5)->text();
+
+    // Read from UserRoles in column 0
+    const QString id     = it->data(Qt::UserRole).toString();
+    const QString zone   = it->data(Qt::UserRole + 1).toString();
+    const QString shelf  = it->data(Qt::UserRole + 2).toString();
+    const QString unit   = it->data(Qt::UserRole + 3).toString();
+    const QString type   = it->data(Qt::UserRole + 4).toString();
+    const QString desc   = it->data(Qt::UserRole + 5).toString();
+    const QString qtRs   = it->data(Qt::UserRole + 6).toString();
+    const QString thr    = it->data(Qt::UserRole + 7).toString();
+
+    // Update Detail labels
+    ui->aff_id->setText(id);
+    ui->aff_sku->setText(sku);
+    ui->aff_name->setText(name);
+    ui->aff_type->setText(type);
+    ui->aff_price->setText(price + " €");
+    ui->aff_qtav->setText(qtAv);
+    ui->aff_qtrs->setText(qtRs);
+    ui->aff_threshold->setText(thr);
+    ui->aff_unit->setText(unit);
+    ui->aff_zone->setText(zone);
+    ui->aff_shelf->setText(shelf);
+    ui->aff_status->setText(status);
+    ui->aff_description->setText(desc.isEmpty() ? "Pas de description" : desc);
+
+    ui->stacked_I->setCurrentIndex(4);
+}
+// on_BtnInventoryEdit_clicked → full CRUD implementation below (//start inventory crud)
 void MainWindow::on_BtnInventoryAdd_5_clicked() { ui->stacked_I->setCurrentIndex(3); }
 void MainWindow::on_retour_stat_7_clicked() { ui->stacked_I->setCurrentIndex(0); }
 void MainWindow::on_BtnPopupCancelInventory_2_clicked() { ui->stacked_I->setCurrentIndex(0); }
@@ -721,56 +927,30 @@ Finance::Row MainWindow::selectedFinanceRowFromTable(bool *ok) const
     return row;
 }
 
-// ==================== PUBLICATION CRUD ====================
-
+//================================================================================================================================================
 void MainWindow::initPublicationUi()
 {
-    // Combo Type Brevet (Add)
-    ui->comboTypeBrevetAdd->clear();
-    ui->comboTypeBrevetAdd->addItem("Brevet", "Brevet");
-    ui->comboTypeBrevetAdd->addItem("Article", "Article");
-    ui->comboTypeBrevetAdd->addItem("Autre", "Autre");
-
-    // Combo Type Brevet (Edit)
-    ui->comboTypeBrevetEdit->clear();
-    ui->comboTypeBrevetEdit->addItem("Brevet", "Brevet");
-    ui->comboTypeBrevetEdit->addItem("Article", "Article");
-    ui->comboTypeBrevetEdit->addItem("Autre", "Autre");
-
-    // Statut (contrainte SQL)
+    // Remplir combos (si pas déjà fait dans UI)
     ui->comboStatusBrevetAdd->clear();
-    ui->comboStatusBrevetAdd->addItem("En cours", "En cours");
-    ui->comboStatusBrevetAdd->addItem("Déposé", "Déposé");
-    ui->comboStatusBrevetAdd->addItem("Accepté", "Accepté");
-    ui->comboStatusBrevetAdd->addItem("Refusé", "Refusé");
-    ui->comboStatusBrevetAdd->addItem("Publié", "Publié");
+    ui->comboStatusBrevetAdd->addItems({"En cours","Déposé","Accepté","Refusé","Publié"});
 
     ui->comboStatusBrevetEdit->clear();
-    ui->comboStatusBrevetEdit->addItem("En cours", "En cours");
-    ui->comboStatusBrevetEdit->addItem("Déposé", "Déposé");
-    ui->comboStatusBrevetEdit->addItem("Accepté", "Accepté");
-    ui->comboStatusBrevetEdit->addItem("Refusé", "Refusé");
-    ui->comboStatusBrevetEdit->addItem("Publié", "Publié");
+    ui->comboStatusBrevetEdit->addItems({"En cours","Déposé","Accepté","Refusé","Publié"});
 
-    setupTablePublication();
-    ui->stack_pub->setCurrentIndex(0);
-    loadPublications();
-}
-
-void MainWindow::setupTablePublication()
-{
-    ui->tablePublication->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->tablePublication->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->tablePublication->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->tablePublication->verticalHeader()->setVisible(false);
-    ui->tablePublication->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
-    // 8 colonnes visibles, ID caché dans UserRole col 0
+    // tablePublication : on suppose 8 colonnes visibles (sans lien_document)
     ui->tablePublication->setColumnCount(8);
     ui->tablePublication->setHorizontalHeaderLabels({
-        "Titre", "Résumé", "Inventeurs", "Domaine",
-        "Type", "Numéro", "Date dépôt", "Statut"
+        "Titre","Résumé","Inventeurs","Domaine","Type","Numéro","Date dépôt","Statut"
     });
+}
+
+QString MainWindow::selectedPublicationId() const
+{
+    int row = ui->tablePublication->currentRow();
+    if (row < 0) return {};
+    auto *it = ui->tablePublication->item(row, 0);
+    if (!it) return {};
+    return it->data(Qt::UserRole).toString(); // ID stocké caché
 }
 
 void MainWindow::loadPublications()
@@ -784,186 +964,137 @@ void MainWindow::loadPublications()
         return;
     }
 
-    int row = 0;
-    for (const auto& r : rows) {
-        ui->tablePublication->insertRow(row);
+    int r = 0;
+    for (const auto &p : rows) {
+        ui->tablePublication->insertRow(r);
 
-        auto *itTitre = new QTableWidgetItem(r.titre);
-        itTitre->setData(Qt::UserRole, r.id); // ID caché
-        ui->tablePublication->setItem(row, 0, itTitre);
+        auto *itTitre = new QTableWidgetItem(p.titre);
+        itTitre->setData(Qt::UserRole, p.id); // on cache ID_PUBLICATION ici
+        ui->tablePublication->setItem(r, 0, itTitre);
 
-        ui->tablePublication->setItem(row, 1, new QTableWidgetItem(r.resume));
-        ui->tablePublication->setItem(row, 2, new QTableWidgetItem(r.inventeurs));
-        ui->tablePublication->setItem(row, 3, new QTableWidgetItem(r.domaineFabrication));
-        ui->tablePublication->setItem(row, 4, new QTableWidgetItem(r.typeBrevet));
-        ui->tablePublication->setItem(row, 5, new QTableWidgetItem(r.numeroBrevet));
-        ui->tablePublication->setItem(row, 6, new QTableWidgetItem(r.dateDepot));
-        ui->tablePublication->setItem(row, 7, new QTableWidgetItem(r.statutBrevet));
+        ui->tablePublication->setItem(r, 1, new QTableWidgetItem(p.resume));
+        ui->tablePublication->setItem(r, 2, new QTableWidgetItem(p.inventeurs));
+        ui->tablePublication->setItem(r, 3, new QTableWidgetItem(p.domaine));
+        ui->tablePublication->setItem(r, 4, new QTableWidgetItem(p.type));
+        ui->tablePublication->setItem(r, 5, new QTableWidgetItem(p.numero));
+        ui->tablePublication->setItem(r, 6, new QTableWidgetItem(p.dateDepot));
+        ui->tablePublication->setItem(r, 7, new QTableWidgetItem(p.statut));
 
-        row++;
+        r++;
     }
 }
 
-QString MainWindow::selectedPublicationId() const
-{
-    int row = ui->tablePublication->currentRow();
-    if (row < 0) return {};
-
-    QTableWidgetItem *it = ui->tablePublication->item(row, 0);
-    if (!it) return {};
-    return it->data(Qt::UserRole).toString();
-}
-
+//-----------------------------------------------------------------------------------------------
 void MainWindow::on_btnAddPub_clicked()
 {
-    const QString titre = ui->lineTitreAdd->text().trimmed();
-    const QString resume = ui->lineResumeAdd->text().trimmed();
-    const QString inventeurs = ui->lineInventeursAdd->text().trimmed();
-    const QString domaine = ui->lineDomaineAdd->text().trimmed();
-    const QString typeBrevet = ui->comboTypeBrevetAdd->currentData().toString();
-    const QString statut = ui->comboStatusBrevetAdd->currentData().toString();
-    const QDate dateDepot = ui->dateDepotAdd->date();
+    QString titre = ui->lineTitreAdd->text().trimmed();
+    QString resume = ui->lineResumeAdd->text().trimmed();
+    QString inventeurs = ui->lineInventeursAdd->text().trimmed();
+    QString domaine = ui->lineDomaineAdd->text().trimmed();
+    QString type = ui->comboTypeBrevetAdd->currentText();
+    QString statut = ui->comboStatusBrevetAdd->currentText();
+    QDate dateDepot = ui->dateDepotAdd->date();
 
-    // ====== CONTROLE DE SAISIE ======
-    if (titre.isEmpty()) {
-        QMessageBox::warning(this, "Ajout", "Le titre est obligatoire.");
-        ui->lineTitreAdd->setFocus();
-        return;
-    }
-    if (inventeurs.isEmpty()) {
-        QMessageBox::warning(this, "Ajout", "Le champ inventeurs est obligatoire.");
-        ui->lineInventeursAdd->setFocus();
-        return;
-    }
-    if (domaine.isEmpty()) {
-        QMessageBox::warning(this, "Ajout", "Le domaine de fabrication est obligatoire.");
-        ui->lineDomaineAdd->setFocus();
-        return;
-    }
-    if (!dateDepot.isValid()) {
-        QMessageBox::warning(this, "Ajout", "Date dépôt invalide.");
-        return;
-    }
+    // ---- contrôle de saisie ----
+    if (titre.isEmpty()) { QMessageBox::warning(this,"Saisie","Titre obligatoire"); return; }
+    if (inventeurs.isEmpty()) { QMessageBox::warning(this,"Saisie","Inventeurs obligatoire"); return; }
+    if (domaine.isEmpty()) { QMessageBox::warning(this,"Saisie","Domaine obligatoire"); return; }
 
-    bool okNum = false;
-    int numero = ui->lineNumeroBrevetAdd->text().trimmed().toInt(&okNum);
-    if (!okNum || numero <= 0) {
-        QMessageBox::warning(this, "Ajout", "Numéro brevet invalide (entier > 0).");
-        ui->lineNumeroBrevetAdd->setFocus();
-        return;
-    }
+    bool ok=false;
+    int numero = ui->lineNumeroBrevetAdd->text().trimmed().toInt(&ok);
+    if (!ok || numero<=0) { QMessageBox::warning(this,"Saisie","Numéro brevet invalide"); return; }
 
-    // ====== INSERT DB ======
-    Publication p(titre, resume, inventeurs, domaine, typeBrevet, numero, dateDepot, statut);
+    Publication p(titre,resume,inventeurs,domaine,type,numero,dateDepot,statut);
+
     QString err;
-    if (!p.ajouter(&err)) {
-        QMessageBox::critical(this, "SQL Error", err);
+    if (!p.ajouter(currentEmployeeId, &err)) {
+        QMessageBox::critical(this,"SQL Error", err);
         return;
     }
 
-    QMessageBox::information(this, "Ajout", "Publication ajoutée avec succès.");
+    QMessageBox::information(this,"Ajout","Publication ajoutée ");
     ui->stack_pub->setCurrentIndex(0);
     loadPublications();
 }
 
+//-----------------------------------------------------------------------------------------------------
 void MainWindow::on_btnModifierPub_clicked()
 {
-    const QString id = selectedPublicationId();
+    QString id = selectedPublicationId();
     if (id.isEmpty()) {
-        QMessageBox::warning(this, "Modification", "Sélectionne une publication d'abord.");
+        QMessageBox::warning(this,"Modification","Sélectionne une publication d'abord.");
         return;
     }
     idPublicationToEdit = id;
 
     int row = ui->tablePublication->currentRow();
-    ui->lineTitreEdit->setText(ui->tablePublication->item(row, 0)->text());
-    ui->lineResumeEdit->setText(ui->tablePublication->item(row, 1)->text());
-    ui->lineInventeursEdit->setText(ui->tablePublication->item(row, 2)->text());
-    ui->lineDomaineEdit->setText(ui->tablePublication->item(row, 3)->text());
+    ui->lineTitreEdit->setText(ui->tablePublication->item(row,0)->text());
+    ui->lineResumeEdit->setText(ui->tablePublication->item(row,1)->text());
+    ui->lineInventeursEdit->setText(ui->tablePublication->item(row,2)->text());
+    ui->lineDomaineEdit->setText(ui->tablePublication->item(row,3)->text());
 
-    const QString type = ui->tablePublication->item(row, 4)->text();
-    int idxType = ui->comboTypeBrevetEdit->findData(type);
-    ui->comboTypeBrevetEdit->setCurrentIndex(idxType >= 0 ? idxType : 0);
+    ui->comboTypeBrevetEdit->setCurrentText(ui->tablePublication->item(row,4)->text());
+    ui->lineNumeroBrevetEdit->setText(ui->tablePublication->item(row,5)->text());
 
-    ui->lineNumeroBrevetEdit->setText(ui->tablePublication->item(row, 5)->text());
-
-    const QString dateStr = ui->tablePublication->item(row, 6)->text();
-    ui->dateDepotEdit->setDate(QDate::fromString(dateStr, "yyyy-MM-dd"));
-
-    const QString statut = ui->tablePublication->item(row, 7)->text();
-    int idxStatut = ui->comboStatusBrevetEdit->findData(statut);
-    ui->comboStatusBrevetEdit->setCurrentIndex(idxStatut >= 0 ? idxStatut : 0);
+    ui->dateDepotEdit->setDate(QDate::fromString(ui->tablePublication->item(row,6)->text(),"yyyy-MM-dd"));
+    ui->comboStatusBrevetEdit->setCurrentText(ui->tablePublication->item(row,7)->text());
 
     ui->stack_pub->setCurrentIndex(2);
 }
-
+//--------------------------------------------------------------------------------------------------------
 void MainWindow::on_btnConfirmEditPub_clicked()
 {
     if (idPublicationToEdit.isEmpty()) {
-        QMessageBox::warning(this, "Modification", "ID publication manquant.");
+        QMessageBox::warning(this,"Modification","ID manquant.");
         return;
     }
 
-    const QString titre = ui->lineTitreEdit->text().trimmed();
-    const QString resume = ui->lineResumeEdit->text().trimmed();
-    const QString inventeurs = ui->lineInventeursEdit->text().trimmed();
-    const QString domaine = ui->lineDomaineEdit->text().trimmed();
-    const QString typeBrevet = ui->comboTypeBrevetEdit->currentData().toString();
-    const QString statut = ui->comboStatusBrevetEdit->currentData().toString();
-    const QDate dateDepot = ui->dateDepotEdit->date();
+    QString titre = ui->lineTitreEdit->text().trimmed();
+    QString resume = ui->lineResumeEdit->text().trimmed();
+    QString inventeurs = ui->lineInventeursEdit->text().trimmed();
+    QString domaine = ui->lineDomaineEdit->text().trimmed();
+    QString type = ui->comboTypeBrevetEdit->currentText();
+    QString statut = ui->comboStatusBrevetEdit->currentText();
+    QDate dateDepot = ui->dateDepotEdit->date();
 
-    // ====== CONTROLE DE SAISIE ======
-    if (titre.isEmpty()) {
-        QMessageBox::warning(this, "Modification", "Le titre est obligatoire.");
-        ui->lineTitreEdit->setFocus();
-        return;
-    }
+    if (titre.isEmpty()) { QMessageBox::warning(this,"Saisie","Titre obligatoire"); return; }
 
-    bool okNum = false;
-    int numero = ui->lineNumeroBrevetEdit->text().trimmed().toInt(&okNum);
-    if (!okNum || numero <= 0) {
-        QMessageBox::warning(this, "Modification", "Numéro brevet invalide (entier > 0).");
-        ui->lineNumeroBrevetEdit->setFocus();
-        return;
-    }
+    bool ok=false;
+    int numero = ui->lineNumeroBrevetEdit->text().trimmed().toInt(&ok);
+    if (!ok || numero<=0) { QMessageBox::warning(this,"Saisie","Numéro brevet invalide"); return; }
 
-    // ====== UPDATE DB ======
     QString err;
-    if (!Publication::modifier(idPublicationToEdit, titre, resume, inventeurs, domaine,
-                               typeBrevet, numero, dateDepot, statut, &err)) {
-        QMessageBox::critical(this, "SQL Error", err);
+    if (!Publication::modifier(idPublicationToEdit, titre,resume,inventeurs,domaine,type,numero,dateDepot,statut,&err)) {
+        QMessageBox::critical(this,"SQL Error",err);
         return;
     }
 
-    QMessageBox::information(this, "Modification", "Publication modifiée avec succès.");
+    QMessageBox::information(this,"Modification","Modification réussie ");
     idPublicationToEdit.clear();
     ui->stack_pub->setCurrentIndex(0);
     loadPublications();
 }
-
+//-----------------------------------------------------------------------------------------------------
 void MainWindow::on_btnSupprimerPub_clicked()
 {
-    const QString id = selectedPublicationId();
+    QString id = selectedPublicationId();
     if (id.isEmpty()) {
-        QMessageBox::warning(this, "Suppression", "Sélectionne une publication d'abord.");
+        QMessageBox::warning(this,"Suppression","Sélectionne une publication d'abord.");
         return;
     }
 
-    auto reply = QMessageBox::question(
-        this, "Confirmation",
-        "Voulez-vous vraiment supprimer cette publication ?",
-        QMessageBox::Yes | QMessageBox::No
-        );
-
+    auto reply = QMessageBox::question(this,"Confirmation",
+                                       "Voulez-vous vraiment supprimer cette publication ?",
+                                       QMessageBox::Yes | QMessageBox::No);
     if (reply != QMessageBox::Yes) return;
 
     QString err;
     if (!Publication::supprimer(id, &err)) {
-        QMessageBox::critical(this, "SQL Error", err);
+        QMessageBox::critical(this,"SQL Error",err);
         return;
     }
 
-    QMessageBox::information(this, "Suppression", "Publication supprimée avec succès.");
+    QMessageBox::information(this,"Suppression","Suppression réussie ✅");
     loadPublications();
 }
 
@@ -1141,22 +1272,18 @@ void MainWindow::on_BtnPopupSaveFinance_clicked()
         return;
     }
 
-    if (m_idEmployeConnecte.isEmpty()) {
-        QMessageBox::critical(this, "Erreur", "Aucun employé connecté !");
-        return;
-    }
+    // --- IDEMP placeholder (à remplacer quand Employe intégré) ---
+    const QString IDEMP = "12348765"; // placeholder "technique"
 
-    qDebug() << "Finance → IDEMP =" << m_idEmployeConnecte;
-
-    Finance f(code, type, montant, cat, desc, dt, mode, dc, m_idEmployeConnecte);
+    Finance f(code, type, montant, cat, desc, dt, mode, dc, IDEMP);
 
     QString err;
     if (!f.ajouter(&err)) {
-        QMessageBox::critical(this, "Erreur", err);
+        QMessageBox::critical(this, "SQL Error", err);
         return;
     }
 
-    QMessageBox::information(this, "Succès", "Transaction enregistrée");
+    ui->stacked_F->setCurrentIndex(0);
     loadFinance();
 }
 
@@ -1623,15 +1750,13 @@ void MainWindow::on_btnSaveEmployee_clicked()
 
     QString passwordHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256).toHex();
 
-    Employe e(cin, nom, prenom, username, passwordHash, email, poste, departement, dateEmb, salaire, role);
+    Employe e(cin, nom, prenom, username, passwordHash, email,
+              poste, departement, dateEmb, salaire, role);
 
-    QString err;
-    if (e.ajouter(&err)) {
-        QMessageBox::information(this, "Succès", "Employé ajouté");
-        loadEmployees();
-        ui->stackedWidget->setCurrentIndex(0);  // retour liste
-    } else {
-        QMessageBox::critical(this, "Erreur", err);
+    QString errMsg;
+    if (!e.ajouter(&errMsg)) {
+        QMessageBox::critical(this, "Échec ajout", errMsg);
+        return;
     }
 
     QMessageBox::information(this, "Succès", "Employé ajouté.");
@@ -2183,8 +2308,470 @@ void MainWindow::on_btnAjouterPub_3_clicked()
     ui->stacked_L->setCurrentIndex(4);
 }
 
+//start inventory crud
+// ==================== INVENTORY HELPERS ====================
 
+QString MainWindow::selectedInventoryIdProduct() const
+{
+    const int r = ui->TableInventory->currentRow();
+    if (r < 0) return {};
+    QTableWidgetItem *it = ui->TableInventory->item(r, 0);
+    return it ? it->data(Qt::UserRole).toString() : QString();
+}
 
+QString MainWindow::selectedInventorySku() const
+{
+    const int r = ui->TableInventory->currentRow();
+    if (r < 0) return {};
+    QTableWidgetItem *it = ui->TableInventory->item(r, 1);
+    return it ? it->text() : QString();
+}
 
+// ── Init ─────────────────────────────────────────────────────────────────────
+
+void MainWindow::initInventoryUi()
+{
+    // Populate Status combo (add form)
+    ui->Status->clear();
+    ui->Status->addItem("on hand",   "on hand");
+    ui->Status->addItem("limited",   "limited");
+    ui->Status->addItem("stock out", "stock out");
+
+    // Populate Status combo (edit form)
+    ui->Status_2->clear();
+    ui->Status_2->addItem("on hand",   "on hand");
+    ui->Status_2->addItem("limited",   "limited");
+    ui->Status_2->addItem("stock out", "stock out");
+
+    // Filter Status combo
+    ui->InventoryStatus->clear();
+    ui->InventoryStatus->addItem("-- Tous --", "");
+    ui->InventoryStatus->addItem("on hand",   "on hand");
+    ui->InventoryStatus->addItem("limited",   "limited");
+    ui->InventoryStatus->addItem("stock out", "stock out");
+
+    // Zone combo (Add form) – Zones A B C D
+    ui->Zone->clear();
+    ui->Zone->addItem("Zone A", "A");
+    ui->Zone->addItem("Zone B", "B");
+    ui->Zone->addItem("Zone C", "C");
+    ui->Zone->addItem("Zone D", "D");
+
+    // Zone combo (Edit form) – Zones A B C D
+    ui->Zone_2->clear();
+    ui->Zone_2->addItem("Zone A", "A");
+    ui->Zone_2->addItem("Zone B", "B");
+    ui->Zone_2->addItem("Zone C", "C");
+    ui->Zone_2->addItem("Zone D", "D");
+
+    // Zone filter combo – Zones A B C D
+    ui->InventoryZone->clear();
+    ui->InventoryZone->addItem("-- Toutes zones --", "");
+    ui->InventoryZone->addItem("Zone A", "A");
+    ui->InventoryZone->addItem("Zone B", "B");
+    ui->InventoryZone->addItem("Zone C", "C");
+    ui->InventoryZone->addItem("Zone D", "D");
+
+    // Shelf combo (Add form) – RDC / 1st / 2nd / 3rd floor
+    ui->Shelf->clear();
+    ui->Shelf->addItem("RDC",       "RDC");
+    ui->Shelf->addItem("1st floor", "1st floor");
+    ui->Shelf->addItem("2nd floor", "2nd floor");
+    ui->Shelf->addItem("3rd floor", "3rd floor");
+
+    // Shelf combo (Edit form) – RDC / 1st / 2nd / 3rd floor
+    ui->Shelf_2->clear();
+    ui->Shelf_2->addItem("RDC",       "RDC");
+    ui->Shelf_2->addItem("1st floor", "1st floor");
+    ui->Shelf_2->addItem("2nd floor", "2nd floor");
+    ui->Shelf_2->addItem("3rd floor", "3rd floor");
+
+    // Unit combo (Add form) – KG / L / M
+    ui->Unit->clear();
+    ui->Unit->addItem("kg", "kg");
+    ui->Unit->addItem("L",  "L");
+    ui->Unit->addItem("m",  "m");
+
+    // Unit combo (Edit form) – KG / L / M
+    ui->Unit_2->clear();
+    ui->Unit_2->addItem("kg", "kg");
+    ui->Unit_2->addItem("L",  "L");
+    ui->Unit_2->addItem("m",  "m");
+
+    // Type combo (Add form)
+    ui->Type->clear();
+    ui->Type->addItem("Matière première",  "Matière première");
+    ui->Type->addItem("Composant",          "Composant");
+    ui->Type->addItem("Produit fini",       "Produit fini");
+    ui->Type->addItem("Produit semi-fini",  "Produit semi-fini");
+    ui->Type->addItem("Outil",              "Outil");
+    ui->Type->addItem("Équipement",         "Équipement");
+    ui->Type->addItem("Consommable",        "Consommable");
+    ui->Type->addItem("Pièce de rechange",  "Pièce de rechange");
+
+    // Type combo (Edit form)
+    ui->Type_2->clear();
+    ui->Type_2->addItem("Matière première",  "Matière première");
+    ui->Type_2->addItem("Composant",          "Composant");
+    ui->Type_2->addItem("Produit fini",       "Produit fini");
+    ui->Type_2->addItem("Produit semi-fini",  "Produit semi-fini");
+    ui->Type_2->addItem("Outil",              "Outil");
+    ui->Type_2->addItem("Équipement",         "Équipement");
+    ui->Type_2->addItem("Consommable",        "Consommable");
+    ui->Type_2->addItem("Pièce de rechange",  "Pièce de rechange");
+
+    // SKU Input Mask: 3 Letters - 3 Numbers (case insensitive input, forces upper)
+    // Format: AAA-999
+    ui->Sku->setInputMask(">AAA-999; ");
+    ui->Sku_2->setInputMask(">AAA-999; ");
+
+    // Name Validation: Uppercase Letters, Numbers and Spaces only
+    QRegularExpression nameRegex("^[A-Z0-9 ]*$");
+    QRegularExpressionValidator *nameValidator = new QRegularExpressionValidator(nameRegex, this);
+    ui->Name->setValidator(nameValidator);
+    ui->Name_2->setValidator(nameValidator);
+
+    setupTableInventory();
+    ui->stacked_I->setCurrentIndex(0);
+    loadInventory();
+}
+
+void MainWindow::setupTableInventory()
+{
+    ui->TableInventory->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->TableInventory->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->TableInventory->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->TableInventory->verticalHeader()->setVisible(false);
+    ui->TableInventory->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    // Columns: ID | SKU | Nom | Prix | Qt_AV | STATUS
+    ui->TableInventory->setColumnCount(6);
+    ui->TableInventory->setHorizontalHeaderLabels({
+        "ID", "SKU", "Nom", "Prix", "Qté disp.", "Statut"
+    });
+    ui->TableInventory->hideColumn(0); // Hide physical PK from Admin
+    ui->TableInventory->setSortingEnabled(true);
+    
+    // SKU Input Mask: Alphanumeric prefix, hyphen, digits (relaxed to avoid blocking)
+    ui->Sku->setInputMask(">NNN-NNN;0");
+    ui->Sku_2->setInputMask(">NNN-NNN;0");
+
+    // Hide ID input fields from Admin (automated)
+    ui->IdProduct->setVisible(false);
+    ui->IdProduct_2->setVisible(false);
+    ui->LblIdProduct->setVisible(false);
+    ui->LblIdProduct_2->setVisible(false);
+}
+
+// ── READ (load) ───────────────────────────────────────────────────────────────
+
+void MainWindow::loadInventory()
+{
+    ui->TableInventory->setRowCount(0);
+
+    QVector<Inventory::Row> rows;
+    QString err;
+    const int sortIdx = ui->InventorySort->currentIndex();
+    QString orderBy = "SKU";
+    if (sortIdx == 1) orderBy = "NAME ASC";
+    else if (sortIdx == 2) orderBy = "PRICE ASC";
+    else if (sortIdx == 3) orderBy = "PRICE DESC";
+
+    if (!Inventory::chargerTout(rows, orderBy, &err)) {
+        QMessageBox::critical(this, "Erreur SQL – Inventaire", err);
+        return;
+    }
+
+    int r = 0;
+    for (const auto &row : rows) {
+        ui->TableInventory->insertRow(r);
+
+        // col 0 – ID_PRODUCT (hidden PK stored in UserRole)
+        auto *itId = new QTableWidgetItem(row.idProduct);
+        itId->setData(Qt::UserRole,     row.idProduct);
+        itId->setData(Qt::UserRole + 1, row.zone);        // store zone for edit pre-fill
+        itId->setData(Qt::UserRole + 2, row.shelf);       // store shelf for edit pre-fill
+        itId->setData(Qt::UserRole + 3, row.unit);        // store unit for edit pre-fill
+        itId->setData(Qt::UserRole + 4, row.type);        // store type for edit pre-fill
+        itId->setData(Qt::UserRole + 5, row.description); // store description
+        itId->setData(Qt::UserRole + 6, row.qtRs);        // store qtRs
+        itId->setData(Qt::UserRole + 7, row.threshold);   // store threshold
+        ui->TableInventory->setItem(r, 0, itId);
+
+        ui->TableInventory->setItem(r, 1, new QTableWidgetItem(row.sku));
+        ui->TableInventory->setItem(r, 2, new QTableWidgetItem(row.name));
+        ui->TableInventory->setItem(r, 3, new QTableWidgetItem(QString::number(row.price, 'f', 2)));
+        ui->TableInventory->setItem(r, 4, new QTableWidgetItem(QString::number(row.qtAv)));
+        ui->TableInventory->setItem(r, 5, new QTableWidgetItem(row.status));
+        ++r;
+    }
+}
+
+// ── CREATE ────────────────────────────────────────────────────────────────────
+
+void MainWindow::on_BtnPopupSaveInventory_clicked()
+{
+    // Auto-uppercase for consistency
+    const QString name      = ui->Name->text().trimmed().toUpper();
+    const QString sku       = ui->Sku->text().trimmed().toUpper();
+    
+    // UI update to reflect uppercase
+    ui->Name->setText(name);
+    ui->Sku->setText(sku);
+
+    const QString type      = ui->Type->currentData().toString();
+    const int     qtAv      = ui->QtAv->value();
+    const int     qtRs      = ui->QtRs->value();
+    const int     threshold = ui->Threshold->value();
+    const QString unit      = ui->Unit->currentData().toString();
+    const double  price     = ui->Price->value();
+    const QString status    = ui->Status->currentData().toString();
+    const QString zone      = ui->Zone->currentData().toString();
+    const QString shelf     = ui->Shelf->currentData().toString();
+    const QString desc      = ui->Description->toPlainText().trimmed();
+
+    // Validation: Name (Uppercase and Numbers only)
+    QRegularExpression nameRegex("^[A-Z0-9 ]+$");
+    if (!nameRegex.match(name).hasMatch()) {
+        QMessageBox::warning(this, "Validation", "Le nom doit contenir uniquement des majuscules et des chiffres.");
+        return;
+    }
+
+    // Validation: SKU (ABC-123 format: 3 letters, hyphen, 3 numbers)
+    QRegularExpression skuRegex("^[A-Z]{3}-\\d{3}$");
+    if (!skuRegex.match(sku).hasMatch()) {
+        QMessageBox::warning(this, "Validation", "Le SKU doit respecter le format ABC-123 (3 lettres, un tiret, 3 chiffres).");
+        return;
+    }
+
+    if (status.isEmpty()) {
+        QMessageBox::warning(this, "Validation", "Veuillez sélectionner un statut.");
+        return;
+    }
+
+    Inventory inv(name, sku, type, qtAv, qtRs, threshold, unit, price, status, zone, shelf, desc);
+    QString err;
+    if (!inv.ajouter(&err)) {
+        QMessageBox::critical(this, "Erreur SQL – Ajout", err);
+        return;
+    }
+
+    QMessageBox::information(this, "Inventaire", "Produit ajouté avec succès.");
+    ui->stacked_I->setCurrentIndex(0);
+    loadInventory();
+}
+
+void MainWindow::on_BtnPopupResetInventory_clicked()
+{
+    ui->IdProduct->clear();
+    ui->Sku->clear();
+    ui->QtAv->setValue(0);
+    ui->QtRs->setValue(0);
+    ui->Threshold->setValue(0);
+    ui->Price->setValue(0.0);
+    ui->Status->setCurrentIndex(0);
+    ui->Type->setCurrentIndex(0);
+    ui->Unit->setCurrentIndex(0);
+    ui->Zone->setCurrentIndex(0);
+    ui->Shelf->setCurrentIndex(0);
+    ui->Description->clear();
+}
+
+// ── UPDATE ────────────────────────────────────────────────────────────────────
+
+void MainWindow::on_BtnInventoryEdit_clicked()
+{
+    const int r = ui->TableInventory->currentRow();
+    if (r < 0) {
+        QMessageBox::warning(this, "Modifier", "Sélectionnez un produit.");
+        return;
+    }
+
+    idProductToEdit = selectedInventoryIdProduct();
+    skuToEdit       = selectedInventorySku();
+
+    if (idProductToEdit.isEmpty() || skuToEdit.isEmpty()) {
+        QMessageBox::warning(this, "Modifier", "Impossible de récupérer l'ID ou le SKU.");
+        return;
+    }
+
+    // Pre-fill the edit form
+    ui->IdProduct_2->setText(ui->TableInventory->item(r, 0)->text());
+    ui->Sku_2->setText(ui->TableInventory->item(r, 1)->text());
+    ui->Name_2->setText(ui->TableInventory->item(r, 2)->text());
+    ui->Price_2->setValue(ui->TableInventory->item(r, 3)->text().toDouble());
+    ui->QtAv_2->setValue(ui->TableInventory->item(r, 4)->text().toInt());
+
+    const QString statusVal = ui->TableInventory->item(r, 5)->text();
+    int idx = ui->Status_2->findData(statusVal);
+    ui->Status_2->setCurrentIndex(idx >= 0 ? idx : 0);
+
+    // Pre-fill Zone combo (zone stored as "A"/"B"/"C"/"D" in UserRole+1)
+    const QString zoneVal = ui->TableInventory->item(r, 0)->data(Qt::UserRole + 1).toString();
+    int zoneIdx = ui->Zone_2->findData(zoneVal);
+    ui->Zone_2->setCurrentIndex(zoneIdx >= 0 ? zoneIdx : 0);
+
+    // Pre-fill Shelf combo (shelf stored in UserRole+2)
+    const QString shelfVal = ui->TableInventory->item(r, 0)->data(Qt::UserRole + 2).toString();
+    int shelfIdx = ui->Shelf_2->findData(shelfVal);
+    ui->Shelf_2->setCurrentIndex(shelfIdx >= 0 ? shelfIdx : 0);
+
+    // Pre-fill Unit combo (unit stored in UserRole+3)
+    const QString unitVal = ui->TableInventory->item(r, 0)->data(Qt::UserRole + 3).toString();
+    int unitIdx = ui->Unit_2->findData(unitVal);
+    ui->Unit_2->setCurrentIndex(unitIdx >= 0 ? unitIdx : 0);
+
+    // Pre-fill Type combo (type stored in UserRole+4)
+    const QString typeVal = ui->TableInventory->item(r, 0)->data(Qt::UserRole + 4).toString();
+    int typeIdx = ui->Type_2->findData(typeVal);
+    ui->Type_2->setCurrentIndex(typeIdx >= 0 ? typeIdx : 0);
+
+    // Pre-fill Description text (stored in UserRole+5)
+    const QString descVal = ui->TableInventory->item(r, 0)->data(Qt::UserRole + 5).toString();
+    ui->Description_2->setPlainText(descVal);
+
+    ui->stacked_I->setCurrentIndex(2);
+}
+
+void MainWindow::on_BtnPopupSaveInventory_2_clicked()
+{
+    // Auto-uppercase for consistency
+    const QString name      = ui->Name_2->text().trimmed().toUpper();
+    const QString sku       = ui->Sku_2->text().trimmed().toUpper();
+
+    // UI update to reflect uppercase
+    ui->Name_2->setText(name);
+    ui->Sku_2->setText(sku);
+
+    const QString type      = ui->Type_2->currentData().toString();
+    const int     qtAv      = ui->QtAv_2->value();
+    const int     qtRs      = ui->QtRs_2->value();
+    const int     threshold = ui->Threshold_2->value();
+    const QString unit      = ui->Unit_2->currentData().toString();
+    const double  price     = ui->Price_2->value();
+    const QString status    = ui->Status_2->currentData().toString();
+    const QString zone      = ui->Zone_2->currentData().toString();
+    const QString shelf     = ui->Shelf_2->currentData().toString();
+    const QString desc      = ui->Description_2->toPlainText().trimmed();
+
+    if (idProductToEdit.isEmpty()) {
+        QMessageBox::warning(this, "Modifier", "Aucun produit sélectionné.");
+        return;
+    }
+
+    // Validation: Name (Uppercase and Numbers only)
+    QRegularExpression nameRegex("^[A-Z0-9 ]+$");
+    if (!nameRegex.match(name).hasMatch()) {
+        QMessageBox::warning(this, "Validation", "Le nom doit contenir uniquement des majuscules et des chiffres.");
+        return;
+    }
+
+    // Validation: SKU (ABC-123 format: 3 letters, hyphen, 3 numbers)
+    QRegularExpression skuRegex("^[A-Z]{3}-\\d{3}$");
+    if (!skuRegex.match(sku).hasMatch()) {
+        QMessageBox::warning(this, "Validation", "Le SKU doit respecter le format ABC-123 (3 lettres, un tiret, 3 chiffres).");
+        return;
+    }
+
+    if (status.isEmpty()) {
+        QMessageBox::warning(this, "Validation", "Veuillez sélectionner un statut.");
+        return;
+    }
+
+    QString err;
+    if (!Inventory::modifier(idProductToEdit, name, sku, type, qtAv, qtRs, threshold, unit, price, status, zone, shelf, desc, &err)) {
+        QMessageBox::critical(this, "Erreur SQL – Modification", err);
+        return;
+    }
+
+    QMessageBox::information(this, "Inventaire", "Produit modifié avec succès.");
+    idProductToEdit.clear();
+    skuToEdit.clear();
+    ui->stacked_I->setCurrentIndex(0);
+    loadInventory();
+}
+
+void MainWindow::on_BtnPopupResetInventory_2_clicked()
+{
+    const int r = ui->TableInventory->currentRow();
+    if (r < 0) return;
+
+    ui->IdProduct_2->setText(ui->TableInventory->item(r, 0)->text());
+    ui->Sku_2->setText(ui->TableInventory->item(r, 1)->text());
+    ui->Name_2->setText(ui->TableInventory->item(r, 2)->text());
+    ui->Price_2->setValue(ui->TableInventory->item(r, 3)->text().toDouble());
+    ui->QtAv_2->setValue(ui->TableInventory->item(r, 4)->text().toInt());
+    const QString statusVal = ui->TableInventory->item(r, 5)->text();
+    int idx = ui->Status_2->findData(statusVal);
+    ui->Status_2->setCurrentIndex(idx >= 0 ? idx : 0);
+}
+
+// ── DELETE ────────────────────────────────────────────────────────────────────
+
+void MainWindow::on_BtnInventoryDelete_clicked()
+{
+    const QString id  = selectedInventoryIdProduct();
+    const QString sku = selectedInventorySku();
+
+    if (id.isEmpty() || sku.isEmpty()) {
+        QMessageBox::warning(this, "Supprimer", "Sélectionnez un produit à supprimer.");
+        return;
+    }
+
+    auto reply = QMessageBox::question(
+        this,
+        "Confirmation",
+        QString("Supprimer le produit « %1 / %2 » ?").arg(id, sku),
+        QMessageBox::Yes | QMessageBox::No
+    );
+    if (reply != QMessageBox::Yes) return;
+
+    QString err;
+    if (!Inventory::supprimer(id, sku, &err)) {
+        QMessageBox::critical(this, "Erreur SQL – Suppression", err);
+        return;
+    }
+
+    QMessageBox::information(this, "Inventaire", "Produit supprimé.");
+    loadInventory();
+}
+
+// ── SEARCH / FILTER ───────────────────────────────────────────────────────────
+
+void MainWindow::on_BtnInventoryApply_clicked()
+{
+    const QString kw     = ui->InventorySearch->text().trimmed();
+    const QString status = ui->InventoryStatus->currentData().toString();
+    const int     sortIdx = ui->InventorySort->currentIndex();
+
+    QString orderBy = "SKU";
+    if (sortIdx == 1) orderBy = "NAME ASC";
+    else if (sortIdx == 2) orderBy = "PRICE ASC";
+    else if (sortIdx == 3) orderBy = "PRICE DESC";
+
+    QVector<Inventory::Row> rows;
+    QString err;
+    if (!Inventory::chercher(rows, kw, status, orderBy, &err)) {
+        QMessageBox::critical(this, "Erreur SQL – Recherche", err);
+        return;
+    }
+
+    ui->TableInventory->setRowCount(0);
+    int r = 0;
+    for (const auto &row : rows) {
+        ui->TableInventory->insertRow(r);
+        auto *itId = new QTableWidgetItem(row.idProduct);
+        itId->setData(Qt::UserRole, row.idProduct);
+        ui->TableInventory->setItem(r, 0, itId);
+        ui->TableInventory->setItem(r, 1, new QTableWidgetItem(row.sku));
+        ui->TableInventory->setItem(r, 2, new QTableWidgetItem(row.name));
+        ui->TableInventory->setItem(r, 3, new QTableWidgetItem(QString::number(row.price, 'f', 2)));
+        ui->TableInventory->setItem(r, 4, new QTableWidgetItem(QString::number(row.qtAv)));
+        ui->TableInventory->setItem(r, 5, new QTableWidgetItem(row.status));
+        ++r;
+    }
+}
+
+//end
 
 

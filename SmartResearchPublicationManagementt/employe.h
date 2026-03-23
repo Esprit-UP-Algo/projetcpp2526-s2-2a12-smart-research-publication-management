@@ -4,6 +4,8 @@
 #include <QString>
 #include <QDate>
 #include <QVector>
+#include <QSqlQuery>
+#include <QSqlError>
 
 class Employe
 {
@@ -20,7 +22,7 @@ public:
         QString departement;
         QString dateEmbauche;     // "yyyy-MM-dd"
         double  salaire = 0.0;
-        QString role;
+        QString role;             // ADMIN, RH, EMPLOYE
 
         // ──── Partie demande (optionnelle) ────
         QString typeDemande;
@@ -36,10 +38,6 @@ public:
         QString heureArrivee;
         QString heureDepart;
         QString statutJournalier;
-
-
-
-
     };
 
     Employe() = default;
@@ -69,6 +67,15 @@ public:
         QString statutJournalier = ""
         );
 
+    // ──── GESTION DES RÔLES ET AUTHENTIFICATION ────
+
+    // Méthode classique (Username + Password)
+    static bool authentifier(const QString &username, const QString &passwordHash, QString *err = nullptr);
+
+    // AJOUT : Méthode FaceID (Username uniquement après validation visuelle)
+    // Elle doit remplir Session::instance() comme la méthode classique
+static bool authentifierFaceID(const QString &username, QString *err = nullptr);    // ──── CRUD ET BASE DE DONNÉES ────
+
     bool ajouter(QString *err = nullptr) const;
 
     static bool modifier(
@@ -81,27 +88,19 @@ public:
         const QString& poste,
         const QString& departement,
         const QDate&   dateEmbauche,
-        double         salaire,
+        double          salaire,
         const QString& role,
         QString       *err = nullptr
         );
 
     static bool supprimer(const QString& idEmploye, QString *err = nullptr);
-
     static bool chargerTout(QVector<Row> &out, QString *err = nullptr);
-
     static bool usernameExiste(const QString &username);
-    static bool verifierLogin(
-        const QString &username,
-        const QString &passwordHash,
-        QString &idEmployeOut,
-        QString &roleOut,
-        QString *err = nullptr
-        );
 
 private:
     static bool nextId(int &outId, QString *err = nullptr);
 
+    // Attributs principaux
     QString m_cin;
     QString m_nom;
     QString m_prenom;
@@ -114,6 +113,7 @@ private:
     double  m_salaire = 0.0;
     QString m_role;
 
+    // Attributs Demande
     QString m_typeDemande;
     QDate   m_dateDebut;
     QDate   m_dateFin;
@@ -122,6 +122,7 @@ private:
     QString m_statutDemande;
     QString m_commentaireRH;
 
+    // Attributs Pointage
     QDate   m_datePointage;
     QString m_heureArrivee;
     QString m_heureDepart;

@@ -9,6 +9,7 @@
 #include "publication.h"
 #include "labs.h"
 #include "employe.h"
+#include "inventory.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,13 +21,10 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    explicit MainWindow(const QString &idEmploye = "", const QString &role = "", QWidget *parent = nullptr);
     ~MainWindow();
 
 private:
     Ui::MainWindow *ui;
-    QString m_idEmployeConnecte;
-    QString m_roleConnecte;
 
     // ===== FINANCE =====
     Finance::Row selectedFinanceRowFromTable(bool *ok=nullptr) const;
@@ -41,10 +39,10 @@ private:
 
     // ===== PUBLICATION =====
     void initPublicationUi();
-    void setupTablePublication();
     void loadPublications();
     QString selectedPublicationId() const;
     QString idPublicationToEdit;
+    int currentEmployeeId = 3; // مثال: انت الموظف 3 (بعد login نخليها تتغير)
     // =======================
 
     // ===== LABS =====
@@ -63,7 +61,18 @@ private:
     void filterEmployees(const QString &searchText);
     void sortByEmbaucheDate();
     bool embaucheAscending = true;
+    void configurerPermissions();
     // ====================
+
+    // ===== INVENTORY =====
+    void initInventoryUi();
+    void setupTableInventory();
+    void loadInventory();
+    QString selectedInventoryIdProduct() const;
+    QString selectedInventorySku() const;
+    QString idProductToEdit;
+    QString skuToEdit;
+    // =====================
 
     void updateTopTitle(int index);
     void applyModernStyle();
@@ -144,6 +153,12 @@ private slots:
     void on_BtnPopupCancelInventory_2_triggered(QAction *arg1);
     void on_BtnPopupCancelInventory_2_clicked();
     void on_BtnPopupCancelInventory_clicked();
+    void on_BtnPopupSaveInventory_clicked();    // ADD save
+    void on_BtnPopupResetInventory_clicked();   // ADD reset
+    void on_BtnPopupSaveInventory_2_clicked();  // EDIT save
+    void on_BtnPopupResetInventory_2_clicked(); // EDIT reset
+    void on_BtnInventoryDelete_clicked();       // DELETE
+    void on_BtnInventoryApply_clicked();        // filter/search
 
     // Finance slots
     void on_btnFinance_clicked();

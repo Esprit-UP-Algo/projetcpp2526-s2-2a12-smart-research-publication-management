@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
@@ -229,14 +229,14 @@
       <item>
        <widget class="QStackedWidget" name="stackedWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>5</number>
         </property>
         <widget class="QWidget" name="pageEmployee">
          <layout class="QVBoxLayout" name="verticalLayoutPage0">
           <item>
            <widget class="QStackedWidget" name="stack_emp">
             <property name="currentIndex">
-             <number>2</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_Emp">
              <layout class="QGridLayout" name="gridLayout_4">
@@ -1727,7 +1727,7 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="1" column="4">
+                 <item row="1" column="5">
                   <widget class="QPushButton" name="BtnInventoryApply">
                    <property name="text">
                     <string>Appliquer</string>
@@ -1773,6 +1773,37 @@
                    <property name="text">
                     <string>Type</string>
                    </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="4">
+                  <widget class="QLabel" name="LblInventorySort">
+                   <property name="text">
+                    <string>Trier par</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="4">
+                  <widget class="QComboBox" name="InventorySort">
+                   <item>
+                    <property name="text">
+                     <string>SKU</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Nom (A-Z)</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Prix (Croissant)</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Prix (Décroissant)</string>
+                    </property>
+                   </item>
                   </widget>
                  </item>
                 </layout>
@@ -2044,6 +2075,20 @@
                    <widget class="QComboBox" name="Shelf">
                     <property name="placeholderText">
                      <string>Sélectionner étagère</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="0">
+                   <widget class="QLabel" name="LblDescription">
+                    <property name="text">
+                     <string>Description</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="1" colspan="3">
+                   <widget class="QTextEdit" name="Description">
+                    <property name="placeholderText">
+                     <string>Entrez une description...</string>
                     </property>
                    </widget>
                   </item>
@@ -2357,6 +2402,20 @@
                     </property>
                    </widget>
                   </item>
+                  <item row="6" column="0">
+                   <widget class="QLabel" name="LblDescription_2">
+                    <property name="text">
+                     <string>Description</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="1" colspan="3">
+                   <widget class="QTextEdit" name="Description_2">
+                    <property name="placeholderText">
+                     <string>Entrez une description...</string>
+                    </property>
+                   </widget>
+                  </item>
                  </layout>
                 </widget>
                </item>
@@ -2429,32 +2488,277 @@
              </widget>
             </widget>
             <widget class="QWidget" name="afficheri">
-             <widget class="QLabel" name="stat_pub_5">
-              <property name="geometry">
-               <rect>
-                <x>170</x>
-                <y>70</y>
-                <width>1021</width>
-                <height>381</height>
-               </rect>
+             <layout class="QVBoxLayout" name="detailInventoryRootLayout">
+              <property name="spacing">
+               <number>20</number>
               </property>
-              <property name="text">
-               <string/>
+              <property name="leftMargin">
+               <number>30</number>
               </property>
-             </widget>
-             <widget class="QPushButton" name="retour_stat_6">
-              <property name="geometry">
-               <rect>
-                <x>90</x>
-                <y>530</y>
-                <width>1101</width>
-                <height>41</height>
-               </rect>
+              <property name="topMargin">
+               <number>30</number>
               </property>
-              <property name="text">
-               <string>retour</string>
+              <property name="rightMargin">
+               <number>30</number>
               </property>
-             </widget>
+              <property name="bottomMargin">
+               <number>30</number>
+              </property>
+              <item>
+               <layout class="QHBoxLayout" name="detailHeaderLayout">
+                <item>
+                 <widget class="QLabel" name="aff_header_title">
+                  <property name="styleSheet">
+                   <string>font-size: 24px; font-weight: 900; color: #0B2E1F;</string>
+                  </property>
+                  <property name="text">
+                   <string>📄 Fiche Produit détaillée</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="hSpacerDetailHeader">
+                  <property name="orientation">
+                   <enum>Qt::Orientation::Horizontal</enum>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="retour_stat_6">
+                  <property name="text">
+                   <string>← Retour au Stock</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="detailCardsLayout">
+                <property name="spacing">
+                 <number>20</number>
+                </property>
+                <item>
+                 <widget class="QFrame" name="CardGeneral">
+                  <layout class="QFormLayout" name="formGeneral">
+                   <property name="verticalSpacing">
+                    <number>12</number>
+                   </property>
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="lbl_g1">
+                     <property name="text">
+                      <string>🆔 ID PRODUIT</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLabel" name="aff_id">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="lbl_g2">
+                     <property name="text">
+                      <string>🔖 SKU</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLabel" name="aff_sku">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="lbl_g3">
+                     <property name="text">
+                      <string>📛 NOM</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QLabel" name="aff_name">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="0">
+                    <widget class="QLabel" name="lbl_g4">
+                     <property name="text">
+                      <string>📂 TYPE</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="1">
+                    <widget class="QLabel" name="aff_type">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="0">
+                    <widget class="QLabel" name="lbl_g5">
+                     <property name="text">
+                      <string>💰 PRIX</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="1">
+                    <widget class="QLabel" name="aff_price">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="5" column="0">
+                    <widget class="QLabel" name="lbl_g6">
+                     <property name="text">
+                      <string>✨ STATUT</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="5" column="1">
+                    <widget class="QLabel" name="aff_status">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QFrame" name="CardStock">
+                  <layout class="QFormLayout" name="formStock">
+                   <property name="verticalSpacing">
+                    <number>12</number>
+                   </property>
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="lbl_s1">
+                     <property name="text">
+                      <string>📦 DISPONIBLE</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLabel" name="aff_qtav">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="lbl_s2">
+                     <property name="text">
+                      <string>🔒 RÉSERVÉ</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLabel" name="aff_qtrs">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="lbl_s3">
+                     <property name="text">
+                      <string>⚠️ SEUIL MIN</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QLabel" name="aff_threshold">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="0">
+                    <widget class="QLabel" name="lbl_s4">
+                     <property name="text">
+                      <string>📏 UNITÉ</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="1">
+                    <widget class="QLabel" name="aff_unit">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="0">
+                    <widget class="QLabel" name="lbl_s5">
+                     <property name="text">
+                      <string>📍 ZONE</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="1">
+                    <widget class="QLabel" name="aff_zone">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="5" column="0">
+                    <widget class="QLabel" name="lbl_s6">
+                     <property name="text">
+                      <string>🪜 ÉTAGÈRE</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="5" column="1">
+                    <widget class="QLabel" name="aff_shelf">
+                     <property name="text">
+                      <string>-</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QFrame" name="CardDescription">
+                <layout class="QVBoxLayout" name="vLayoutDesc">
+                 <item>
+                  <widget class="QLabel" name="lbl_d1">
+                   <property name="text">
+                    <string>DESCRIPTION</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="aff_description">
+                   <property name="text">
+                    <string>-</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <spacer name="vSpacerDetailBottom">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Vertical</enum>
+                </property>
+               </spacer>
+              </item>
+             </layout>
             </widget>
            </widget>
           </item>
@@ -2465,7 +2769,7 @@
           <item>
            <widget class="QStackedWidget" name="stack_pub">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_pub_list">
              <layout class="QVBoxLayout" name="verticalLayoutPubList">
@@ -3004,7 +3308,7 @@
           <item>
            <widget class="QStackedWidget" name="stacked_F">
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="finance">
              <layout class="QGridLayout" name="gridLayout">
@@ -5737,9 +6041,6 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
-               <widget class="QComboBox" name="comboTypeBrevetAdd"/>
-              </item>
               <item row="1" column="0">
                <widget class="QLabel" name="lblDomaineAdd">
                 <property name="text">
@@ -5761,23 +6062,6 @@
                 </property>
                </widget>
               </item>
-              <item row="4" column="1">
-               <widget class="QDateEdit" name="dateDepotAdd">
-                <property name="calendarPopup">
-                 <bool>true</bool>
-                </property>
-                <property name="date">
-                 <date>
-                  <year>2000</year>
-                  <month>1</month>
-                  <day>1</day>
-                 </date>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLineEdit" name="lineNumeroBrevetAdd"/>
-              </item>
               <item row="4" column="0">
                <widget class="QLabel" name="lblDateDepotAdd">
                 <property name="text">
@@ -5787,9 +6071,6 @@
               </item>
               <item row="0" column="1">
                <widget class="QLineEdit" name="lineTitreAdd"/>
-              </item>
-              <item row="5" column="1">
-               <widget class="QComboBox" name="comboStatusBrevetAdd"/>
               </item>
               <item row="3" column="0">
                <widget class="QLabel" name="lblNumeroBrevetAdd">
@@ -5817,6 +6098,18 @@
                  <string>statut  </string>
                 </property>
                </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QDateEdit" name="dateEdit"/>
+              </item>
+              <item row="4" column="1">
+               <widget class="QDateEdit" name="dateEdit_2"/>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="lineEdit"/>
+              </item>
+              <item row="5" column="1">
+               <widget class="QDateEdit" name="dateEdit_3"/>
               </item>
              </layout>
             </widget>
@@ -5867,30 +6160,10 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
-               <widget class="QComboBox" name="comboTypeBrevetEdit"/>
-              </item>
               <item row="3" column="2">
                <widget class="QLabel" name="lblResumeEdit">
                 <property name="text">
                  <string>priorite </string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="3">
-               <widget class="QComboBox" name="comboStatusBrevetEdit"/>
-              </item>
-              <item row="0" column="3">
-               <widget class="QDateEdit" name="dateDepotEdit">
-                <property name="calendarPopup">
-                 <bool>true</bool>
-                </property>
-                <property name="date">
-                 <date>
-                  <year>2000</year>
-                  <month>1</month>
-                  <day>1</day>
-                 </date>
                 </property>
                </widget>
               </item>
@@ -5928,9 +6201,6 @@
               <item row="2" column="3">
                <widget class="QLineEdit" name="lineInventeursEdit"/>
               </item>
-              <item row="3" column="1">
-               <widget class="QLineEdit" name="lineNumeroBrevetEdit"/>
-              </item>
               <item row="0" column="2">
                <widget class="QLabel" name="lblDateDepotEdit">
                 <property name="text">
@@ -5962,12 +6232,24 @@
                 </property>
                </widget>
               </item>
+              <item row="1" column="3">
+               <widget class="QDateEdit" name="dateEdit_4"/>
+              </item>
+              <item row="0" column="3">
+               <widget class="QDateEdit" name="dateEdit_5"/>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="lineEdit_2"/>
+              </item>
+              <item row="3" column="1">
+               <widget class="QDateEdit" name="dateEdit_6"/>
+              </item>
              </layout>
             </widget>
             <widget class="QWidget" name="page_proj_empty">
              <layout class="QVBoxLayout" name="verticalLayoutProjEmpty">
               <item>
-               <widget class="QLabel" name="stat_pub">
+               <widget class="QLabel" name="stat_pub_8">
                 <property name="text">
                  <string/>
                 </property>
@@ -5998,7 +6280,7 @@
      <x>0</x>
      <y>0</y>
      <width>1528</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
