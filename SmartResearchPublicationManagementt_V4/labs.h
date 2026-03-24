@@ -30,7 +30,11 @@ public:
          QString disponibilite,
          QString resultat,
          QString qrlabs,
+<<<<<<< HEAD:SmartResearchPublicationManagementt_V4/labs.h
          QString IDEMP)
+=======
+         int IDEMP)
+>>>>>>> 9fd98e05953d86978b42c6fda2f7a3b994435af5:SmartResearchPublicationManagement_V003/labs.h
         : m_nomlabo(std::move(nomlabo)),
         m_responsable(std::move(responsable)),
         m_numero(std::move(numero)),
@@ -69,7 +73,11 @@ private:
     QString m_disponibilite;
     QString m_resultat;
     QString m_qrlabs;
+<<<<<<< HEAD:SmartResearchPublicationManagementt_V4/labs.h
     QString m_IDEMP;
+=======
+    int m_IDEMP;
+>>>>>>> 9fd98e05953d86978b42c6fda2f7a3b994435af5:SmartResearchPublicationManagement_V003/labs.h
 };
 
 #endif // LABS_H

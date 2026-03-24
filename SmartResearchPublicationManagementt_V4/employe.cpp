@@ -2,6 +2,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
+<<<<<<< HEAD:SmartResearchPublicationManagementt_V4/employe.cpp
 #include "session.h"
 
 // Constructeur (Utilisation de std::move pour la performance)
@@ -9,20 +10,48 @@ Employe::Employe(
     QString cin, QString nom, QString prenom, QString username, QString passwordHash,
     QString email, QString poste, QString departement,
     QDate dateEmbauche, double salaire, QString role
+=======
+
+Employe::Employe(
+    QString cin, QString nom, QString prenom, QString username, QString passwordHash,
+    QString email, QString poste, QString departement,
+    QDate dateEmbauche, double salaire, QString role,
+    QString typeDemande, QDate dateDebut, QDate dateFin,
+    QString description, QDate dateDemande, QString statutDemande,
+    QString commentaireRH, QDate datePointage,
+    QString heureArrivee, QString heureDepart, QString statutJournalier
+>>>>>>> 9fd98e05953d86978b42c6fda2f7a3b994435af5:SmartResearchPublicationManagement_V003/employe.cpp
     )
     : m_cin(std::move(cin)), m_nom(std::move(nom)), m_prenom(std::move(prenom)),
     m_username(std::move(username)), m_passwordHash(std::move(passwordHash)),
     m_email(std::move(email)), m_poste(std::move(poste)),
     m_departement(std::move(departement)), m_dateEmbauche(dateEmbauche),
+<<<<<<< HEAD:SmartResearchPublicationManagementt_V4/employe.cpp
     m_salaire(salaire), m_role(std::move(role))
 {}
 
 // Génération d'ID automatique (Oracle/SQLite style)
+=======
+    m_salaire(salaire), m_role(std::move(role)),
+    m_typeDemande(std::move(typeDemande)), m_dateDebut(dateDebut),
+    m_dateFin(dateFin), m_description(std::move(description)),
+    m_dateDemande(dateDemande), m_statutDemande(std::move(statutDemande)),
+    m_commentaireRH(std::move(commentaireRH)), m_datePointage(datePointage),
+    m_heureArrivee(std::move(heureArrivee)), m_heureDepart(std::move(heureDepart)),
+    m_statutJournalier(std::move(statutJournalier))
+{}
+
+>>>>>>> 9fd98e05953d86978b42c6fda2f7a3b994435af5:SmartResearchPublicationManagement_V003/employe.cpp
 bool Employe::nextId(int &outId, QString *err)
 {
     QSqlQuery query;
     if (!query.exec("SELECT NVL(MAX(ID_EMPLOYE), 0) + 1 FROM EMPLOYES")) {
+<<<<<<< HEAD:SmartResearchPublicationManagementt_V4/employe.cpp
         if (err) *err = query.lastError().text();
+=======
+        QString error = query.lastError().text();
+        if (err) *err = error;
+>>>>>>> 9fd98e05953d86978b42c6fda2f7a3b994435af5:SmartResearchPublicationManagement_V003/employe.cpp
         return false;
     }
     if (query.next()) {
@@ -33,7 +62,10 @@ bool Employe::nextId(int &outId, QString *err)
     return false;
 }
 
+<<<<<<< HEAD:SmartResearchPublicationManagementt_V4/employe.cpp
 // CREATE : Ajouter un employé
+=======
+>>>>>>> 9fd98e05953d86978b42c6fda2f7a3b994435af5:SmartResearchPublicationManagement_V003/employe.cpp
 bool Employe::ajouter(QString *err) const
 {
     int id;
@@ -63,6 +95,7 @@ bool Employe::ajouter(QString *err) const
     query.bindValue(":role",         m_role);
 
     if (!query.exec()) {
+<<<<<<< HEAD:SmartResearchPublicationManagementt_V4/employe.cpp
         if (err) *err = "Échec de l'ajout : " + query.lastError().text();
         return false;
     }
@@ -71,6 +104,29 @@ bool Employe::ajouter(QString *err) const
 
 // UPDATE : Modifier un employé (Appelé via l'objet instance dans MainWindow)
 bool Employe::modifier(const QString& idEmploye, QString *err)
+=======
+        QString error = query.lastError().text();
+        if (err) *err = "Échec de l'ajout : " + error;
+        return false;
+    }
+
+    return true;
+}
+
+bool Employe::modifier(
+    const QString& idEmploye,
+    const QString& cin,
+    const QString& nom,
+    const QString& prenom,
+    const QString& username,
+    const QString& email,
+    const QString& poste,
+    const QString& departement,
+    const QDate&   dateEmbauche,
+    double         salaire,
+    const QString& role,
+    QString       *err)
+>>>>>>> 9fd98e05953d86978b42c6fda2f7a3b994435af5:SmartResearchPublicationManagement_V003/employe.cpp
 {
     QSqlQuery query;
     query.prepare(
@@ -81,6 +137,7 @@ bool Employe::modifier(const QString& idEmploye, QString *err)
         "WHERE ID_EMPLOYE = :id"
         );
 
+<<<<<<< HEAD:SmartResearchPublicationManagementt_V4/employe.cpp
     query.bindValue(":cin",          m_cin);
     query.bindValue(":nom",          m_nom);
     query.bindValue(":prenom",       m_prenom);
@@ -101,6 +158,34 @@ bool Employe::modifier(const QString& idEmploye, QString *err)
 }
 
 // DELETE : Supprimer un employé
+=======
+    query.bindValue(":cin",          cin);
+    query.bindValue(":nom",          nom);
+    query.bindValue(":prenom",       prenom);
+    query.bindValue(":username",     username);
+    query.bindValue(":email",        email);
+    query.bindValue(":poste",        poste);
+    query.bindValue(":departement",  departement);
+    query.bindValue(":dateEmbauche", dateEmbauche);
+    query.bindValue(":salaire",      salaire);
+    query.bindValue(":role",         role);
+    query.bindValue(":id",           idEmploye);
+
+    if (!query.exec()) {
+        QString error = query.lastError().text();
+        if (err) *err = "Échec modification : " + error;
+        return false;
+    }
+
+    if (query.numRowsAffected() == 0) {
+        if (err) *err = "Aucun employé trouvé";
+        return false;
+    }
+
+    return true;
+}
+
+>>>>>>> 9fd98e05953d86978b42c6fda2f7a3b994435af5:SmartResearchPublicationManagement_V003/employe.cpp
 bool Employe::supprimer(const QString& idEmploye, QString *err)
 {
     QSqlQuery query;
@@ -108,6 +193,7 @@ bool Employe::supprimer(const QString& idEmploye, QString *err)
     query.bindValue(":id", idEmploye);
 
     if (!query.exec()) {
+<<<<<<< HEAD:SmartResearchPublicationManagementt_V4/employe.cpp
         if (err) *err = "Échec suppression : " + query.lastError().text();
         return false;
     }
@@ -122,10 +208,36 @@ bool Employe::chargerTout(QVector<Row> &out, QString *err)
                     "POSTE, DEPARTEMENT, DATE_EMBAUCHE, SALAIRE, ROLE "
                     "FROM EMPLOYES ORDER BY ID_EMPLOYE ASC")) {
         if (err) *err = "Impossible de charger : " + query.lastError().text();
+=======
+        QString error = query.lastError().text();
+        if (err) *err = "Échec suppression : " + error;
+        return false;
+    }
+
+    if (query.numRowsAffected() == 0) {
+        if (err) *err = "Aucun employé trouvé";
+        return false;
+    }
+
+    return true;
+}
+
+bool Employe::chargerTout(QVector<Row> &out, QString *err)
+{
+    QSqlQuery query;
+    if (!query.exec(
+            "SELECT ID_EMPLOYE, CIN, NOM, PRENOM, USERNAME, EMAIL, "
+            "POSTE, DEPARTEMENT, DATE_EMBAUCHE, SALAIRE, ROLE "
+            "FROM EMPLOYES ORDER BY ID_EMPLOYE ASC"
+            )) {
+        QString error = query.lastError().text();
+        if (err) *err = "Impossible de charger : " + error;
+>>>>>>> 9fd98e05953d86978b42c6fda2f7a3b994435af5:SmartResearchPublicationManagement_V003/employe.cpp
         return false;
     }
 
     out.clear();
+<<<<<<< HEAD:SmartResearchPublicationManagementt_V4/employe.cpp
     while (query.next()) {
         Row r;
         r.idEmploye    = query.value(0).toString();
@@ -145,11 +257,35 @@ bool Employe::chargerTout(QVector<Row> &out, QString *err)
 }
 
 // Vérifier si un username est déjà pris
+=======
+
+    while (query.next()) {
+        Row r;
+        r.idEmploye    = query.value("ID_EMPLOYE").toString();
+        r.cin          = query.value("CIN").toString();
+        r.nom          = query.value("NOM").toString();
+        r.prenom       = query.value("PRENOM").toString();
+        r.username     = query.value("USERNAME").toString();
+        r.email        = query.value("EMAIL").toString();
+        r.poste        = query.value("POSTE").toString();
+        r.departement  = query.value("DEPARTEMENT").toString();
+        r.dateEmbauche = query.value("DATE_EMBAUCHE").toDate().toString("yyyy-MM-dd");
+        r.salaire      = query.value("SALAIRE").toDouble();
+        r.role         = query.value("ROLE").toString();
+
+        out.append(r);
+    }
+
+    return true;
+}
+
+>>>>>>> 9fd98e05953d86978b42c6fda2f7a3b994435af5:SmartResearchPublicationManagement_V003/employe.cpp
 bool Employe::usernameExiste(const QString &username)
 {
     QSqlQuery query;
     query.prepare("SELECT 1 FROM EMPLOYES WHERE USERNAME = :username");
     query.bindValue(":username", username);
+<<<<<<< HEAD:SmartResearchPublicationManagementt_V4/employe.cpp
     return query.exec() && query.next();
 }
 
@@ -203,4 +339,9 @@ bool Employe::authentifierFaceID(const QString &username, QString *err)
 
     if (err) *err = "Utilisateur reconnu par FaceID mais introuvable en base.";
     return false;
+=======
+
+    if (!query.exec()) return false;
+    return query.next();
+>>>>>>> 9fd98e05953d86978b42c6fda2f7a3b994435af5:SmartResearchPublicationManagement_V003/employe.cpp
 }

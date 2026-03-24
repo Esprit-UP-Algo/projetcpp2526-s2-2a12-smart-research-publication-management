@@ -31,7 +31,11 @@ public:
             QDate dateTransaction,
             QString modePaiement,
             QDate dateCreation,
+<<<<<<< HEAD:SmartResearchPublicationManagementt_V4/finance.h
             QString IDEMP)
+=======
+            int IDEMP)
+>>>>>>> 9fd98e05953d86978b42c6fda2f7a3b994435af5:SmartResearchPublicationManagement_V003/finance.h
         : m_code(std::move(code)),
         m_type(std::move(type)),
         m_montant(montant),
@@ -71,7 +75,11 @@ private:
     QDate   m_dateTransaction;
     QString m_modePaiement;
     QDate   m_dateCreation;
+<<<<<<< HEAD:SmartResearchPublicationManagementt_V4/finance.h
     QString m_IDEMP;
+=======
+    int m_IDEMP;
+>>>>>>> 9fd98e05953d86978b42c6fda2f7a3b994435af5:SmartResearchPublicationManagement_V003/finance.h
 };
 
 #endif // FINANCE_H

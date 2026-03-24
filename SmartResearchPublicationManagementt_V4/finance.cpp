@@ -33,7 +33,11 @@ bool Finance::ajouter(QString *err) const
         "INSERT INTO HICHEM.FINANCE "
         "(IDFINANCE, CODETRANSA, TYPETRANSACTION, MONTANT, CATEGORIE, DESCRIPTION, "
         " DATETRANSACTION, MODEPAIEMENT, DATECREATION, IDEMP) "
+<<<<<<< HEAD:SmartResearchPublicationManagementt_V4/finance.cpp
         "VALUES (:id, :code, :type, :montant, :cat, :desc, :dt, :mode, :dc, :cin)"
+=======
+        "VALUES (:id, :code, :type, :montant, :cat, :desc, :dt, :mode, :dc, :idemp)"
+>>>>>>> 9fd98e05953d86978b42c6fda2f7a3b994435af5:SmartResearchPublicationManagement_V003/finance.cpp
         );
 
     q.bindValue(":id", newId);
@@ -45,7 +49,11 @@ bool Finance::ajouter(QString *err) const
     q.bindValue(":dt", m_dateTransaction);
     q.bindValue(":mode", m_modePaiement);
     q.bindValue(":dc", m_dateCreation);
+<<<<<<< HEAD:SmartResearchPublicationManagementt_V4/finance.cpp
     q.bindValue(":cin", m_IDEMP);
+=======
+    q.bindValue(":idemp", m_IDEMP);
+>>>>>>> 9fd98e05953d86978b42c6fda2f7a3b994435af5:SmartResearchPublicationManagement_V003/finance.cpp
 
     if (!q.exec()) {
         setErr(err, q.lastError().text());

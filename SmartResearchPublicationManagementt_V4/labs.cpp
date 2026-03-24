@@ -29,6 +29,7 @@ bool Labs::ajouter(QString *err) const
     if (!nextId(newId, err)) return false;
 
     QSqlQuery q;
+<<<<<<< HEAD:SmartResearchPublicationManagementt_V4/labs.cpp
     q.prepare(
         "INSERT INTO HICHEM.LABS "
         "(IDLABO, RESPONSABLE, LOCALISATION, NUMERO, SPECIALITE, DISPONIBILITE, "
@@ -46,6 +47,27 @@ bool Labs::ajouter(QString *err) const
     q.bindValue(":qr",   m_qrlabs);
     q.bindValue(":nom",  m_nomlabo);
     //q.bindValue(":cin",  m_IDEMP);
+=======
+    q.prepare(R"(
+        INSERT INTO HICHEM.LABS
+        (IDLABO, NOMLABO, RESPONSABLE, NUMERO, LOCALISATION,
+         SPECIALITE, DISPONIBILITE, RESULTAT, QRLABS, IDEMP)
+        VALUES
+        (:id, :nom, :resp, :num, :loc,
+         :spec, :disp, :res, :qr, :idemp)
+    )");
+
+    q.bindValue(":id",    newId);
+    q.bindValue(":nom",   m_nomlabo);
+    q.bindValue(":resp",  m_responsable);
+    q.bindValue(":num",   m_numero);
+    q.bindValue(":loc",   m_localisation);
+    q.bindValue(":spec",  m_specialite);
+    q.bindValue(":disp",  m_disponibilite);
+    q.bindValue(":res",   m_resultat);
+    q.bindValue(":qr",    m_qrlabs);
+    q.bindValue(":idemp", m_IDEMP);   // IMPORTANT
+>>>>>>> 9fd98e05953d86978b42c6fda2f7a3b994435af5:SmartResearchPublicationManagement_V003/labs.cpp
 
     if (!q.exec()) {
         setErr(err, q.lastError().text());

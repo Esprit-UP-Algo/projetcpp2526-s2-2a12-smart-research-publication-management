@@ -14,6 +14,7 @@ class LoginDialog : public QDialog
 public:
     explicit LoginDialog(QWidget *parent = nullptr);
     ~LoginDialog();
+    int empId() const { return m_empId; }   // ✅ getter
 
 private slots:
     void on_btnLogin_clicked();
@@ -22,8 +23,10 @@ private slots:
     void on_btnFaceID_clicked();
 
 
+
 private:
     Ui::LoginDialog *ui;
+        int m_empId = -1;
 };
 
 #endif // LOGINDIALOG_H
