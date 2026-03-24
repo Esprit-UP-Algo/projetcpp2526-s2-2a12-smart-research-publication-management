@@ -1,25 +1,47 @@
-#include "login.h"
+#include "mainwindow.h"
+#include "logindialog.h"
 #include <QApplication>
-#include <QFile>
-#include <QDebug>
+#include <QMessageBox>
+#include "connection.h"
 
 int main(int argc, char *argv[])
 {
+    // Indispensable pour l'interface Qt
     QApplication a(argc, argv);
 
-    // Charger le style depuis les ressources
-    QFile styleFile(":/style/style.qss");  // ← chemin spécial Qt (dans .qrc)
-    if (styleFile.open(QFile::ReadOnly | QFile::Text)) {
-        QString style = QLatin1String(styleFile.readAll());
-        a.setStyleSheet(style);
-        qDebug() << "STYLE CHARGÉ DEPUIS RESSOURCES !";
-        styleFile.close();
-    } else {
-        qDebug() << "ERREUR : style.qss non trouvé dans les ressources";
+    // 1) Connexion à la Base de Données
+    // On récupère l'instance unique (Singleton)
+    Connection* c = Connection::instance();
+    if (!c->createConnect()) {
+        QMessageBox::critical(nullptr, "Erreur Fatale",
+                              "Impossible d'établir une connexion avec la base de données.\n"
+                              "Vérifiez vos paramètres réseau ou SQL.");
+        return -1; // On quitte avec un code d'erreur
     }
 
-    Login login;
-    login.show();
+    // 2) Lancement du Login (Classique + FaceID)
+    LoginDialog login;
 
-    return a.exec();
+    /* Le .exec() bloque ici tant que l'utilisateur n'a pas réussi
+       son login (bouton Connect ou Scan Face réussi).
+       Dès que ton code appelle 'accept()', exec() renvoie QDialog::Accepted.
+    */
+    if (login.exec() != QDialog::Accepted) {
+        // Si l'utilisateur ferme la fenêtre sans se connecter
+        c->closeConnection();
+        return 0;
+    }
+
+    // 3) Ouverture de la fenêtre principale
+    // On n'arrive ici que si le Scan FaceID ou le Login a fonctionné
+    MainWindow w;
+    w.show();
+
+    // Boucle d'événements principale
+    int ret = a.exec();
+
+    // 4) Nettoyage avant de quitter
+    c->closeConnection();
+
+    return ret;
 }
