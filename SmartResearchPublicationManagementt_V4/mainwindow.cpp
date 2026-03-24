@@ -97,6 +97,32 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+
+
+    //employee
+
+    ui->lineCINAdd->setInputMask("99999999");
+    ui->lineCIN_emp->setInputMask("99999999");
+
+    // --- CONTROLE SALAIRE (Nombres décimaux uniquement) ---
+    // Autorise les nombres de 0 à 999,999.99
+    QDoubleValidator *salaryValidator = new QDoubleValidator(0.0, 999999.0, 2, this);
+    salaryValidator->setNotation(QDoubleValidator::StandardNotation);
+    ui->lineSalaireAdd->setValidator(salaryValidator);
+    ui->lineSalaireEmp->setValidator(salaryValidator);
+
+    // --- CONTROLE NOM / PRENOM (Lettres uniquement) ---
+    QRegularExpression nameRegex("^[a-zA-ZáàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ ]*$");
+    QRegularExpressionValidator *nameValidator = new QRegularExpressionValidator(nameRegex, this);
+    ui->lineNomAdd->setValidator(nameValidator);
+    ui->linePrenomAdd->setValidator(nameValidator);
+    ui->lineNomEmp->setValidator(nameValidator);
+    ui->linePrenomEmp->setValidator(nameValidator);
+
+
+
+    //employee
+
     // --- Configuration des Tables ---
     ui->TableEmp->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->TableEmp->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -1668,114 +1694,109 @@ void MainWindow::on_BtnAdd_4_clicked() { ui->stacked_F->setCurrentIndex(3); }
 
 void MainWindow::loadEmployees()
 {
+    ui->TableEmp->setSortingEnabled(false); // Désactiver le tri pendant le remplissage
     ui->TableEmp->clearContents();
     ui->TableEmp->setRowCount(0);
 
     QVector<Employe::Row> rows;
     QString errMsg;
     if (!Employe::chargerTout(rows, &errMsg)) {
-        QMessageBox::warning(this, "Erreur", "Impossible de charger les employés :\n" + errMsg);
+        QMessageBox::critical(this, "Erreur", "Impossible de charger les données :\n" + errMsg);
         return;
     }
 
-    ui->TableEmp->setColumnCount(10);
-    ui->TableEmp->setHorizontalHeaderLabels({
-        "CIN", "Nom", "Prénom", "Username", "Email",
-        "Poste", "Département", "Date embauche", "Salaire", "Rôle"
-    });
+    for (const auto &r : rows) {
+        int row = ui->TableEmp->rowCount();
+        ui->TableEmp->insertRow(row);
 
-    ui->TableEmp->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->TableEmp->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->TableEmp->setEditTriggers(QAbstractItemView::NoEditTriggers);
-
-    int rowIndex = 0;
-    for (const auto &r : rows)
-    {
-        ui->TableEmp->insertRow(rowIndex);
-
+        // Colonne 0 : CIN + ID SQL caché dans le UserRole
         auto *itemCin = new QTableWidgetItem(r.cin);
         itemCin->setData(Qt::UserRole, r.idEmploye);
-        ui->TableEmp->setItem(rowIndex, 0, itemCin);
+        ui->TableEmp->setItem(row, 0, itemCin);
 
-        ui->TableEmp->setItem(rowIndex, 1, new QTableWidgetItem(r.nom));
-        ui->TableEmp->setItem(rowIndex, 2, new QTableWidgetItem(r.prenom));
-        ui->TableEmp->setItem(rowIndex, 3, new QTableWidgetItem(r.username));
-        ui->TableEmp->setItem(rowIndex, 4, new QTableWidgetItem(r.email));
-        ui->TableEmp->setItem(rowIndex, 5, new QTableWidgetItem(r.poste));
-        ui->TableEmp->setItem(rowIndex, 6, new QTableWidgetItem(r.departement));
-        ui->TableEmp->setItem(rowIndex, 7, new QTableWidgetItem(r.dateEmbauche));
-        ui->TableEmp->setItem(rowIndex, 8, new QTableWidgetItem(QString::number(r.salaire, 'f', 2)));
-        ui->TableEmp->setItem(rowIndex, 9, new QTableWidgetItem(r.role));
+        ui->TableEmp->setItem(row, 1, new QTableWidgetItem(r.nom));
+        ui->TableEmp->setItem(row, 2, new QTableWidgetItem(r.prenom));
+        ui->TableEmp->setItem(row, 3, new QTableWidgetItem(r.username));
+        ui->TableEmp->setItem(row, 4, new QTableWidgetItem(r.email));
+        ui->TableEmp->setItem(row, 5, new QTableWidgetItem(r.poste));
+        ui->TableEmp->setItem(row, 6, new QTableWidgetItem(r.departement));
 
-        rowIndex++;
+        // Date (Triable)
+        auto *itemDate = new QTableWidgetItem(r.dateEmbauche);
+        itemDate->setData(Qt::EditRole, QDate::fromString(r.dateEmbauche, "yyyy-MM-dd"));
+        ui->TableEmp->setItem(row, 7, itemDate);
+
+        // Salaire (Numérique)
+        auto *itemSal = new QTableWidgetItem(QString::number(r.salaire, 'f', 2));
+        itemSal->setData(Qt::EditRole, r.salaire);
+        ui->TableEmp->setItem(row, 8, itemSal);
+
+        ui->TableEmp->setItem(row, 9, new QTableWidgetItem(r.role));
     }
-
     ui->TableEmp->resizeColumnsToContents();
 }
-
 void MainWindow::on_btnSaveEmployee_clicked()
 {
+    // 1. Récupération des données
     QString cin         = ui->lineCINAdd->text().trimmed();
     QString nom         = ui->lineNomAdd->text().trimmed();
     QString prenom      = ui->linePrenomAdd->text().trimmed();
     QString username    = ui->lineUsernameAdd->text().trimmed();
     QString email       = ui->lineEmailAdd->text().trimmed();
-    QString password    = ui->linePasswordAdd->text();
+    QString password    = ui->linePasswordAdd->text(); // On ne trim pas un mot de passe
     QString poste       = ui->linePosteAdd->text().trimmed();
     QString departement = ui->lineDepartementAdd->text().trimmed();
-    double  salaire     = ui->lineSalaireAdd->text().toDouble();
-    QString role        = ui->comboRoleAdd->currentText().trimmed();
-    QDate   dateEmb     = ui->dateEmbaucheAdd->date();
+    QString salaireStr  = ui->lineSalaireAdd->text().trimmed();
+    QString role        = ui->comboRoleAdd->currentText();
+    QDate dateEmb       = ui->dateEmbaucheAdd->date();
 
-    // Validations de base
-    if (cin.length() != 8 || !QRegularExpression("^[0-9]{8}$").match(cin).hasMatch()) {
-        QMessageBox::warning(this, "CIN invalide", "Le CIN doit contenir exactement 8 chiffres.");
+    // 2. CONTRAINTE : Tous les champs obligatoires
+    if (cin.isEmpty() || nom.isEmpty() || prenom.isEmpty() || username.isEmpty() ||
+        email.isEmpty() || password.isEmpty() || poste.isEmpty() ||
+        departement.isEmpty() || salaireStr.isEmpty()) {
+        QMessageBox::warning(this, "Champs vides", "Veuillez remplir tous les champs du formulaire.");
         return;
     }
 
+    // 3. CONTRAINTE : CIN (Exactement 8 chiffres)
+    QRegularExpression cinRegex("^[0-9]{8}$");
+    if (!cinRegex.match(cin).hasMatch()) {
+        QMessageBox::warning(this, "Format CIN", "Le CIN doit contenir exactement 8 chiffres.");
+        return;
+    }
+
+    // 4. CONTRAINTE : Format EMAIL (Regex standard)
+    QRegularExpression emailRegex("^[\\w\\.-]+@[\\w\\.-]+\\.[a-z]{2,4}$", QRegularExpression::CaseInsensitiveOption);
+    if (!emailRegex.match(email).hasMatch()) {
+        QMessageBox::warning(this, "Format Email", "L'adresse email saisie est invalide (ex: exemple@mail.com).");
+        return;
+    }
+
+    // 5. CONTRAINTE : Unicité (Vérification SQL)
     if (Employe::usernameExiste(username)) {
-        QMessageBox::warning(this, "Username", "Ce nom d'utilisateur existe déjà.");
+        QMessageBox::warning(this, "Doublon", "Ce nom d'utilisateur est déjà utilisé.");
         return;
     }
 
-    if (password.isEmpty()) {
-        QMessageBox::warning(this, "Mot de passe", "Obligatoire.");
-        return;
-    }
+    // NB: Tu peux ajouter Employe::emailExiste(email) si tu as créé la fonction en SQL
 
-    if (salaire <= 0) {
-        QMessageBox::warning(this, "Salaire", "Doit être positif.");
-        return;
-    }
+    // 6. Hachage et Enregistrement
+    QString passHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256).toHex();
+    double salaire = salaireStr.toDouble();
 
-    QString passwordHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256).toHex();
-
-    Employe e(cin, nom, prenom, username, passwordHash, email,
-              poste, departement, dateEmb, salaire, role);
+    Employe e(cin, nom, prenom, username, passHash, email, poste, departement, dateEmb, salaire, role);
 
     QString errMsg;
-    if (!e.ajouter(&errMsg)) {
-        QMessageBox::critical(this, "Échec ajout", errMsg);
-        return;
+    if (e.ajouter(&errMsg)) {
+        QMessageBox::information(this, "Succès", "L'employé a été ajouté avec succès.");
+        loadEmployees();
+        ui->stack_emp->setCurrentIndex(0);
+        // Optionnel : Vider les champs après succès
+    } else {
+        QMessageBox::critical(this, "Erreur SQL", "L'ajout a échoué :\n" + errMsg);
     }
-
-    QMessageBox::information(this, "Succès", "Employé ajouté.");
-    loadEmployees();
-    ui->stack_emp->setCurrentIndex(0);
-
-    // Reset
-    ui->lineCINAdd->clear();
-    ui->lineNomAdd->clear();
-    ui->linePrenomAdd->clear();
-    ui->lineUsernameAdd->clear();
-    ui->linePasswordAdd->clear();
-    ui->lineEmailAdd->clear();
-    ui->linePosteAdd->clear();
-    ui->lineDepartementAdd->clear();
-    ui->lineSalaireAdd->clear();
-    ui->comboRoleAdd->setCurrentIndex(0);
-    ui->dateEmbaucheAdd->setDate(QDate::currentDate());
 }
+
 
 void MainWindow::on_btnSupprimer_emp_clicked()
 {
@@ -1828,16 +1849,12 @@ void MainWindow::on_btnSupprimer_emp_clicked()
 void MainWindow::on_btnModifier_emp_clicked()
 {
     int row = ui->TableEmp->currentRow();
-    if(row < 0){
-        QMessageBox::warning(this, "Sélection", "Veuillez sélectionner un employé !");
+    if (row < 0) {
+        QMessageBox::warning(this, "Sélection", "Veuillez sélectionner un employé.");
         return;
     }
 
-    for(int col=0; col<ui->TableEmp->columnCount(); ++col){
-        if(!ui->TableEmp->item(row, col))
-            ui->TableEmp->setItem(row, col, new QTableWidgetItem(""));
-    }
-
+    // Remplissage des champs de l'interface de modification
     ui->lineCIN_emp->setText(ui->TableEmp->item(row, 0)->text());
     ui->lineNomEmp->setText(ui->TableEmp->item(row, 1)->text());
     ui->linePrenomEmp->setText(ui->TableEmp->item(row, 2)->text());
@@ -1849,61 +1866,76 @@ void MainWindow::on_btnModifier_emp_clicked()
     ui->lineSalaireEmp->setText(ui->TableEmp->item(row, 8)->text());
     ui->comboRoleAdd_2->setCurrentText(ui->TableEmp->item(row, 9)->text());
 
-    ancienCin = ui->lineCIN_emp->text();
-    ancienUsername = ui->lineUsernameEmp->text();
-
-    ui->stack_emp->setCurrentIndex(2);
+    ui->stack_emp->setCurrentIndex(2); // Aller vers la page de modif
 }
-
 void MainWindow::on_btnSaveEditEmployee_clicked()
 {
     int row = ui->TableEmp->currentRow();
-    if(row < 0){
-        QMessageBox::warning(this, "Erreur", "Aucune ligne sélectionnée !");
+    if (row < 0) return;
+
+    QString idEmploye = ui->TableEmp->item(row, 0)->data(Qt::UserRole).toString();
+
+    // Récupération des saisies
+    QString cin      = ui->lineCIN_emp->text().trimmed();
+    QString nom      = ui->lineNomEmp->text().trimmed();
+    QString prenom   = ui->linePrenomEmp->text().trimmed();
+    QString username = ui->lineUsernameEmp->text().trimmed();
+    QString email    = ui->lineEmailEmp->text().trimmed();
+    QString salaireS = ui->lineSalaireEmp->text().trimmed();
+
+    // 1. Validation : Champs vides
+    if (cin.isEmpty() || nom.isEmpty() || prenom.isEmpty() || username.isEmpty() || email.isEmpty() || salaireS.isEmpty()) {
+        QMessageBox::warning(this, "Erreur", "Tous les champs sont obligatoires.");
         return;
     }
 
-    for(int col=0; col<ui->TableEmp->columnCount(); ++col){
-        if(!ui->TableEmp->item(row, col))
-            ui->TableEmp->setItem(row, col, new QTableWidgetItem(""));
+    // 2. Validation : Format CIN (8 chiffres)
+    if (!QRegularExpression("^[0-9]{8}$").match(cin).hasMatch()) {
+        QMessageBox::warning(this, "Format CIN", "Le CIN doit comporter exactement 8 chiffres.");
+        return;
     }
 
-    QString cin         = ui->lineCIN_emp->text().trimmed();
-    QString nom         = ui->lineNomEmp->text().trimmed();
-    QString prenom      = ui->linePrenomEmp->text().trimmed();
-    QString username    = ui->lineUsernameEmp->text().trimmed();
-    QString email       = ui->lineEmailEmp->text().trimmed();
-    QString poste       = ui->linePostemp->text().trimmed();
-    QString departement = ui->lineDepartementEmp->text().trimmed();
-    QString salaire     = ui->lineSalaireEmp->text().trimmed();
-    QString role        = ui->comboRoleAdd_2->currentText().trimmed();
-    QString dateEmbauche= ui->dateEmbaucheEmp->date().toString("yyyy-MM-dd");
+    // 3. Validation : Format Email
+    QRegularExpression emailRegex("^[\\w\\.-]+@[\\w\\.-]+\\.[a-z]{2,4}$", QRegularExpression::CaseInsensitiveOption);
+    if (!emailRegex.match(email).hasMatch()) {
+        QMessageBox::warning(this, "Format Email", "L'adresse email est invalide.");
+        return;
+    }
 
-    for(int r=0; r<ui->TableEmp->rowCount(); ++r){
-        if(r==row) continue;
-        if(ui->TableEmp->item(r,0)->text() == cin){
-            QMessageBox::critical(this,"Erreur","Ce CIN existe déjà !");
+    // 4. Validation : Unicité (Sauf pour la ligne en cours de modification)
+    for (int i = 0; i < ui->TableEmp->rowCount(); ++i) {
+        if (i == row) continue; // On ignore la ligne actuelle
+
+        if (ui->TableEmp->item(i, 0)->text() == cin) {
+            QMessageBox::warning(this, "Doublon", "Ce CIN est déjà attribué à un autre employé.");
             return;
         }
-        if(ui->TableEmp->item(r,3)->text() == username){
-            QMessageBox::critical(this,"Erreur","Ce nom d'utilisateur existe déjà !");
+        if (ui->TableEmp->item(i, 3)->text() == username) {
+            QMessageBox::warning(this, "Doublon", "Ce nom d'utilisateur est déjà pris.");
+            return;
+        }
+        if (ui->TableEmp->item(i, 4)->text() == email) { // Colonne 4 = Email
+            QMessageBox::warning(this, "Doublon", "Cet email est déjà utilisé par un autre employé.");
             return;
         }
     }
 
-    ui->TableEmp->item(row,0)->setText(cin);
-    ui->TableEmp->item(row,1)->setText(nom);
-    ui->TableEmp->item(row,2)->setText(prenom);
-    ui->TableEmp->item(row,3)->setText(username);
-    ui->TableEmp->item(row,4)->setText(email);
-    ui->TableEmp->item(row,5)->setText(poste);
-    ui->TableEmp->item(row,6)->setText(departement);
-    ui->TableEmp->item(row,7)->setText(dateEmbauche);
-    ui->TableEmp->item(row,8)->setText(salaire);
-    ui->TableEmp->item(row,9)->setText(role);
+    // 5. Exécution de l'Update
+    Employe e(cin, nom, prenom, username, "", email,
+              ui->linePostemp->text().trimmed(),
+              ui->lineDepartementEmp->text().trimmed(),
+              ui->dateEmbaucheEmp->date(),
+              salaireS.toDouble(),
+              ui->comboRoleAdd_2->currentText());
 
-    QMessageBox::information(this,"Succès","Employé modifié !");
-    ui->stack_emp->setCurrentIndex(0);
+    QString errMsg;
+    if (e.modifier(idEmploye, &errMsg)) {
+        QMessageBox::information(this, "Succès", "L'employé a été mis à jour.");
+        loadEmployees();
+        ui->stack_emp->setCurrentIndex(0);
+    } else {
+        QMessageBox::critical(this, "Erreur", "Erreur SQL :\n" + errMsg);
+    }
 }
 void MainWindow::on_btnAnnuler_emp_clicked()
 {
