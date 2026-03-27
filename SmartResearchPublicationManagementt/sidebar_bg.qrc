@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>images/sidebar_bg.png</file>
+    </qresource>
+</RCC>
