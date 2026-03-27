@@ -6,6 +6,8 @@
 #include <QCryptographicHash>  // Pour le hash SHA256
 #include <QSqlQuery>
 #include <QSqlError>
+#include "faceauth.h"
+#include <QInputDialog>
 
 LoginDialog::LoginDialog(QWidget *parent) :
     QDialog(parent),
@@ -31,6 +33,18 @@ LoginDialog::LoginDialog(QWidget *parent) :
                 stop:1 #e6f7f7);
             font-family: Consolas;
         }
+/* Bouton Face ID */
+QPushButton#btnFaceID {
+    background: white;
+    border: 2px solid #00CED1;
+    border-radius: 20px;
+    color: #004D40;
+    font-weight: 900;
+    padding: 10px;
+}
+QPushButton#btnFaceID:hover {
+    background: #e6f7f7;
+}
         /* Card */
         QGroupBox#groupBox_2{
             background: rgba(255,255,255,220);
@@ -104,34 +118,95 @@ void LoginDialog::on_btnLogin_clicked()
         return;
     }
 
-    // Hash du password saisi
+    // 1. On prépare le hash du mot de passe (SHA256 comme dans ta version)
     QString passwordHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256).toHex();
 
-    // Vérification en base via Employe
-    QSqlQuery query;
-    query.prepare("SELECT ID_EMPLOYE FROM EMPLOYES WHERE USERNAME = :username AND PASSWORD_HASH = :passwordHash");
-    query.bindValue(":username", username);
-    query.bindValue(":passwordHash", passwordHash);
-
-    if (!query.exec()) {
-        QString error = query.lastError().text();
-        qDebug() << "Erreur login SQL :" << error;
-        QMessageBox::critical(this, "Erreur base", "Impossible de vérifier les identifiants :\n" + error);
-        return;
-    }
-
-    if (query.next()) {
-        // Login OK
-        m_empId = query.value(0).toInt();
-        accept();  // Ferme le dialog avec succès
+    // 2. On utilise la méthode statique de la classe Employe
+    // Elle va vérifier en BD ET remplir Session::instance() d'un seul coup
+    QString errorMsg;
+    if (Employe::authentifier(username, passwordHash, &errorMsg)) {
+        // Succès ! La session est maintenant remplie (ID, Nom, Rôle)
+        accept();  // Ferme le dialog et renvoie QDialog::Accepted
     } else {
-        QMessageBox::critical(this, "Accès Refusé", "Nom d'utilisateur ou mot de passe incorrect.");
+        // Échec (mauvais pass ou erreur SQL)
+        QMessageBox::critical(this, "Accès Refusé", errorMsg);
         ui->lePassword->clear();
         ui->lePassword->setFocus();
     }
 }
+void LoginDialog::on_btnFaceID_clicked()
+{
+    QString user = ui->leUsername->text().trimmed();
 
+    if (user.isEmpty()) {
+        QMessageBox::warning(this, "Erreur", "Veuillez saisir votre username.");
+        return;
+    }
+
+    FaceAuth auth;
+    // 1. Reconnaissance faciale OpenCV
+    if (auth.identifierUtilisateur(user)) {
+
+        QString errorMsg;
+        // 2. Initialisation de la session (C'est ici que le rôle est fixé)
+        if (Employe::authentifierFaceID(user, &errorMsg)) {
+
+            // 3. REDIRECTION IDENTIQUE
+            // On ferme le dialogue, le main.cpp lancera MainWindow
+            this->accept();
+
+        } else {
+            QMessageBox::critical(this, "Erreur Session", errorMsg);
+        }
+    } else {
+        QMessageBox::critical(this, "Échec", "Visage non reconnu pour " + user);
+    }
+}
 void LoginDialog::on_Quitter_clicked()
 {
-    qApp->exit(0);
+    this->reject(); // Ferme la fenêtre proprement
+}
+
+
+void LoginDialog::on_btnForgotPass_clicked()
+{
+    bool ok;
+
+    // 1. Vérification de l'identité
+    QString username = QInputDialog::getText(this, "Récupération", "Nom d'utilisateur :", QLineEdit::Normal, "", &ok);
+    if (!ok || username.isEmpty()) return;
+
+    QString cin = QInputDialog::getText(this, "Vérification", "Numéro de CIN :", QLineEdit::Normal, "", &ok);
+    if (!ok || cin.isEmpty()) return;
+
+    QSqlQuery query;
+    query.prepare("SELECT NOM FROM EMPLOYES WHERE USERNAME = :user AND CIN = :cin");
+    query.bindValue(":user", username);
+    query.bindValue(":cin", cin);
+
+    if (query.exec() && query.next()) {
+        // 2. Si l'identité est confirmée, on demande le NOUVEAU mot de passe
+        QString newPass = QInputDialog::getText(this, "Succès",
+                                                "Identité confirmée. Entrez votre nouveau mot de passe :",
+                                                QLineEdit::Password, "", &ok);
+
+        if (ok && !newPass.isEmpty()) {
+            // Ici, tu dois utiliser ta fonction de hachage habituelle (ex: QCryptographicHash)
+            // Si tu n'as pas encore de fonction de hash, dis-le moi !
+            QByteArray hashedPass = QCryptographicHash::hash(newPass.toUtf8(), QCryptographicHash::Sha256).toHex();
+
+            QSqlQuery updateQuery;
+            updateQuery.prepare("UPDATE EMPLOYES SET PASSWORD_HASH = :pass WHERE USERNAME = :user");
+            updateQuery.bindValue(":pass", QString(hashedPass));
+            updateQuery.bindValue(":user", username);
+
+            if (updateQuery.exec()) {
+                QMessageBox::information(this, "Succès", "Mot de passe mis à jour avec succès !");
+            } else {
+                QMessageBox::critical(this, "Erreur", "Impossible de mettre à jour la base de données.");
+            }
+        }
+    } else {
+        QMessageBox::critical(this, "Erreur", "Username ou CIN incorrect.");
+    }
 }

@@ -217,6 +217,32 @@ QLabel#LogoLabel {
      <string>Username</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="btnFaceID">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>300</y>
+      <width>151</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Scan FaceID</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnForgotPass">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>300</y>
+      <width>111</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>MDP O</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">

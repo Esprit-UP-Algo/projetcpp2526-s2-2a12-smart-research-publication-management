@@ -2,35 +2,27 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
+#include "session.h"
 
+// Constructeur (Utilisation de std::move pour la performance)
 Employe::Employe(
     QString cin, QString nom, QString prenom, QString username, QString passwordHash,
     QString email, QString poste, QString departement,
-    QDate dateEmbauche, double salaire, QString role,
-    QString typeDemande, QDate dateDebut, QDate dateFin,
-    QString description, QDate dateDemande, QString statutDemande,
-    QString commentaireRH, QDate datePointage,
-    QString heureArrivee, QString heureDepart, QString statutJournalier
+    QDate dateEmbauche, double salaire, QString role
     )
     : m_cin(std::move(cin)), m_nom(std::move(nom)), m_prenom(std::move(prenom)),
     m_username(std::move(username)), m_passwordHash(std::move(passwordHash)),
     m_email(std::move(email)), m_poste(std::move(poste)),
     m_departement(std::move(departement)), m_dateEmbauche(dateEmbauche),
-    m_salaire(salaire), m_role(std::move(role)),
-    m_typeDemande(std::move(typeDemande)), m_dateDebut(dateDebut),
-    m_dateFin(dateFin), m_description(std::move(description)),
-    m_dateDemande(dateDemande), m_statutDemande(std::move(statutDemande)),
-    m_commentaireRH(std::move(commentaireRH)), m_datePointage(datePointage),
-    m_heureArrivee(std::move(heureArrivee)), m_heureDepart(std::move(heureDepart)),
-    m_statutJournalier(std::move(statutJournalier))
+    m_salaire(salaire), m_role(std::move(role))
 {}
 
+// Génération d'ID automatique (Oracle/SQLite style)
 bool Employe::nextId(int &outId, QString *err)
 {
     QSqlQuery query;
     if (!query.exec("SELECT NVL(MAX(ID_EMPLOYE), 0) + 1 FROM EMPLOYES")) {
-        QString error = query.lastError().text();
-        if (err) *err = error;
+        if (err) *err = query.lastError().text();
         return false;
     }
     if (query.next()) {
@@ -41,6 +33,7 @@ bool Employe::nextId(int &outId, QString *err)
     return false;
 }
 
+// CREATE : Ajouter un employé
 bool Employe::ajouter(QString *err) const
 {
     int id;
@@ -70,27 +63,14 @@ bool Employe::ajouter(QString *err) const
     query.bindValue(":role",         m_role);
 
     if (!query.exec()) {
-        QString error = query.lastError().text();
-        if (err) *err = "Échec de l'ajout : " + error;
+        if (err) *err = "Échec de l'ajout : " + query.lastError().text();
         return false;
     }
-
     return true;
 }
 
-bool Employe::modifier(
-    const QString& idEmploye,
-    const QString& cin,
-    const QString& nom,
-    const QString& prenom,
-    const QString& username,
-    const QString& email,
-    const QString& poste,
-    const QString& departement,
-    const QDate&   dateEmbauche,
-    double         salaire,
-    const QString& role,
-    QString       *err)
+// UPDATE : Modifier un employé (Appelé via l'objet instance dans MainWindow)
+bool Employe::modifier(const QString& idEmploye, QString *err)
 {
     QSqlQuery query;
     query.prepare(
@@ -101,32 +81,26 @@ bool Employe::modifier(
         "WHERE ID_EMPLOYE = :id"
         );
 
-    query.bindValue(":cin",          cin);
-    query.bindValue(":nom",          nom);
-    query.bindValue(":prenom",       prenom);
-    query.bindValue(":username",     username);
-    query.bindValue(":email",        email);
-    query.bindValue(":poste",        poste);
-    query.bindValue(":departement",  departement);
-    query.bindValue(":dateEmbauche", dateEmbauche);
-    query.bindValue(":salaire",      salaire);
-    query.bindValue(":role",         role);
+    query.bindValue(":cin",          m_cin);
+    query.bindValue(":nom",          m_nom);
+    query.bindValue(":prenom",       m_prenom);
+    query.bindValue(":username",     m_username);
+    query.bindValue(":email",        m_email);
+    query.bindValue(":poste",        m_poste);
+    query.bindValue(":departement",  m_departement);
+    query.bindValue(":dateEmbauche", m_dateEmbauche);
+    query.bindValue(":salaire",      m_salaire);
+    query.bindValue(":role",         m_role);
     query.bindValue(":id",           idEmploye);
 
     if (!query.exec()) {
-        QString error = query.lastError().text();
-        if (err) *err = "Échec modification : " + error;
+        if (err) *err = "Échec modification SQL : " + query.lastError().text();
         return false;
     }
-
-    if (query.numRowsAffected() == 0) {
-        if (err) *err = "Aucun employé trouvé";
-        return false;
-    }
-
     return true;
 }
 
+// DELETE : Supprimer un employé
 bool Employe::supprimer(const QString& idEmploye, QString *err)
 {
     QSqlQuery query;
@@ -134,60 +108,99 @@ bool Employe::supprimer(const QString& idEmploye, QString *err)
     query.bindValue(":id", idEmploye);
 
     if (!query.exec()) {
-        QString error = query.lastError().text();
-        if (err) *err = "Échec suppression : " + error;
+        if (err) *err = "Échec suppression : " + query.lastError().text();
         return false;
     }
-
-    if (query.numRowsAffected() == 0) {
-        if (err) *err = "Aucun employé trouvé";
-        return false;
-    }
-
     return true;
 }
 
+// READ : Charger la liste complète
 bool Employe::chargerTout(QVector<Row> &out, QString *err)
 {
     QSqlQuery query;
-    if (!query.exec(
-            "SELECT ID_EMPLOYE, CIN, NOM, PRENOM, USERNAME, EMAIL, "
-            "POSTE, DEPARTEMENT, DATE_EMBAUCHE, SALAIRE, ROLE "
-            "FROM EMPLOYES ORDER BY ID_EMPLOYE ASC"
-            )) {
-        QString error = query.lastError().text();
-        if (err) *err = "Impossible de charger : " + error;
+    if (!query.exec("SELECT ID_EMPLOYE, CIN, NOM, PRENOM, USERNAME, EMAIL, "
+                    "POSTE, DEPARTEMENT, DATE_EMBAUCHE, SALAIRE, ROLE "
+                    "FROM EMPLOYES ORDER BY ID_EMPLOYE ASC")) {
+        if (err) *err = "Impossible de charger : " + query.lastError().text();
         return false;
     }
 
     out.clear();
-
     while (query.next()) {
         Row r;
-        r.idEmploye    = query.value("ID_EMPLOYE").toString();
-        r.cin          = query.value("CIN").toString();
-        r.nom          = query.value("NOM").toString();
-        r.prenom       = query.value("PRENOM").toString();
-        r.username     = query.value("USERNAME").toString();
-        r.email        = query.value("EMAIL").toString();
-        r.poste        = query.value("POSTE").toString();
-        r.departement  = query.value("DEPARTEMENT").toString();
-        r.dateEmbauche = query.value("DATE_EMBAUCHE").toDate().toString("yyyy-MM-dd");
-        r.salaire      = query.value("SALAIRE").toDouble();
-        r.role         = query.value("ROLE").toString();
-
+        r.idEmploye    = query.value(0).toString();
+        r.cin          = query.value(1).toString();
+        r.nom          = query.value(2).toString();
+        r.prenom       = query.value(3).toString();
+        r.username     = query.value(4).toString();
+        r.email        = query.value(5).toString();
+        r.poste        = query.value(6).toString();
+        r.departement  = query.value(7).toString();
+        r.dateEmbauche = query.value(8).toDate().toString("yyyy-MM-dd");
+        r.salaire      = query.value(9).toDouble();
+        r.role         = query.value(10).toString();
         out.append(r);
     }
-
     return true;
 }
 
+// Vérifier si un username est déjà pris
 bool Employe::usernameExiste(const QString &username)
 {
     QSqlQuery query;
     query.prepare("SELECT 1 FROM EMPLOYES WHERE USERNAME = :username");
     query.bindValue(":username", username);
+    return query.exec() && query.next();
+}
 
-    if (!query.exec()) return false;
-    return query.next();
+// Authentification classique (Login)
+bool Employe::authentifier(const QString &username, const QString &passwordHash, QString *err)
+{
+    QSqlQuery query;
+    query.prepare("SELECT ID_EMPLOYE, NOM, PRENOM, ROLE FROM EMPLOYES "
+                  "WHERE USERNAME = :user AND PASSWORD_HASH = :pass");
+    query.bindValue(":user", username);
+    query.bindValue(":pass", passwordHash);
+
+    if (!query.exec()) {
+        if (err) *err = "Erreur SQL : " + query.lastError().text();
+        return false;
+    }
+
+    if (query.next()) {
+        QString id = query.value("ID_EMPLOYE").toString();
+        QString nomComplet = query.value("NOM").toString() + " " + query.value("PRENOM").toString();
+        QString role = query.value("ROLE").toString();
+
+        Session::instance().login(id, nomComplet, role);
+        return true;
+    }
+
+    if (err) *err = "Nom d'utilisateur ou mot de passe incorrect.";
+    return false;
+}
+
+// Authentification FaceID
+bool Employe::authentifierFaceID(const QString &username, QString *err)
+{
+    QSqlQuery query;
+    query.prepare("SELECT ID_EMPLOYE, NOM, PRENOM, ROLE FROM EMPLOYES WHERE USERNAME = :user");
+    query.bindValue(":user", username);
+
+    if (!query.exec()) {
+        if (err) *err = "Erreur SQL : " + query.lastError().text();
+        return false;
+    }
+
+    if (query.next()) {
+        QString id = query.value("ID_EMPLOYE").toString();
+        QString nomComplet = query.value("NOM").toString() + " " + query.value("PRENOM").toString();
+        QString role = query.value("ROLE").toString();
+
+        Session::instance().login(id, nomComplet, role);
+        return true;
+    }
+
+    if (err) *err = "Utilisateur reconnu par FaceID mais introuvable en base.";
+    return false;
 }

@@ -4,42 +4,31 @@
 #include <QString>
 #include <QDate>
 #include <QVector>
+#include <QSqlQuery>
+#include <QSqlError>
 
 class Employe
 {
 public:
+    // Structure pour le transfert de données vers l'UI (Tableau)
     struct Row {
         QString idEmploye;
         QString cin;
         QString nom;
         QString prenom;
         QString username;
-        QString passwordHash;
         QString email;
         QString poste;
         QString departement;
-        QString dateEmbauche;     // "yyyy-MM-dd"
+        QString dateEmbauche;  // Formaté en "yyyy-MM-dd"
         double  salaire = 0.0;
-        QString role;
-
-        // ──── Partie demande (optionnelle) ────
-        QString typeDemande;
-        QString dateDebut;
-        QString dateFin;
-        QString description;
-        QString dateDemande;
-        QString statutDemande;
-        QString commentaireRH;
-
-        // ──── Partie pointage (optionnelle) ────
-        QString datePointage;
-        QString heureArrivee;
-        QString heureDepart;
-        QString statutJournalier;
+        QString role;          // ADMIN, RH, EMPLOYE
     };
 
+    // Constructeurs
     Employe() = default;
 
+    // Constructeur principal pour le CRUD (Ajout/Modification)
     Employe(
         QString cin,
         QString nom,
@@ -51,46 +40,35 @@ public:
         QString departement,
         QDate   dateEmbauche,
         double  salaire,
-        QString role,
-        QString typeDemande    = "",
-        QDate   dateDebut      = QDate(),
-        QDate   dateFin        = QDate(),
-        QString description    = "",
-        QDate   dateDemande    = QDate(),
-        QString statutDemande  = "",
-        QString commentaireRH  = "aucun",
-        QDate   datePointage   = QDate(),
-        QString heureArrivee   = "",
-        QString heureDepart    = "",
-        QString statutJournalier = ""
+        QString role
         );
 
+    // ──── AUTHENTIFICATION ────
+    static bool authentifier(const QString &username, const QString &passwordHash, QString *err = nullptr);
+    static bool authentifierFaceID(const QString &username, QString *err = nullptr);
+
+    // ──── CRUD (BASE DE DONNÉES) ────
+
+    // Create
     bool ajouter(QString *err = nullptr) const;
 
-    static bool modifier(
-        const QString& idEmploye,
-        const QString& cin,
-        const QString& nom,
-        const QString& prenom,
-        const QString& username,
-        const QString& email,
-        const QString& poste,
-        const QString& departement,
-        const QDate&   dateEmbauche,
-        double         salaire,
-        const QString& role,
-        QString       *err = nullptr
-        );
+    // Update : Modifie l'employé identifié par 'idEmploye' avec les données de l'instance
+    bool modifier(const QString& idEmploye, QString *err = nullptr);
 
+    // Delete
     static bool supprimer(const QString& idEmploye, QString *err = nullptr);
 
+    // Read
     static bool chargerTout(QVector<Row> &out, QString *err = nullptr);
 
+    // Utilitaires
     static bool usernameExiste(const QString &username);
 
 private:
+    // Générateur d'ID interne
     static bool nextId(int &outId, QString *err = nullptr);
 
+    // Membres de données
     QString m_cin;
     QString m_nom;
     QString m_prenom;
@@ -102,19 +80,6 @@ private:
     QDate   m_dateEmbauche;
     double  m_salaire = 0.0;
     QString m_role;
-
-    QString m_typeDemande;
-    QDate   m_dateDebut;
-    QDate   m_dateFin;
-    QString m_description;
-    QDate   m_dateDemande;
-    QString m_statutDemande;
-    QString m_commentaireRH;
-
-    QDate   m_datePointage;
-    QString m_heureArrivee;
-    QString m_heureDepart;
-    QString m_statutJournalier;
 };
 
 #endif // EMPLOYE_H

@@ -6,10 +6,12 @@
 #include <QAction>
 #include <QString>
 #include "finance.h"
+#include "ocrscanner.h"
 #include "publication.h"
 #include "labs.h"
 #include "employe.h"
 #include "inventory.h"
+#include <QSqlTableModel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,13 +24,10 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-     int empId() const { return m_empId; }
-        explicit MainWindow(int empId, QWidget *parent = nullptr);
+
 private:
     Ui::MainWindow *ui;
-        int m_empId = -1;
-
-
+    QSqlQueryModel *model; // <--- C'est ce type qu'il faut utiliser
     // ===== FINANCE =====
     Finance::Row selectedFinanceRowFromTable(bool *ok=nullptr) const;
     bool exportInternalInvoicePdf_19(const QString& filePath, const Finance::Row& row);
@@ -36,25 +35,37 @@ private:
     void setupTableFinance();
     void loadFinance();
     void showFinanceList();
+    void updateFinanceStats();
+    void openCurrencyConverter();
     QString selectedFinanceId() const;
     QString idFinanceToEdit;   // seulement pour UPDATE
-    // ====================
 
-    // ===== PUBLICATION =====
+    // ===== PUBLICATION ===================================================
+
     void initPublicationUi();
     void loadPublications();
     QString selectedPublicationId() const;
+
     QString idPublicationToEdit;
 
-    // =======================
+    void clearLayout(QLayout *layout);
+    void showPublicationStats();
+    void showPublicationStatsByDomaine();
+    void showPublicationStatsByStatut();
 
-    // ===== LABS =====
+    QString genererReponsePublication(const QString &question);
+    QString formaterResultatsPublication(QSqlQuery &query);
+    QString genererContenuMailPublications();
+    bool emailValide(const QString &email);
+
+    // ===== LABS ===========================================================
+    void verrouillerChampsAffichage();
     void initLabsUi();
     void setupTableLabs();
     void loadLabs();
     QString selectedLabsId() const;
     QString idLabsToEdit;
-    // ================
+    void showLabsPaymentStats();
 
     // ===== EMPLOYEE =====
     void loadEmployees();
@@ -64,6 +75,9 @@ private:
     void filterEmployees(const QString &searchText);
     void sortByEmbaucheDate();
     bool embaucheAscending = true;
+    void configurerPermissions();
+    void on_btn_reset_clicked();
+
     // ====================
 
     // ===== INVENTORY =====
@@ -94,7 +108,6 @@ private slots:
     void on_btnAjouterEmp_clicked();
     void on_btnModifier_emp_clicked();
     void on_btnSaveEditEmployee_clicked();
-    void on_tableEmployees_clicked(const QModelIndex &index);
     void on_btnSaveEmployee_clicked();
     void on_btnSaveEmployee_2_clicked();
     void on_btnSupprimer_emp_clicked();
@@ -106,17 +119,23 @@ private slots:
     void on_btnExporter_emp_excel_3_clicked();
     void on_btnTrier_emp_clicked();
     void on_btnCancelEditEmp_clicked();
+    void on_btn_exportt_clicked();      // Le slot pour ton bouton Export Excel
+    void simulerPointage();
+    void on_btnStat_emp_clicked();
+    void on_btn_ret_clicked();
 
     // Publication slots
     void on_btnAjouterPub_clicked();
     void on_btnAjouterPub_2_clicked();
     void on_btnAjouterPub_3_clicked();
     void on_btnAjouterPub_4_clicked();
+    void on_btnAjouterPub_5_clicked();
+    void on_btnmapl_3_clicked();
+    void on_btnAppliquerPub_clicked();
     void on_btnRetourAddPub_clicked();
     void on_btnRetourEditPub_clicked();
     void on_btnModifierPub_clicked();
     void on_btnModifierPub_2_clicked();
-    void on_btnVoirStatistiquesPub_clicked();
     void on_btnVoirStatistiquesPub_2_clicked();
     void on_retour_stat_clicked();
     void on_retour_stat_2_clicked();
@@ -126,12 +145,35 @@ private slots:
     void on_retour_stat_6_clicked();
     void on_retour_stat_7_clicked();
     void on_retour_stat_8_clicked();
+    void on_retour_stat_9_clicked();
     void on_retour_statn_clicked();
     void on_btnSupprimerPub_clicked();
     void on_btnAddPub_clicked();
     void on_btnConfirmEditPub_clicked();
+    void on_btnExporterPub_clicked();
+    void on_lineSearchPub_textChanged(const QString &text);
+    void on_comboTriPub_currentIndexChanged(int index);
+    void on_btnVoirStatistiquesPub_clicked();
+    void on_comboBox_currentIndexChanged(int index);
+    void on_btnChatbotPub_clicked();
+    void on_btnRetourChatbotPub_clicked();
+    void on_btnEnvoyerQuestionPub_clicked();
+    void on_btnMailingPub_clicked();
+
 
     // Labs slots
+    void on_btnOpenGoogleMaps_clicked();
+    // Nouveaux slots pour le filtrage dynamique
+    void filterLabsDynamic();
+    void resetLabsFilters();
+    void on_pointage_pressed();
+
+protected:
+    // Le filtre pour capturer le double-clic sur aff2
+    bool eventFilter(QObject *obj, QEvent *event) override;
+    void on_btnPasteLocation_clicked();
+    void onMapLocationSelected(const QString& title);
+    void on_BtnExportLabs_clicked(); // Remplacez par le vrai nom de votre bouton PDF
     void on_BtnPopupCancelLabs_3_clicked();
     void on_BtnPopupCancelLabs_5_clicked();
     void on_BtnPopupCancelLabs_6_clicked();
@@ -139,6 +181,7 @@ private slots:
     void on_BtnPopupCancelLabs_8_clicked();
     void on_BtnPopupCancelLabs_9_clicked();
     void on_BtnPopupCancelLabs_10_clicked();
+    void on_TableLabs_2_headerClicked(int logicalIndex);
     void on_BtnPopupSaveLabs_3_clicked();   // ajouter
     void on_BtnPopupResetLabs_3_clicked();
     void on_BtnPopupSaveLabs_5_clicked();   // modifier
@@ -146,7 +189,7 @@ private slots:
     void on_btnSupprimerPub_2_clicked();    // supprimer labs
     void on_btnAppliquerPub_3_clicked();    // filtre
     void on_btnReinitialiserPub_3_clicked();// reset filtre
-
+    void on_BtnExportLabsDirect_clicked();
     // Inventory slots
     void on_BtnInventoryAdd_clicked();
     void on_BtnInventoryAdd_2_clicked();
@@ -176,6 +219,7 @@ private slots:
     void on_BtnApply_clicked();
     void on_BtnReset_clicked();
     void on_BtnExport_clicked();
+    void on_BtnOcrReceipt_clicked();
 
     // Projects slots
     void on_btnRetourEditProj_clicked();
@@ -185,7 +229,10 @@ private slots:
     void on_btnVoirStatistiquesProj_clicked();
     void on_btnAnnuler_emp_clicked();
     void on_btnForm_emp_clicked();
-    void on_btnAddProj_clicked();
+    void on_pushButton_clicked();
+    void on_pointage_clicked();
+    void on_btn_ret_triggered(QAction *arg1);
+    void on_BtnPopupCancelLabs_6_triggered(QAction *arg1);
 };
 
 #endif

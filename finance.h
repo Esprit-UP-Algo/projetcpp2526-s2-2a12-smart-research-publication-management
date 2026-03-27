@@ -31,7 +31,7 @@ public:
             QDate dateTransaction,
             QString modePaiement,
             QDate dateCreation,
-            int IDEMP)
+            QString IDEMP)
         : m_code(std::move(code)),
         m_type(std::move(type)),
         m_montant(montant),
@@ -71,7 +71,7 @@ private:
     QDate   m_dateTransaction;
     QString m_modePaiement;
     QDate   m_dateCreation;
-    int m_IDEMP;
+    QString m_IDEMP;
 };
 
 #endif // FINANCE_H

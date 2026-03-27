@@ -33,7 +33,7 @@ bool Finance::ajouter(QString *err) const
         "INSERT INTO HICHEM.FINANCE "
         "(IDFINANCE, CODETRANSA, TYPETRANSACTION, MONTANT, CATEGORIE, DESCRIPTION, "
         " DATETRANSACTION, MODEPAIEMENT, DATECREATION, IDEMP) "
-        "VALUES (:id, :code, :type, :montant, :cat, :desc, :dt, :mode, :dc, :idemp)"
+        "VALUES (:id, :code, :type, :montant, :cat, :desc, :dt, :mode, :dc, :cin)"
         );
 
     q.bindValue(":id", newId);
@@ -45,7 +45,7 @@ bool Finance::ajouter(QString *err) const
     q.bindValue(":dt", m_dateTransaction);
     q.bindValue(":mode", m_modePaiement);
     q.bindValue(":dc", m_dateCreation);
-    q.bindValue(":idemp", m_IDEMP);
+    q.bindValue(":cin", m_IDEMP);
 
     if (!q.exec()) {
         setErr(err, q.lastError().text());

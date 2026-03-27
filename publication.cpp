@@ -1,149 +1,170 @@
 #include "publication.h"
+
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QVariant>
 
-static void setErr(QString *err, const QString &msg) {
-    if (err) *err = msg;
+Publication::Publication(
+    const QString& titre,
+    const QString& resume,
+    const QString& inventeurs,
+    const QString& domaineFabrication,
+    const QString& typeBrevet,
+    int numeroBrevet,
+    const QDate& dateDepot,
+    const QString& statutBrevet,
+    const QString& idEmp
+    )
+    : m_titre(titre),
+    m_resume(resume),
+    m_inventeurs(inventeurs),
+    m_domaineFabrication(domaineFabrication),
+    m_typeBrevet(typeBrevet),
+    m_numeroBrevet(numeroBrevet),
+    m_dateDepot(dateDepot),
+    m_statutBrevet(statutBrevet),
+    m_idEmp(idEmp)
+{
 }
-
-Publication::Publication(QString titre, QString resume, QString inventeurs,
-                         QString domaine, QString type, int numero,
-                         QDate dateDepot, QString statut)
-    : m_titre(std::move(titre)),
-    m_resume(std::move(resume)),
-    m_inventeurs(std::move(inventeurs)),
-    m_domaine(std::move(domaine)),
-    m_type(std::move(type)),
-    m_statut(std::move(statut)),
-    m_numero(numero),
-    m_dateDepot(dateDepot)
-{}
 
 bool Publication::nextId(int &outId, QString *err)
 {
-    QSqlQuery q;
-    if (!q.exec("SELECT NVL(MAX(ID_PUBLICATION),0)+1 FROM HICHEM.PUBLICATIONS")) {
-        setErr(err, q.lastError().text());
+    QSqlQuery query;
+    if (!query.exec("SELECT NVL(MAX(ID_PUBLICATION), 0) + 1 FROM PUBLICATIONS")) {
+        if (err) *err = query.lastError().text();
         return false;
     }
-    if (!q.next()) return false;
-    outId = q.value(0).toInt();
-    return true;
+
+    if (query.next()) {
+        outId = query.value(0).toInt();
+        return true;
+    }
+
+    if (err) *err = "Impossible de générer l'identifiant de la publication.";
+    return false;
 }
 
-bool Publication::ajouter(int idemp, QString *err) const
+bool Publication::ajouter(QString *err) const
 {
-    int newId = 0;
-    if (!nextId(newId, err)) return false;
+    int id = 0;
+    if (!nextId(id, err))
+        return false;
 
-    QSqlQuery q;
-    q.prepare(
-        "INSERT INTO HICHEM.PUBLICATIONS "
-        "(ID_PUBLICATION, TITRE, RESUME, INVENTEURS, DOMAINE_FABRICATION, "
-        " TYPE_BREVET, NUMERO_BREVET, DATE_DEPOT, STATUT_BREVET, IDEMP) "
-        "VALUES "
-        "(:id, :titre, :resume, :inventeurs, :domaine, :type, :numero, :dateDepot, :statut, :idemp)"
+    QSqlQuery query;
+    query.prepare(
+        "INSERT INTO PUBLICATIONS ("
+        "ID_PUBLICATION, TITRE, RESUME, INVENTEURS, DOMAINE_FABRICATION, "
+        "TYPE_BREVET, NUMERO_BREVET, DATE_DEPOT, STATUT_BREVET, LIEN_DOCUMENT, IDEMP"
+        ") VALUES ("
+        ":id, :titre, :resume, :inventeurs, :domaine, "
+        ":typeBrevet, :numeroBrevet, :dateDepot, :statutBrevet, NULL, :idEmp)"
         );
 
-    q.bindValue(":id", newId);
-    q.bindValue(":titre", m_titre);
-    q.bindValue(":resume", m_resume);
-    q.bindValue(":inventeurs", m_inventeurs);
-    q.bindValue(":domaine", m_domaine);
-    q.bindValue(":type", m_type);
-    q.bindValue(":numero", m_numero);
-    q.bindValue(":dateDepot", m_dateDepot);
-    q.bindValue(":statut", m_statut);
-    q.bindValue(":idemp", idemp);
+    query.bindValue(":id", id);
+    query.bindValue(":titre", m_titre);
+    query.bindValue(":resume", m_resume);
+    query.bindValue(":inventeurs", m_inventeurs);
+    query.bindValue(":domaine", m_domaineFabrication);
+    query.bindValue(":typeBrevet", m_typeBrevet);
 
-    if (!q.exec()) {
-        setErr(err, q.lastError().text());
+    if (m_numeroBrevet <= 0)
+        query.bindValue(":numeroBrevet", QVariant(QVariant::Int));
+    else
+        query.bindValue(":numeroBrevet", m_numeroBrevet);
+
+    query.bindValue(":dateDepot", m_dateDepot);
+    query.bindValue(":statutBrevet", m_statutBrevet);
+    query.bindValue(":idEmp", m_idEmp);
+
+    if (!query.exec()) {
+        if (err) *err = "Erreur ajout publication : " + query.lastError().text();
         return false;
     }
+
     return true;
 }
 
-bool Publication::modifier(const QString &id,
-                           const QString &titre,
-                           const QString &resume,
-                           const QString &inventeurs,
-                           const QString &domaine,
-                           const QString &type,
-                           int numero,
-                           const QDate &dateDepot,
-                           const QString &statut,
-                           QString *err)
+bool Publication::modifier(const QString& idPublication, QString *err) const
 {
-    QSqlQuery q;
-    q.prepare(
-        "UPDATE HICHEM.PUBLICATIONS SET "
-        "TITRE=:titre, RESUME=:resume, INVENTEURS=:inventeurs, "
-        "DOMAINE_FABRICATION=:domaine, TYPE_BREVET=:type, "
-        "NUMERO_BREVET=:numero, DATE_DEPOT=:dateDepot, STATUT_BREVET=:statut "
-        "WHERE ID_PUBLICATION=:id"
+    QSqlQuery query;
+    query.prepare(
+        "UPDATE PUBLICATIONS SET "
+        "TITRE = :titre, "
+        "RESUME = :resume, "
+        "INVENTEURS = :inventeurs, "
+        "DOMAINE_FABRICATION = :domaine, "
+        "TYPE_BREVET = :typeBrevet, "
+        "NUMERO_BREVET = :numeroBrevet, "
+        "DATE_DEPOT = :dateDepot, "
+        "STATUT_BREVET = :statutBrevet "
+        "WHERE ID_PUBLICATION = :id"
         );
 
-    q.bindValue(":titre", titre);
-    q.bindValue(":resume", resume);
-    q.bindValue(":inventeurs", inventeurs);
-    q.bindValue(":domaine", domaine);
-    q.bindValue(":type", type);
-    q.bindValue(":numero", numero);
-    q.bindValue(":dateDepot", dateDepot);
-    q.bindValue(":statut", statut);
-    q.bindValue(":id", id);
+    query.bindValue(":titre", m_titre);
+    query.bindValue(":resume", m_resume);
+    query.bindValue(":inventeurs", m_inventeurs);
+    query.bindValue(":domaine", m_domaineFabrication);
+    query.bindValue(":typeBrevet", m_typeBrevet);
 
-    if (!q.exec()) {
-        setErr(err, q.lastError().text());
+    if (m_numeroBrevet <= 0)
+        query.bindValue(":numeroBrevet", QVariant(QVariant::Int));
+    else
+        query.bindValue(":numeroBrevet", m_numeroBrevet);
+
+    query.bindValue(":dateDepot", m_dateDepot);
+    query.bindValue(":statutBrevet", m_statutBrevet);
+    query.bindValue(":id", idPublication);
+
+    if (!query.exec()) {
+        if (err) *err = "Erreur modification publication : " + query.lastError().text();
         return false;
     }
+
     return true;
 }
 
-bool Publication::supprimer(const QString &id, QString *err)
+bool Publication::supprimer(const QString& idPublication, QString *err)
 {
-    QSqlQuery q;
-    q.prepare("DELETE FROM HICHEM.PUBLICATIONS WHERE ID_PUBLICATION=:id");
-    q.bindValue(":id", id);
+    QSqlQuery query;
+    query.prepare("DELETE FROM PUBLICATIONS WHERE ID_PUBLICATION = :id");
+    query.bindValue(":id", idPublication);
 
-    if (!q.exec()) {
-        setErr(err, q.lastError().text());
+    if (!query.exec()) {
+        if (err) *err = "Erreur suppression publication : " + query.lastError().text();
         return false;
     }
+
     return true;
 }
 
 bool Publication::chargerTout(QVector<Row> &out, QString *err)
 {
-    out.clear();
-    QSqlQuery q;
-    q.prepare(
-        "SELECT ID_PUBLICATION, TITRE, RESUME, INVENTEURS, DOMAINE_FABRICATION, "
-        "TYPE_BREVET, TO_CHAR(NUMERO_BREVET), TO_CHAR(DATE_DEPOT,'YYYY-MM-DD'), "
-        "STATUT_BREVET, IDEMP "
-        "FROM HICHEM.PUBLICATIONS "
-        "ORDER BY DATE_DEPOT DESC"
-        );
-
-    if (!q.exec()) {
-        setErr(err, q.lastError().text());
+    QSqlQuery query;
+    if (!query.exec(
+            "SELECT ID_PUBLICATION, TITRE, RESUME, INVENTEURS, DOMAINE_FABRICATION, "
+            "TYPE_BREVET, NUMERO_BREVET, DATE_DEPOT, STATUT_BREVET, IDEMP "
+            "FROM PUBLICATIONS "
+            "ORDER BY ID_PUBLICATION ASC")) {
+        if (err) *err = "Erreur chargement publications : " + query.lastError().text();
         return false;
     }
 
-    while (q.next()) {
+    out.clear();
+
+    while (query.next()) {
         Row r;
-        r.id = q.value(0).toString();
-        r.titre = q.value(1).toString();
-        r.resume = q.value(2).toString();
-        r.inventeurs = q.value(3).toString();
-        r.domaine = q.value(4).toString();
-        r.type = q.value(5).toString();
-        r.numero = q.value(6).toString();
-        r.dateDepot = q.value(7).toString();
-        r.statut = q.value(8).toString();
-        r.idemp = q.value(9).toInt();
+        r.idPublication      = query.value(0).toString();
+        r.titre              = query.value(1).toString();
+        r.resume             = query.value(2).toString();
+        r.inventeurs         = query.value(3).toString();
+        r.domaineFabrication = query.value(4).toString();
+        r.typeBrevet         = query.value(5).toString();
+        r.numeroBrevet       = query.value(6).toInt();
+        r.dateDepot          = query.value(7).toDate().toString("yyyy-MM-dd");
+        r.statutBrevet       = query.value(8).toString();
+        r.idEmp              = query.value(9).toString();
         out.push_back(r);
     }
+
     return true;
 }
