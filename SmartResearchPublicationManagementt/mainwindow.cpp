@@ -189,7 +189,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
 
 
-<<<<<<< HEAD
 
 
     // 1. Créer le menu
@@ -205,8 +204,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
 
 
-=======
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
     //pointage
 
 
@@ -355,25 +352,19 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
             this, &MainWindow::on_pointage_clicked);
     connect(ui->btn_ret, &QPushButton::clicked,
             this, &MainWindow::on_btn_ret_clicked);
-<<<<<<< HEAD
     connect(ui->btnAnnuler_emp, &QPushButton::clicked,
             this, &MainWindow::on_btnAnnuler_emp_clicked);
     connect(ui->BtnPopupCancelLabs_8, &QPushButton::clicked,
             this, &MainWindow::on_BtnPopupCancelLabs_8_clicked);
     connect(ui->BtnPopupCancelLabs_10, &QPushButton::clicked,
             this, &MainWindow::on_BtnPopupCancelLabs_10_clicked);
-=======
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
 }
 
 
 
 
-<<<<<<< HEAD
 
 
-=======
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
 void MainWindow::on_btnStat_emp_clicked()
 {
     QStringList categories;
@@ -1587,7 +1578,6 @@ void MainWindow::on_btnmapl_3_clicked()
 }
 // Inventory - Navigation
 // ====================== AJOUT ======================
-<<<<<<< HEAD
 void MainWindow::handleInventoryAdd()
 {
     qDebug() << "[INVENTORY] handleInventoryAdd: Navigating to Index 1 (ajouteri)";
@@ -1654,71 +1644,6 @@ void MainWindow::handleInventoryStats()
 }
 
 
-=======
-void MainWindow::on_BtnInventoryAdd_clicked()
-{
-    // Réinitialiser le formulaire d'ajout
-    ui->aff1->clear();
-    ui->aff2->clear();
-    ui->aff3->setCurrentIndex(0);   // spécialité
-    ui->aff7->setCurrentIndex(0);   // disponibilité
-    ui->aff3_2->setCurrentIndex(0); // résultat
-    ui->aff7_2->setCurrentIndex(0); // paiement
-
-    ui->stacked_I->setCurrentIndex(1); // Page d'ajout
-}
-void MainWindow::on_BtnInventoryAdd_2_clicked()
-{
-    const int r = ui->TableInventory->currentRow();
-    if (r < 0) {
-        QMessageBox::warning(this, "Afficher", "Sélectionnez un produit.");
-        return;
-    }
-
-    QTableWidgetItem *it = ui->TableInventory->item(r, 0);
-    if (!it) return;
-
-    // Read from basic columns
-    const QString sku    = ui->TableInventory->item(r, 1)->text();
-    const QString name   = ui->TableInventory->item(r, 2)->text();
-    const QString price  = ui->TableInventory->item(r, 3)->text();
-    const QString qtAv   = ui->TableInventory->item(r, 4)->text();
-    const QString status = ui->TableInventory->item(r, 5)->text();
-
-    // Read from UserRoles in column 0
-    const QString id     = it->data(Qt::UserRole).toString();
-    const QString zone   = it->data(Qt::UserRole + 1).toString();
-    const QString shelf  = it->data(Qt::UserRole + 2).toString();
-    const QString unit   = it->data(Qt::UserRole + 3).toString();
-    const QString type   = it->data(Qt::UserRole + 4).toString();
-    const QString desc   = it->data(Qt::UserRole + 5).toString();
-    const QString qtRs   = it->data(Qt::UserRole + 6).toString();
-    const QString thr    = it->data(Qt::UserRole + 7).toString();
-
-    // Update Detail labels
-    ui->aff_id->setText(id);
-    ui->aff_sku->setText(sku);
-    ui->aff_name->setText(name);
-    ui->aff_type->setText(type);
-    ui->aff_price->setText(price + " €");
-    ui->aff_qtav->setText(qtAv);
-    ui->aff_qtrs->setText(qtRs);
-    ui->aff_threshold->setText(thr);
-    ui->aff_unit->setText(unit);
-    ui->aff_zone->setText(zone);
-    ui->aff_shelf->setText(shelf);
-    ui->aff_status->setText(status);
-    ui->aff_description->setText(desc.isEmpty() ? "Pas de description" : desc);
-
-    ui->stacked_I->setCurrentIndex(4);
-}
-// on_BtnInventoryEdit_clicked → full CRUD implementation below (//start inventory crud)
-void MainWindow::on_BtnInventoryAdd_5_clicked() { ui->stacked_I->setCurrentIndex(3); }
-void MainWindow::on_retour_stat_7_clicked() { ui->stacked_I->setCurrentIndex(0); }
-void MainWindow::on_BtnPopupCancelInventory_2_clicked() { ui->stacked_I->setCurrentIndex(0); }
-void MainWindow::on_BtnPopupCancelInventory_clicked() { ui->stacked_I->setCurrentIndex(0); }
-void MainWindow::on_retour_stat_6_clicked() { ui->stacked_I->setCurrentIndex(0); }
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
 
 // Finance “retour” existants
 void MainWindow::on_retour_stat_4_clicked() { ui->stacked_F->setCurrentIndex(0); }
@@ -1729,15 +1654,9 @@ void MainWindow::on_BtnPopupCancelLabs_6_clicked() { ui->stack_emp->setCurrentIn
 void MainWindow::on_btnCancelEditEmp_clicked() { ui->stack_emp->setCurrentIndex(0); }
 void MainWindow::on_BtnPopupCancelLabs_10_clicked() { ui->stack_emp->setCurrentIndex(0); }
 void MainWindow::on_BtnPopupCancelLabs_9_clicked() { ui->stack_emp->setCurrentIndex(0); }
-<<<<<<< HEAD
 void MainWindow::on_BtnPopupCancelLabs_8_clicked() { ui->stack_emp->setCurrentIndex(0); }
 void MainWindow::on_btnSaveEmployee_2_clicked() { ui->stack_emp->setCurrentIndex(0); }
 void MainWindow::on_BtnPopupCancelLabs_7_clicked() { ui->stack_emp->setCurrentIndex(0); }
-=======
-void MainWindow::on_BtnPopupCancelLabs_7_clicked() { ui->stack_emp->setCurrentIndex(0); }
-void MainWindow::on_BtnPopupCancelLabs_8_clicked() { ui->stack_emp->setCurrentIndex(0); }
-void MainWindow::on_btnSaveEmployee_2_clicked() { ui->stack_emp->setCurrentIndex(0); }
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
 
 // Projets - Navigation
 void MainWindow::on_retour_statn_clicked() { ui->stack_proj->setCurrentIndex(0); }
@@ -2655,11 +2574,7 @@ void MainWindow::on_BtnReset_clicked()
     ui->DateFrom->setDate(QDate(2000, 1, 1));
     ui->DateTo->setDate(QDate::currentDate());
     ui->EdSearch->clear();
-<<<<<<< HEAD
     on_BtnApply_clicked();
-=======
-    on_BtnApply_clicked(); // Rafraîchir via la logique de filtrage
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
 }
 
 void MainWindow::on_BtnExport_clicked()
@@ -3795,82 +3710,130 @@ void MainWindow::loadEmployees()
 }
 void MainWindow::on_btnSaveEmployee_clicked()
 {
-    // 1. Récupération des données
+    // 1. Récupération des données (Trim pour nettoyer les espaces inutiles)
     QString cin         = ui->lineCINAdd->text().trimmed();
+    QString username    = ui->lineUsernameAdd->text().trimmed();
+    QString password    = ui->linePasswordAdd->text(); // Pas de trim pour le pass
+    QString email       = ui->lineEmailAdd->text().trimmed();
     QString nom         = ui->lineNomAdd->text().trimmed();
     QString prenom      = ui->linePrenomAdd->text().trimmed();
-    QString username    = ui->lineUsernameAdd->text().trimmed();
-    QString email       = ui->lineEmailAdd->text().trimmed();
-    QString password    = ui->linePasswordAdd->text(); // On ne trim pas un mot de passe
-    QString poste       = ui->linePosteAdd->text().trimmed();
-    QString departement = ui->lineDepartementAdd->text().trimmed();
-    QString salaireStr  = ui->lineSalaireAdd->text().trimmed();
+    int roleIndex       = ui->comboRoleAdd->currentIndex();
     QString role        = ui->comboRoleAdd->currentText();
+
+    QString departement = ui->lineDepartementAdd->text().trimmed();
+    QString poste       = ui->linePosteAdd->text().trimmed();
     QDate dateEmb       = ui->dateEmbaucheAdd->date();
-<<<<<<< HEAD
-    int index = ui->comboRoleAdd->currentIndex();
-=======
+    QString salaireStr  = ui->lineSalaireAdd->text().trimmed();
 
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
-    // 2. CONTRAINTE : Tous les champs obligatoires
-    if (cin.isEmpty() || nom.isEmpty() || prenom.isEmpty() || username.isEmpty() ||
-        email.isEmpty() || password.isEmpty() || poste.isEmpty() ||
-        departement.isEmpty() || salaireStr.isEmpty()) {
-        QMessageBox::warning(this, "Champs vides", "Veuillez remplir tous les champs du formulaire.");
-        return;
+    // --- ÉTAPE 2 : CONTRÔLES DANS L'ORDRE DU VISUEL ---
+
+    // --- COLONNE GAUCHE ---
+    // CIN
+    if (cin.isEmpty()) {
+        QMessageBox::warning(this, "Saisie incomplète", "Le champ CIN est vide.");
+        ui->lineCINAdd->setFocus(); return;
+    }
+    if (!QRegularExpression("^[0-9]{8}$").match(cin).hasMatch()) {
+        QMessageBox::warning(this, "Format Incorrect", "Le CIN doit comporter 8 chiffres.");
+        ui->lineCINAdd->setFocus(); return;
+    }
+    if (Employe::existe(cin)) {
+        QMessageBox::critical(this, "Doublon", "Ce CIN est déjà utilisé.");
+        ui->lineCINAdd->setFocus(); return;
     }
 
-    // 3. CONTRAINTE : CIN (Exactement 8 chiffres)
-    QRegularExpression cinRegex("^[0-9]{8}$");
-    if (!cinRegex.match(cin).hasMatch()) {
-        QMessageBox::warning(this, "Format CIN", "Le CIN doit contenir exactement 8 chiffres.");
-        return;
+    // Username
+    if (username.isEmpty()) {
+        QMessageBox::warning(this, "Saisie incomplète", "Le Username est obligatoire.");
+        ui->lineUsernameAdd->setFocus(); return;
     }
-
-    // 4. CONTRAINTE : Format EMAIL (Regex standard)
-    QRegularExpression emailRegex("^[\\w\\.-]+@[\\w\\.-]+\\.[a-z]{2,4}$", QRegularExpression::CaseInsensitiveOption);
-    if (!emailRegex.match(email).hasMatch()) {
-        QMessageBox::warning(this, "Format Email", "L'adresse email saisie est invalide (ex: exemple@mail.com).");
-        return;
-    }
-
-    // 5. CONTRAINTE : Unicité (Vérification SQL)
     if (Employe::usernameExiste(username)) {
-        QMessageBox::warning(this, "Doublon", "Ce nom d'utilisateur est déjà utilisé.");
-        return;
+        QMessageBox::warning(this, "Doublon", "Ce nom d'utilisateur est déjà pris.");
+        ui->lineUsernameAdd->setFocus(); return;
     }
-<<<<<<< HEAD
-    if (index == 0) {
-        // Afficher un message d'alerte
-        QMessageBox::warning(this, "Erreur de saisie", "Veuillez sélectionner un rôle avant de continuer.");
-        return; // On arrête la fonction ici
+
+    // Password
+    if (password.isEmpty()) {
+        QMessageBox::warning(this, "Saisie incomplète", "Veuillez définir un mot de passe.");
+        ui->linePasswordAdd->setFocus(); return;
     }
-=======
 
-    // NB: Tu peux ajouter Employe::emailExiste(email) si tu as créé la fonction en SQL
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
+    // Email
+    if (email.isEmpty()) {
+        QMessageBox::warning(this, "Saisie incomplète", "L'Email est obligatoire.");
+        ui->lineEmailAdd->setFocus(); return;
+    }
+    if (!QRegularExpression("^[\\w\\.-]+@[\\w\\.-]+\\.[a-z]{2,4}$").match(email).hasMatch()) {
+        QMessageBox::warning(this, "Format Incorrect", "L'adresse email est invalide.");
+        ui->lineEmailAdd->setFocus(); return;
+    }
 
-    // 6. Hachage et Enregistrement
+    // Nom
+    if (nom.isEmpty()) {
+        QMessageBox::warning(this, "Saisie incomplète", "Le champ Nom est vide.");
+        ui->lineNomAdd->setFocus(); return;
+    }
+
+    // Prénom
+    if (prenom.isEmpty()) {
+        QMessageBox::warning(this, "Saisie incomplète", "Le champ Prénom est vide.");
+        ui->linePrenomAdd->setFocus(); return;
+    }
+
+    // Role
+    if (roleIndex == 0) {
+        QMessageBox::warning(this, "Choix manquant", "Veuillez choisir un rôle dans la liste.");
+        ui->comboRoleAdd->showPopup(); return;
+    }
+
+    // --- COLONNE DROITE ---
+    // Département
+    if (departement.isEmpty()) {
+        QMessageBox::warning(this, "Saisie incomplète", "Veuillez préciser le département.");
+        ui->lineDepartementAdd->setFocus(); return;
+    }
+
+    // Poste
+    if (poste.isEmpty()) {
+        QMessageBox::warning(this, "Saisie incomplète", "Le poste occupé est obligatoire.");
+        ui->linePosteAdd->setFocus(); return;
+    }
+
+    // Salaire
+    if (salaireStr.isEmpty()) {
+        QMessageBox::warning(this, "Saisie incomplète", "Veuillez entrer le montant du salaire.");
+        ui->lineSalaireAdd->setFocus(); return;
+    }
+    bool ok;
+    double salaire = salaireStr.toDouble(&ok);
+    if (!ok || salaire < 0) {
+        QMessageBox::warning(this, "Format Incorrect", "Le salaire doit être un nombre valide.");
+        ui->lineSalaireAdd->setFocus(); return;
+    }
+
+    // --- ÉTAPE 3 : TOUT EST OK -> ENREGISTREMENT ---
     QString passHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256).toHex();
-    double salaire = salaireStr.toDouble();
 
     Employe e(cin, nom, prenom, username, passHash, email, poste, departement, dateEmb, salaire, role);
 
     QString errMsg;
     if (e.ajouter(&errMsg)) {
-        QMessageBox::information(this, "Succès", "L'employé a été ajouté avec succès.");
-        loadEmployees();
-<<<<<<< HEAD
-        ajouterNotification("SUCCÈS", "Employé " + username + " ajouté.");
-=======
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
-        ui->stack_emp->setCurrentIndex(0);
-        // Optionnel : Vider les champs après succès
+        QMessageBox::information(this, "Succès", "L'employé " + nom + " a été enregistré.");
+
+        loadEmployees(); // Rafraîchir ton tableau SQL
+        ajouterNotification("AJOUT", "Nouvel employé : " + username); // Ta notification 🔔
+
+        // Vider tous les champs (Reset)
+        ui->lineCINAdd->clear(); ui->lineUsernameAdd->clear(); ui->linePasswordAdd->clear();
+        ui->lineEmailAdd->clear(); ui->lineNomAdd->clear(); ui->linePrenomAdd->clear();
+        ui->lineDepartementAdd->clear(); ui->linePosteAdd->clear(); ui->lineSalaireAdd->clear();
+        ui->comboRoleAdd->setCurrentIndex(0);
+
+        ui->stack_emp->setCurrentIndex(0); // Retour à l'écran de liste
     } else {
-        QMessageBox::critical(this, "Erreur SQL", "L'ajout a échoué :\n" + errMsg);
+        QMessageBox::critical(this, "Erreur SQL", errMsg);
     }
 }
-
 
 void MainWindow::on_btnSupprimer_emp_clicked()
 {
@@ -3909,11 +3872,7 @@ void MainWindow::on_btnSupprimer_emp_clicked()
         QMessageBox::information(this, "Succès",
                                  "Employé supprimé.");
         loadEmployees(); // ✅ Recharge tableau
-<<<<<<< HEAD
         ajouterNotification("SUPPRESSION", "CIN: " + idEmploye);    }
-=======
-    }
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
     else
     {
         QMessageBox::critical(this, "Erreur",
@@ -3943,10 +3902,6 @@ void MainWindow::on_btnModifier_emp_clicked()
     ui->dateEmbaucheEmp->setDate(QDate::fromString(ui->TableEmp->item(row, 7)->text(), "yyyy-MM-dd"));
     ui->lineSalaireEmp->setText(ui->TableEmp->item(row, 8)->text());
     ui->comboRoleAdd_2->setCurrentText(ui->TableEmp->item(row, 9)->text());
-<<<<<<< HEAD
-=======
-
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
     ui->stack_emp->setCurrentIndex(2); // Aller vers la page de modif
 }
 void MainWindow::on_btnSaveEditEmployee_clicked()
@@ -3963,10 +3918,7 @@ void MainWindow::on_btnSaveEditEmployee_clicked()
     QString username = ui->lineUsernameEmp->text().trimmed();
     QString email    = ui->lineEmailEmp->text().trimmed();
     QString salaireS = ui->lineSalaireEmp->text().trimmed();
-<<<<<<< HEAD
     int index = ui->comboRoleAdd_2->currentIndex();
-=======
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
 
     // 1. Validation : Champs vides
     if (cin.isEmpty() || nom.isEmpty() || prenom.isEmpty() || username.isEmpty() || email.isEmpty() || salaireS.isEmpty()) {
@@ -3974,11 +3926,13 @@ void MainWindow::on_btnSaveEditEmployee_clicked()
         return;
     }
 
+
     // 2. Validation : Format CIN (8 chiffres)
     if (!QRegularExpression("^[0-9]{8}$").match(cin).hasMatch()) {
         QMessageBox::warning(this, "Format CIN", "Le CIN doit comporter exactement 8 chiffres.");
         return;
     }
+
 
     // 3. Validation : Format Email
     QRegularExpression emailRegex("^[\\w\\.-]+@[\\w\\.-]+\\.[a-z]{2,4}$", QRegularExpression::CaseInsensitiveOption);
@@ -4004,14 +3958,12 @@ void MainWindow::on_btnSaveEditEmployee_clicked()
             return;
         }
     }
-<<<<<<< HEAD
     if (index == 0) {
         // Afficher un message d'alerte
         QMessageBox::warning(this, "Erreur de saisie", "Veuillez sélectionner un rôle avant de continuer.");
         return; // On arrête la fonction ici
     }
-=======
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
+
 
     // 5. Exécution de l'Update
     Employe e(cin, nom, prenom, username, "", email,
@@ -4025,10 +3977,7 @@ void MainWindow::on_btnSaveEditEmployee_clicked()
     if (e.modifier(idEmploye, &errMsg)) {
         QMessageBox::information(this, "Succès", "L'employé a été mis à jour.");
         loadEmployees();
-<<<<<<< HEAD
         ajouterNotification("MODIFICATION", "Employé: " + nom);
-=======
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
         ui->stack_emp->setCurrentIndex(0);
     } else {
         QMessageBox::critical(this, "Erreur", "Erreur SQL :\n" + errMsg);
@@ -4145,7 +4094,6 @@ void MainWindow::on_btnForm_emp_clicked()
 {
     ui->stack_emp->setCurrentIndex(5);
 }
-<<<<<<< HEAD
 void MainWindow::ajouterNotification(const QString &actionType, const QString &cible)
 {
     nbNotifs++;
@@ -4198,13 +4146,6 @@ void MainWindow::notifierConnexion()
     // Format : [HEURE] 👤 Nom (Role) a effectué : CONNEXION sur Session Active
     ajouterNotification("CONNEXION", "Session de travail ouverte");
 }
-=======
-
-
-
-
-
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
 
 
 
@@ -4942,11 +4883,8 @@ void MainWindow::initInventoryUi()
     ui->Unit_2->addItem("L",  "L");
     ui->Unit_2->addItem("m",  "m");
 
-<<<<<<< HEAD
     ui->Unit_2->addItem("m",  "m");
 
-=======
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
     // Type combo (Add form)
     ui->Type->clear();
     ui->Type->addItem("Matière première",  "Matière première");
@@ -4981,7 +4919,6 @@ void MainWindow::initInventoryUi()
     ui->Name_2->setValidator(nameValidator);
 
     setupTableInventory();
-<<<<<<< HEAD
 
     // --- MANUAL CONNECTIONS (Fixing Navigation Issues) ---
     connect(ui->BtnInventoryAdd,    &QPushButton::clicked, this, &MainWindow::handleInventoryAdd);
@@ -5002,8 +4939,6 @@ void MainWindow::initInventoryUi()
     // Apply/filter button — explicit connect (auto-connect fails for nested widgets)
     connect(ui->BtnInventoryApply, &QPushButton::clicked, this, &MainWindow::applyInventoryFilter);
 
-=======
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
     ui->stacked_I->setCurrentIndex(0);
     loadInventory();
 }
@@ -5022,7 +4957,6 @@ void MainWindow::setupTableInventory()
         "ID", "SKU", "Nom", "Prix", "Qté disp.", "Statut"
     });
     ui->TableInventory->hideColumn(0); // Hide physical PK from Admin
-<<<<<<< HEAD
     ui->TableInventory->setSortingEnabled(false); // Rely on SQL order
 
     // SKU Input Mask: Let's use a more flexible mask to avoid blocking the user
@@ -5030,13 +4964,6 @@ void MainWindow::setupTableInventory()
     ui->Sku->setInputMask(">AAA-999; ");
     ui->Sku_2->setInputMask(">AAA-999; ");
 
-=======
-    ui->TableInventory->setSortingEnabled(true);
-
-    // SKU Input Mask: Alphanumeric prefix, hyphen, digits (relaxed to avoid blocking)
-    ui->Sku->setInputMask(">NNN-NNN;0");
-    ui->Sku_2->setInputMask(">NNN-NNN;0");
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
 
     // Hide ID input fields from Admin (automated)
     ui->IdProduct->setVisible(false);
@@ -5045,7 +4972,6 @@ void MainWindow::setupTableInventory()
     ui->LblIdProduct_2->setVisible(false);
 }
 
-<<<<<<< HEAD
 void MainWindow::fillTableInventoryRow(int r, const Inventory::Row &row)
 {
     // col 0 - ID_PRODUCT (hidden PK stored in UserRole)
@@ -5072,39 +4998,24 @@ void MainWindow::fillTableInventoryRow(int r, const Inventory::Row &row)
 void MainWindow::loadInventory()
 {
     ui->TableInventory->setSortingEnabled(false);
-=======
-// ── READ (load) ───────────────────────────────────────────────────────────────
-
-void MainWindow::loadInventory()
-{
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
     ui->TableInventory->setRowCount(0);
 
     QVector<Inventory::Row> rows;
     QString err;
     const int sortIdx = ui->InventorySort->currentIndex();
     QString orderBy = "SKU";
-<<<<<<< HEAD
     if (sortIdx == 1)      orderBy = "NAME ASC";
-=======
-    if (sortIdx == 1) orderBy = "NAME ASC";
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
     else if (sortIdx == 2) orderBy = "PRICE ASC";
     else if (sortIdx == 3) orderBy = "PRICE DESC";
 
     if (!Inventory::chargerTout(rows, orderBy, &err)) {
-<<<<<<< HEAD
         QMessageBox::critical(this, "Erreur SQL - Inventaire", err);
-=======
-        QMessageBox::critical(this, "Erreur SQL – Inventaire", err);
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
         return;
     }
 
     int r = 0;
     for (const auto &row : std::as_const(rows)) {
         ui->TableInventory->insertRow(r);
-<<<<<<< HEAD
         fillTableInventoryRow(r, row);
         ++r;
     }
@@ -5112,30 +5023,6 @@ void MainWindow::loadInventory()
 }
 
 
-=======
-
-        // col 0 – ID_PRODUCT (hidden PK stored in UserRole)
-        auto *itId = new QTableWidgetItem(row.idProduct);
-        itId->setData(Qt::UserRole,     row.idProduct);
-        itId->setData(Qt::UserRole + 1, row.zone);        // store zone for edit pre-fill
-        itId->setData(Qt::UserRole + 2, row.shelf);       // store shelf for edit pre-fill
-        itId->setData(Qt::UserRole + 3, row.unit);        // store unit for edit pre-fill
-        itId->setData(Qt::UserRole + 4, row.type);        // store type for edit pre-fill
-        itId->setData(Qt::UserRole + 5, row.description); // store description
-        itId->setData(Qt::UserRole + 6, row.qtRs);        // store qtRs
-        itId->setData(Qt::UserRole + 7, row.threshold);   // store threshold
-        ui->TableInventory->setItem(r, 0, itId);
-
-        ui->TableInventory->setItem(r, 1, new QTableWidgetItem(row.sku));
-        ui->TableInventory->setItem(r, 2, new QTableWidgetItem(row.name));
-        ui->TableInventory->setItem(r, 3, new QTableWidgetItem(QString::number(row.price, 'f', 2)));
-        ui->TableInventory->setItem(r, 4, new QTableWidgetItem(QString::number(row.qtAv)));
-        ui->TableInventory->setItem(r, 5, new QTableWidgetItem(row.status));
-        ++r;
-    }
-}
-
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
 // ── CREATE ────────────────────────────────────────────────────────────────────
 
 void MainWindow::on_BtnPopupSaveInventory_clicked()
@@ -5159,7 +5046,6 @@ void MainWindow::on_BtnPopupSaveInventory_clicked()
     const QString shelf     = ui->Shelf->currentData().toString();
     const QString desc      = ui->Description->toPlainText().trimmed();
 
-<<<<<<< HEAD
     // Validation: Name
     if (name.isEmpty()) {
         QMessageBox::warning(this, "Validation", "Le nom du produit ne peut pas être vide.");
@@ -5169,19 +5055,6 @@ void MainWindow::on_BtnPopupSaveInventory_clicked()
     // Validation: SKU (Min 3 chars)
     if (sku.length() < 3) {
         QMessageBox::warning(this, "Validation", "Le SKU doit contenir au moins 3 caractères.");
-=======
-    // Validation: Name (Uppercase and Numbers only)
-    QRegularExpression nameRegex("^[A-Z0-9 ]+$");
-    if (!nameRegex.match(name).hasMatch()) {
-        QMessageBox::warning(this, "Validation", "Le nom doit contenir uniquement des majuscules et des chiffres.");
-        return;
-    }
-
-    // Validation: SKU (ABC-123 format: 3 letters, hyphen, 3 numbers)
-    QRegularExpression skuRegex("^[A-Z]{3}-\\d{3}$");
-    if (!skuRegex.match(sku).hasMatch()) {
-        QMessageBox::warning(this, "Validation", "Le SKU doit respecter le format ABC-123 (3 lettres, un tiret, 3 chiffres).");
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
         return;
     }
 
@@ -5193,7 +5066,6 @@ void MainWindow::on_BtnPopupSaveInventory_clicked()
     Inventory inv(name, sku, type, qtAv, qtRs, threshold, unit, price, status, zone, shelf, desc);
     QString err;
     if (!inv.ajouter(&err)) {
-<<<<<<< HEAD
         QMessageBox::critical(this, "Erreur de Sauvegarde",
                               "Impossible d'ajouter le produit.\n\n"
                               "Détail technique : " + err + "\n\n"
@@ -5202,12 +5074,6 @@ void MainWindow::on_BtnPopupSaveInventory_clicked()
     }
 
 
-=======
-        QMessageBox::critical(this, "Erreur SQL – Ajout", err);
-        return;
-    }
-
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
     QMessageBox::information(this, "Inventaire", "Produit ajouté avec succès.");
     ui->stacked_I->setCurrentIndex(0);
     loadInventory();
@@ -5232,7 +5098,6 @@ void MainWindow::on_BtnPopupResetInventory_clicked()
 // ── UPDATE ────────────────────────────────────────────────────────────────────
 
 // ====================== MODIFICATION ======================
-<<<<<<< HEAD
 // ── UPDATE ────────────────────────────────────────────────────────────────────
 
 // ====================== MODIFICATION ======================
@@ -5352,47 +5217,6 @@ void MainWindow::applyInventoryFilter()
 
 
 
-=======
-void MainWindow::on_BtnInventoryEdit_clicked()
-{
-    int row = ui->TableLabs_2->currentRow();
-
-    // Vérification si aucune ligne n'est sélectionnée
-    if (row < 0) {
-        QMessageBox::warning(this, "Modifier", "Veuillez sélectionner un laboratoire dans le tableau.");
-        return;
-    }
-
-    // Récupération sécurisée de l'ID
-    QTableWidgetItem *item = ui->TableLabs_2->item(row, 0);
-    if (!item || item->text().trimmed().isEmpty()) {
-        QMessageBox::critical(this, "Erreur", "ID introuvable (colonne ID vide).");
-        return;
-    }
-
-    idLabsToEdit = item->text().trimmed();
-
-    Labs::Row r;
-    QString err;
-
-    if (!Labs::getById(idLabsToEdit, r, &err)) {
-        QMessageBox::critical(this, "Erreur",
-                              "ID introuvable dans la base de données.\n\nDétail : " + err);
-        idLabsToEdit.clear();
-        return;
-    }
-
-    // Pré-remplissage du formulaire de modification
-    ui->aff1->setText(r.nomlabo);           // Nom Laboratoire
-    ui->aff2->setText(r.localisation);
-    ui->aff3->setCurrentText(r.specialite);
-    ui->aff7->setCurrentText(r.disponibilite);
-    ui->aff3_2->setCurrentText(r.resultat);
-    ui->aff7_2->setCurrentText(r.paiement);
-
-    ui->stacked_I->setCurrentIndex(2);      // Page Modification
-}
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
 void MainWindow::on_BtnPopupSaveInventory_2_clicked()
 {
     // Auto-uppercase for consistency
@@ -5419,7 +5243,6 @@ void MainWindow::on_BtnPopupSaveInventory_2_clicked()
         return;
     }
 
-<<<<<<< HEAD
     // Validation: Name
     if (name.isEmpty()) {
         QMessageBox::warning(this, "Validation", "Le nom du produit ne peut pas être vide.");
@@ -5429,19 +5252,6 @@ void MainWindow::on_BtnPopupSaveInventory_2_clicked()
     // Validation: SKU (Min 3 chars)
     if (sku.length() < 3) {
         QMessageBox::warning(this, "Validation", "Le SKU doit contenir au moins 3 caractères.");
-=======
-    // Validation: Name (Uppercase and Numbers only)
-    QRegularExpression nameRegex("^[A-Z0-9 ]+$");
-    if (!nameRegex.match(name).hasMatch()) {
-        QMessageBox::warning(this, "Validation", "Le nom doit contenir uniquement des majuscules et des chiffres.");
-        return;
-    }
-
-    // Validation: SKU (ABC-123 format: 3 letters, hyphen, 3 numbers)
-    QRegularExpression skuRegex("^[A-Z]{3}-\\d{3}$");
-    if (!skuRegex.match(sku).hasMatch()) {
-        QMessageBox::warning(this, "Validation", "Le SKU doit respecter le format ABC-123 (3 lettres, un tiret, 3 chiffres).");
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
         return;
     }
 
@@ -5480,11 +5290,7 @@ void MainWindow::on_BtnPopupResetInventory_2_clicked()
 
 // ── DELETE ────────────────────────────────────────────────────────────────────
 
-<<<<<<< HEAD
 void MainWindow::handleInventoryDelete()
-=======
-void MainWindow::on_BtnInventoryDelete_clicked()
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
 {
     const QString id  = selectedInventoryIdProduct();
     const QString sku = selectedInventorySku();
@@ -5514,42 +5320,6 @@ void MainWindow::on_BtnInventoryDelete_clicked()
 
 // ── SEARCH / FILTER ───────────────────────────────────────────────────────────
 
-<<<<<<< HEAD
-=======
-void MainWindow::on_BtnInventoryApply_clicked()
-{
-    const QString kw     = ui->InventorySearch->text().trimmed();
-    const QString status = ui->InventoryStatus->currentData().toString();
-    const int     sortIdx = ui->InventorySort->currentIndex();
-
-    QString orderBy = "SKU";
-    if (sortIdx == 1) orderBy = "NAME ASC";
-    else if (sortIdx == 2) orderBy = "PRICE ASC";
-    else if (sortIdx == 3) orderBy = "PRICE DESC";
-
-    QVector<Inventory::Row> rows;
-    QString err;
-    if (!Inventory::chercher(rows, kw, status, orderBy, &err)) {
-        QMessageBox::critical(this, "Erreur SQL – Recherche", err);
-        return;
-    }
-
-    ui->TableInventory->setRowCount(0);
-    int r = 0;
-    for (const auto &row : std::as_const(rows)) {
-        ui->TableInventory->insertRow(r);
-        auto *itId = new QTableWidgetItem(row.idProduct);
-        itId->setData(Qt::UserRole, row.idProduct);
-        ui->TableInventory->setItem(r, 0, itId);
-        ui->TableInventory->setItem(r, 1, new QTableWidgetItem(row.sku));
-        ui->TableInventory->setItem(r, 2, new QTableWidgetItem(row.name));
-        ui->TableInventory->setItem(r, 3, new QTableWidgetItem(QString::number(row.price, 'f', 2)));
-        ui->TableInventory->setItem(r, 4, new QTableWidgetItem(QString::number(row.qtAv)));
-        ui->TableInventory->setItem(r, 5, new QTableWidgetItem(row.status));
-        ++r;
-    }
-}
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
 
 //end
 

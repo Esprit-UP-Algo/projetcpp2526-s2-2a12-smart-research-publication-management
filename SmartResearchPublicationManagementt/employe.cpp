@@ -152,6 +152,27 @@ bool Employe::usernameExiste(const QString &username)
     query.bindValue(":username", username);
     return query.exec() && query.next();
 }
+//verifier si cin existant
+// Dans employe.cpp
+bool Employe::existe(const QString &cin, const QString &excludeId)
+{
+    QSqlQuery query;
+    // Si excludeId est vide, on cherche partout.
+    // Si excludeId n'est pas vide, on cherche partout SAUF pour cet ID (utile en MODIF)
+    if (excludeId.isEmpty()) {
+        query.prepare("SELECT CIN FROM EMPLOYES WHERE CIN = :cin");
+    } else {
+        query.prepare("SELECT CIN FROM EMPLOYES WHERE CIN = :cin AND CIN != :ex");
+        query.bindValue(":ex", excludeId);
+    }
+
+    query.bindValue(":cin", cin);
+
+    if (query.exec() && query.next()) {
+        return true; // Le CIN existe déjà
+    }
+    return false; // Le CIN est libre
+}
 
 // Authentification classique (Login)
 bool Employe::authentifier(const QString &username, const QString &passwordHash, QString *err)

@@ -63,7 +63,8 @@ public:
 
     // Utilitaires
     static bool usernameExiste(const QString &username);
-
+    //existe
+    static bool existe(const QString &cin, const QString &excludeId = "");
 private:
     // Générateur d'ID interne
     static bool nextId(int &outId, QString *err = nullptr);

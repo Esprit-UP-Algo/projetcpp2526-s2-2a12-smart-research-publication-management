@@ -81,11 +81,7 @@ bool Inventory::ajouter(QString *err) const
         QString e = q.lastError().text();
         if (e.contains("ORA-00904") || e.contains("ORA-01722")) {
              QSqlQuery alter;
-<<<<<<< HEAD
              // Ensure columns exist and have correct types
-=======
-             // Add columns one by one if they might be missing. This avoids failure if some exist.
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
              alter.exec("ALTER TABLE PRODUCT ADD NAME VARCHAR2(200)");
              alter.exec("ALTER TABLE PRODUCT ADD PRICE NUMBER");
              alter.exec("ALTER TABLE PRODUCT ADD TYPE VARCHAR2(100)");
@@ -93,7 +89,6 @@ bool Inventory::ajouter(QString *err) const
              alter.exec("ALTER TABLE PRODUCT ADD THRESHOLD NUMBER");
              alter.exec("ALTER TABLE PRODUCT ADD UNIT VARCHAR2(50)");
              alter.exec("ALTER TABLE PRODUCT ADD ZONE VARCHAR2(100)");
-<<<<<<< HEAD
              
              // Fix SHELF: If it's already a NUMBER, ORA-01722 occurs if we try to insert "1st floor".
              // We attempt to change it to VARCHAR2(100) if it already exists as NUMBER.
@@ -107,10 +102,6 @@ bool Inventory::ajouter(QString *err) const
              // Finally try adding IDEMP if missing
              alter.exec("ALTER TABLE PRODUCT ADD IDEMP NUMBER");
 
-=======
-             alter.exec("ALTER TABLE PRODUCT ADD SHELF VARCHAR2(100)");
-             alter.exec("ALTER TABLE PRODUCT ADD DESCR VARCHAR2(2000)");
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
              if (q.exec()) return true;
         }
 
@@ -226,7 +217,6 @@ bool Inventory::chargerTout(QVector<Row> &out, const QString &orderBy, QString *
 bool Inventory::chercher(QVector<Row> &out, const QString &keyword, const QString &zone, const QString &status, const QString &orderBy, QString *err)
 {
     out.clear();
-<<<<<<< HEAD
 
     // Safely escape a string for inline SQL (prevent injection in read queries)
     auto esc = [](const QString &s) -> QString {
@@ -235,11 +225,6 @@ bool Inventory::chercher(QVector<Row> &out, const QString &keyword, const QStrin
 
     QString sql = "SELECT * FROM PRODUCT WHERE 1=1";
 
-=======
-    QString sql = "SELECT * FROM PRODUCT WHERE 1=1";
-    
-    // Search in ID, SKU, and NAME
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
     if (!keyword.isEmpty()) {
         const QString k = esc(keyword);
         sql += QString(" AND (TO_CHAR(ID_PRODUCT) LIKE '%%%1%%'"
@@ -258,28 +243,9 @@ bool Inventory::chercher(QVector<Row> &out, const QString &keyword, const QStrin
     sql += " ORDER BY " + order;
 
     QSqlQuery q;
-<<<<<<< HEAD
     if (!q.exec(sql)) {
         // Fallback: try without NAME column (older schema) and simpler sort
         QString sql2 = "SELECT * FROM PRODUCT WHERE 1=1";
-=======
-    q.prepare(sql);
-    if (!keyword.isEmpty()) {
-        QString like = "%" + keyword + "%";
-        q.bindValue(":kw",  like);
-        q.bindValue(":kw2", like);
-        q.bindValue(":kw3", like);
-    }
-    if (!status.isEmpty()) q.bindValue(":status", status);
-
-    if (!q.exec()) { 
-        // Fallback search if NAME doesn't exist yet
-        sql = "SELECT * FROM PRODUCT WHERE 1=1";
-        if (!keyword.isEmpty()) sql += " AND (UPPER(SKU) LIKE UPPER(:kw))";
-        if (!status.isEmpty()) sql += " AND STATUS=:status";
-        sql += " ORDER BY SKU";
-        q.prepare(sql);
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
         if (!keyword.isEmpty()) {
             const QString k = esc(keyword);
             sql2 += QString(" AND (TO_CHAR(ID_PRODUCT) LIKE '%%%1%%' OR UPPER(SKU) LIKE '%%%1%%')").arg(k);

@@ -1,6 +1,5 @@
 --------------------------------------------------------
 --  Fichier créé - vendredi-mars-27-2026   
-<<<<<<< HEAD
 --------------------------------------------------------
 --------------------------------------------------------
 --  DDL for Sequence CLIENT_SEQ
@@ -26,29 +25,6 @@
 --  DDL for Sequence SEQ_EMPLOYE_ID
 --------------------------------------------------------
 
-=======
-
-   CREATE SEQUENCE  "HICHEM"."CLIENT_SEQ"  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER  NOCYCLE ;
---------------------------------------------------------
---  DDL for Sequence EMPLOYES_SEQ3
---------------------------------------------------------
-
-   CREATE SEQUENCE  "HICHEM"."EMPLOYES_SEQ3"  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 21 CACHE 20 NOORDER  NOCYCLE ;
---------------------------------------------------------
---  DDL for Sequence EMPLOYES_SEQ4
---------------------------------------------------------
-
-   CREATE SEQUENCE  "HICHEM"."EMPLOYES_SEQ4"  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 21 CACHE 20 NOORDER  NOCYCLE ;
---------------------------------------------------------
---  DDL for Sequence SEQ_CONGE_ID
---------------------------------------------------------
-
-   CREATE SEQUENCE  "HICHEM"."SEQ_CONGE_ID"  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 NOCACHE  NOORDER  NOCYCLE ;
---------------------------------------------------------
---  DDL for Sequence SEQ_EMPLOYE_ID
---------------------------------------------------------
-
->>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
    CREATE SEQUENCE  "HICHEM"."SEQ_EMPLOYE_ID"  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 3 NOCACHE  NOORDER  NOCYCLE ;
 --------------------------------------------------------
 --  DDL for Sequence SEQ_FORMATION_ID
