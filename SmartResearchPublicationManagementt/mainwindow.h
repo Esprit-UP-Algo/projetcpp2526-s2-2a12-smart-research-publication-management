@@ -24,13 +24,19 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+<<<<<<< HEAD
     void notifierConnexion(); // Pour signaler l'entrée de l'utilisateur
+=======
+>>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
 
 private:
     Ui::MainWindow *ui;
     QSqlQueryModel *model; // <--- C'est ce type qu'il faut utiliser
+<<<<<<< HEAD
     QString currentUser;
 
+=======
+>>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
     // ===== FINANCE =====
     Finance::Row selectedFinanceRowFromTable(bool *ok=nullptr) const;
     bool exportInternalInvoicePdf_19(const QString& filePath, const Finance::Row& row);
@@ -80,10 +86,14 @@ private:
     bool embaucheAscending = true;
     void configurerPermissions();
     void on_btn_reset_clicked();
+<<<<<<< HEAD
     QMenu *menuNotif;     // Le menu qui va descendre du bouton
     int nbNotifs = 0;     // Le compteur (ex: 1, 2, 3...)
 
     void ajouterNotification(const QString &titre, const QString &message);
+=======
+
+>>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
     // ====================
 
     // ===== INVENTORY =====

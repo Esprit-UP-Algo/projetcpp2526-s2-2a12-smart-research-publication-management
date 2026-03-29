@@ -49,7 +49,11 @@ int main(int argc, char *argv[])
         QObject::connect(&w, &MainWindow::logoutRequested, [&restart]() {
             restart = true;
         });
+<<<<<<< HEAD
         w.notifierConnexion();
+=======
+
+>>>>>>> 30b3d73efc0a4d3e01011549819f8cf3b40fa692
         w.show();
 
         // Boucle d'événements principale pour la fenêtre MainWindow
