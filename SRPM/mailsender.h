@@ -18,3 +18,4 @@ private:
 };
 
 #endif // MAILSENDER_H
+//mail
