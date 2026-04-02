@@ -11,6 +11,7 @@
 #include "labs.h"
 #include "employe.h"
 #include "inventory.h"
+#include "projet.h"
 #include <QSqlTableModel>
 
 QT_BEGIN_NAMESPACE
@@ -85,6 +86,13 @@ private:
 
     void ajouterNotification(const QString &titre, const QString &message);
     // ====================
+
+    // ===== PROJECTS =====
+    void initProjetsUi();
+    void loadProjets();
+    void showProjetsStats();
+    QString selectedProjetId() const;
+    QString idProjetToEdit;
 
     // ===== INVENTORY =====
     void initInventoryUi();
@@ -206,6 +214,8 @@ protected:
     void handleInventoryEdit();
     void handleInventoryStats();
     void handleInventoryDelete();
+    void handleInventoryExportPdf();
+    void handleInventoryDetailExportPdf();
 
     void on_BtnPopupCancelInventory_2_triggered(QAction *arg1);
     void on_BtnPopupCancelInventory_2_clicked();
@@ -216,6 +226,8 @@ protected:
     void on_BtnPopupResetInventory_2_clicked(); // EDIT reset
     void fillTableInventoryRow(int row, const Inventory::Row &data);
     void applyInventoryFilter();               // filter/search (manual connect)
+    void refreshInventoryTypeFilter();         // DISTINCT TYPE depuis la BD
+    void resetInventoryFilters();              // recherche vierge + tous + tri SKU
 
     // Finance slots
     void on_btnFinance_clicked();
@@ -239,6 +251,11 @@ protected:
     void on_btnAjouterProj_clicked();
     void on_btnModifierProj_clicked();
     void on_btnVoirStatistiquesProj_clicked();
+    void on_btnAddProj_clicked();
+    void on_btnConfirmEditProj_clicked();
+    void on_btnSupprimerProj_clicked();
+    void on_btnAppliquerProj_clicked();
+    void on_btnFiltrerDateProj_clicked();
     void on_btnAnnuler_emp_clicked();
     void on_btnForm_emp_clicked();
     void on_pushButton_clicked();

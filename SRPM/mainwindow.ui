@@ -255,7 +255,7 @@
       <item>
        <widget class="QStackedWidget" name="stackedWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>4</number>
         </property>
         <widget class="QWidget" name="pageEmployee">
          <layout class="QVBoxLayout" name="verticalLayoutPage0">
@@ -272,7 +272,7 @@
                  <string/>
                 </property>
                 <property name="placeholderText">
-                 <string>Rechercher (recherche par CIN ou role...)</string>
+                 <string>Rechercher (recherche par CIN ou Username...)</string>
                 </property>
                </widget>
               </item>
@@ -1915,6 +1915,13 @@
                    </property>
                   </widget>
                  </item>
+                 <item row="1" column="6">
+                  <widget class="QPushButton" name="BtnInventoryReset">
+                   <property name="text">
+                    <string>Réinitialiser</string>
+                   </property>
+                  </widget>
+                 </item>
                  <item row="1" column="3">
                   <widget class="QComboBox" name="InventoryZone">
                    <item>
@@ -2939,6 +2946,23 @@
                  </item>
                 </layout>
                </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="detailExportButtonsLayout">
+                <property name="spacing">
+                 <number>10</number>
+                </property>
+                <item>
+                 <widget class="QPushButton" name="BtnInventoryDetailExportPdf">
+                  <property name="text">
+                   <string>Exporter PDF</string>
+                  </property>
+                  <property name="property" stdset="0">
+                   <string>primary</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
               <item>
                <spacer name="vSpacerDetailBottom">
@@ -4557,7 +4581,7 @@
                      <widget class="QComboBox" name="FormType_2">
                       <item>
                        <property name="text">
-                        <string>Dépense</string>
+                        <string>Depense</string>
                        </property>
                       </item>
                       <item>
@@ -4821,16 +4845,16 @@
           <item>
            <widget class="QStackedWidget" name="stacked_L">
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="Lab">
              <widget class="QTableWidget" name="TableLabs_2">
               <property name="geometry">
                <rect>
-                <x>100</x>
-                <y>160</y>
-                <width>981</width>
-                <height>351</height>
+                <x>20</x>
+                <y>110</y>
+                <width>1191</width>
+                <height>401</height>
                </rect>
               </property>
               <property name="editTriggers">
@@ -4892,6 +4916,21 @@
               </column>
               <column>
                <property name="text">
+                <string>Montant</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Montant_paye</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Reste</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
                 <string>Resultat</string>
                </property>
               </column>
@@ -4930,7 +4969,7 @@
                 <string>payer</string>
                </property>
               </item>
-              <item row="0" column="7">
+              <item row="0" column="10">
                <property name="text">
                 <string>pret</string>
                </property>
@@ -5017,57 +5056,18 @@
                 <x>11</x>
                 <y>11</y>
                 <width>1194</width>
-                <height>141</height>
+                <height>91</height>
                </rect>
               </property>
               <property name="frameShape">
                <enum>QFrame::Shape::NoFrame</enum>
               </property>
-              <widget class="QLabel" name="LblLabsSearch_2">
-               <property name="geometry">
-                <rect>
-                 <x>201</x>
-                 <y>40</y>
-                 <width>150</width>
-                 <height>20</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Recherche</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="LblLabsSpec_2">
-               <property name="geometry">
-                <rect>
-                 <x>450</x>
-                 <y>40</y>
-                 <width>150</width>
-                 <height>20</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Spécialité</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="LblLabsCap_2">
-               <property name="geometry">
-                <rect>
-                 <x>660</x>
-                 <y>20</y>
-                 <width>141</width>
-                 <height>41</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>disponibilite</string>
-               </property>
-              </widget>
               <widget class="QLineEdit" name="LabsSearch_2">
                <property name="geometry">
                 <rect>
-                 <x>181</x>
-                 <y>90</y>
-                 <width>200</width>
+                 <x>21</x>
+                 <y>20</y>
+                 <width>301</width>
                  <height>35</height>
                 </rect>
                </property>
@@ -5078,8 +5078,8 @@
               <widget class="QComboBox" name="LabsSpec_2">
                <property name="geometry">
                 <rect>
-                 <x>431</x>
-                 <y>90</y>
+                 <x>390</x>
+                 <y>20</y>
                  <width>171</width>
                  <height>41</height>
                 </rect>
@@ -5103,8 +5103,8 @@
               <widget class="QComboBox" name="LabsCap_2">
                <property name="geometry">
                 <rect>
-                 <x>650</x>
-                 <y>90</y>
+                 <x>609</x>
+                 <y>20</y>
                  <width>161</width>
                  <height>41</height>
                 </rect>
@@ -5128,8 +5128,8 @@
               <widget class="QPushButton" name="btnReinitialiserPub_3">
                <property name="geometry">
                 <rect>
-                 <x>930</x>
-                 <y>40</y>
+                 <x>880</x>
+                 <y>20</y>
                  <width>190</width>
                  <height>50</height>
                 </rect>
@@ -5147,7 +5147,7 @@
                 <x>10</x>
                 <y>10</y>
                 <width>1191</width>
-                <height>581</height>
+                <height>601</height>
                </rect>
               </property>
               <property name="minimumSize">
@@ -5163,9 +5163,9 @@
                <property name="geometry">
                 <rect>
                  <x>74</x>
-                 <y>120</y>
+                 <y>50</y>
                  <width>1051</width>
-                 <height>331</height>
+                 <height>461</height>
                 </rect>
                </property>
                <property name="frameShape">
@@ -5451,54 +5451,81 @@
                  <string>ghost</string>
                 </property>
                </widget>
-              </widget>
-              <widget class="QWidget" name="layoutWidget">
-               <property name="geometry">
-                <rect>
-                 <x>140</x>
-                 <y>30</y>
-                 <width>921</width>
-                 <height>71</height>
-                </rect>
-               </property>
-               <layout class="QHBoxLayout" name="popupLabsHeader_5">
-                <item>
-                 <widget class="QLabel" name="PopupTitleLabs_5">
-                  <property name="text">
-                   <string>Modifier un laboratoire</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="popupLabsHeaderSpacer_5">
-                  <property name="orientation">
-                   <enum>Qt::Orientation::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <widget class="QToolButton" name="BtnPopupCancelLabs_5">
-                  <property name="toolTip">
-                   <string>Fermer</string>
-                  </property>
-                  <property name="text">
-                   <string>✕</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+               <widget class="QLabel" name="label_22">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>320</y>
+                  <width>130</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Montant</string>
+                </property>
+               </widget>
+               <widget class="QLabel" name="label_23">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>390</y>
+                  <width>130</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Reste</string>
+                </property>
+               </widget>
+               <widget class="QLabel" name="label_24">
+                <property name="geometry">
+                 <rect>
+                  <x>560</x>
+                  <y>320</y>
+                  <width>130</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Montant_paye</string>
+                </property>
+               </widget>
+               <widget class="QLineEdit" name="LabMontant_5">
+                <property name="geometry">
+                 <rect>
+                  <x>150</x>
+                  <y>320</y>
+                  <width>300</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+               </widget>
+               <widget class="QLineEdit" name="LabReste_5">
+                <property name="geometry">
+                 <rect>
+                  <x>150</x>
+                  <y>400</y>
+                  <width>300</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+               </widget>
+               <widget class="QLineEdit" name="LabMontantPaye_5">
+                <property name="geometry">
+                 <rect>
+                  <x>680</x>
+                  <y>320</y>
+                  <width>300</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+               </widget>
               </widget>
               <widget class="QPushButton" name="BtnPopupSaveLabs_5">
                <property name="geometry">
                 <rect>
-                 <x>220</x>
-                 <y>500</y>
+                 <x>210</x>
+                 <y>540</y>
                  <width>190</width>
                  <height>50</height>
                 </rect>
@@ -5513,8 +5540,8 @@
               <widget class="QPushButton" name="btnAjouterPub_4">
                <property name="geometry">
                 <rect>
-                 <x>500</x>
-                 <y>500</y>
+                 <x>490</x>
+                 <y>540</y>
                  <width>190</width>
                  <height>50</height>
                 </rect>
@@ -5526,14 +5553,38 @@
               <widget class="QPushButton" name="retour_stat_9">
                <property name="geometry">
                 <rect>
-                 <x>800</x>
-                 <y>500</y>
+                 <x>790</x>
+                 <y>540</y>
                  <width>190</width>
                  <height>50</height>
                 </rect>
                </property>
                <property name="text">
                 <string>retour</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="lblPageTitle_4">
+               <property name="geometry">
+                <rect>
+                 <x>430</x>
+                 <y>10</y>
+                 <width>251</width>
+                 <height>51</height>
+                </rect>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Vivaldi</family>
+                 <pointsize>12</pointsize>
+                 <italic>true</italic>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Modifier un laboratoire</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                </property>
               </widget>
              </widget>
@@ -5544,8 +5595,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>1191</width>
-                <height>591</height>
+                <width>1211</width>
+                <height>611</height>
                </rect>
               </property>
               <property name="minimumSize">
@@ -5561,9 +5612,9 @@
                <property name="geometry">
                 <rect>
                  <x>84</x>
-                 <y>100</y>
+                 <y>50</y>
                  <width>1041</width>
-                 <height>371</height>
+                 <height>471</height>
                 </rect>
                </property>
                <property name="frameShape">
@@ -5830,54 +5881,81 @@
                  </property>
                 </item>
                </widget>
-              </widget>
-              <widget class="QWidget" name="layoutWidget_LabsAdd">
-               <property name="geometry">
-                <rect>
-                 <x>90</x>
-                 <y>20</y>
-                 <width>1001</width>
-                 <height>61</height>
-                </rect>
-               </property>
-               <layout class="QHBoxLayout" name="popupLabsHeader_3">
-                <item>
-                 <widget class="QLabel" name="PopupTitleLabs_3">
-                  <property name="text">
-                   <string>Ajouter un laboratoire</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="popupLabsHeaderSpacer_3">
-                  <property name="orientation">
-                   <enum>Qt::Orientation::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <widget class="QToolButton" name="BtnPopupCancelLabs_3">
-                  <property name="toolTip">
-                   <string>Fermer</string>
-                  </property>
-                  <property name="text">
-                   <string>✕</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+               <widget class="QLabel" name="label_19">
+                <property name="geometry">
+                 <rect>
+                  <x>520</x>
+                  <y>350</y>
+                  <width>130</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Montant_paye</string>
+                </property>
+               </widget>
+               <widget class="QLabel" name="label_20">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>350</y>
+                  <width>130</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Montant</string>
+                </property>
+               </widget>
+               <widget class="QLabel" name="label_21">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>430</y>
+                  <width>130</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Reste</string>
+                </property>
+               </widget>
+               <widget class="QLineEdit" name="LabMontant_3">
+                <property name="geometry">
+                 <rect>
+                  <x>140</x>
+                  <y>350</y>
+                  <width>300</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+               </widget>
+               <widget class="QLineEdit" name="LabReste_3">
+                <property name="geometry">
+                 <rect>
+                  <x>140</x>
+                  <y>430</y>
+                  <width>300</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+               </widget>
+               <widget class="QLineEdit" name="LabMontantPaye_3">
+                <property name="geometry">
+                 <rect>
+                  <x>680</x>
+                  <y>350</y>
+                  <width>300</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+               </widget>
               </widget>
               <widget class="QPushButton" name="BtnPopupSaveLabs_3">
                <property name="geometry">
                 <rect>
                  <x>130</x>
-                 <y>500</y>
+                 <y>550</y>
                  <width>200</width>
                  <height>50</height>
                 </rect>
@@ -5893,7 +5971,7 @@
                <property name="geometry">
                 <rect>
                  <x>690</x>
-                 <y>500</y>
+                 <y>550</y>
                  <width>200</width>
                  <height>50</height>
                 </rect>
@@ -5909,7 +5987,7 @@
                <property name="geometry">
                 <rect>
                  <x>420</x>
-                 <y>500</y>
+                 <y>550</y>
                  <width>190</width>
                  <height>50</height>
                 </rect>
@@ -5922,13 +6000,37 @@
                <property name="geometry">
                 <rect>
                  <x>960</x>
-                 <y>500</y>
+                 <y>550</y>
                  <width>190</width>
                  <height>50</height>
                 </rect>
                </property>
                <property name="text">
                 <string>retour</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="lblPageTitle_3">
+               <property name="geometry">
+                <rect>
+                 <x>460</x>
+                 <y>10</y>
+                 <width>251</width>
+                 <height>51</height>
+                </rect>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Vivaldi</family>
+                 <pointsize>12</pointsize>
+                 <italic>true</italic>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Ajouter un laboratoire</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                </property>
               </widget>
              </widget>
@@ -5991,7 +6093,7 @@
               <property name="geometry">
                <rect>
                 <x>840</x>
-                <y>500</y>
+                <y>550</y>
                 <width>190</width>
                 <height>50</height>
                </rect>
@@ -6004,9 +6106,9 @@
               <property name="geometry">
                <rect>
                 <x>70</x>
-                <y>120</y>
+                <y>70</y>
                 <width>1025</width>
-                <height>351</height>
+                <height>451</height>
                </rect>
               </property>
               <property name="frameShape">
@@ -6172,7 +6274,7 @@
                <property name="geometry">
                 <rect>
                  <x>150</x>
-                 <y>190</y>
+                 <y>200</y>
                  <width>300</width>
                  <height>40</height>
                 </rect>
@@ -6197,7 +6299,7 @@
                <property name="geometry">
                 <rect>
                  <x>680</x>
-                 <y>190</y>
+                 <y>200</y>
                  <width>300</width>
                  <height>40</height>
                 </rect>
@@ -6273,12 +6375,81 @@
                 </property>
                </item>
               </widget>
+              <widget class="QLineEdit" name="aff_montant">
+               <property name="geometry">
+                <rect>
+                 <x>150</x>
+                 <y>340</y>
+                 <width>300</width>
+                 <height>40</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="aff_montant_paye">
+               <property name="geometry">
+                <rect>
+                 <x>680</x>
+                 <y>340</y>
+                 <width>300</width>
+                 <height>40</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="aff_reste">
+               <property name="geometry">
+                <rect>
+                 <x>150</x>
+                 <y>400</y>
+                 <width>300</width>
+                 <height>40</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QLabel" name="label_16">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>340</y>
+                 <width>130</width>
+                 <height>40</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Montant</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="label_17">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>400</y>
+                 <width>130</width>
+                 <height>40</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Reste</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="label_18">
+               <property name="geometry">
+                <rect>
+                 <x>550</x>
+                 <y>340</y>
+                 <width>130</width>
+                 <height>40</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Montant_paye</string>
+               </property>
+              </widget>
              </widget>
              <widget class="QLabel" name="lblPageTitle_2">
               <property name="geometry">
                <rect>
-                <x>90</x>
-                <y>30</y>
+                <x>440</x>
+                <y>20</y>
                 <width>251</width>
                 <height>51</height>
                </rect>
@@ -6298,27 +6469,11 @@
                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
              </widget>
-             <widget class="QToolButton" name="BtnPopupCancelLabs_4">
-              <property name="geometry">
-               <rect>
-                <x>1030</x>
-                <y>50</y>
-                <width>41</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <property name="toolTip">
-               <string>Fermer</string>
-              </property>
-              <property name="text">
-               <string>✕</string>
-              </property>
-             </widget>
              <widget class="QPushButton" name="BtnExportLabsDirect">
               <property name="geometry">
                <rect>
                 <x>220</x>
-                <y>505</y>
+                <y>550</y>
                 <width>190</width>
                 <height>50</height>
                </rect>
@@ -6331,7 +6486,7 @@
               <property name="geometry">
                <rect>
                 <x>490</x>
-                <y>500</y>
+                <y>550</y>
                 <width>261</width>
                 <height>51</height>
                </rect>
@@ -6407,7 +6562,14 @@
                 <item row="2" column="0">
                  <widget class="QPushButton" name="btnAppliquerProj">
                   <property name="text">
-                   <string>Appliquer</string>
+                   <string>Trier</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QPushButton" name="btnFiltrerDateProj">
+                  <property name="text">
+                   <string>Chercher par date</string>
                   </property>
                  </widget>
                 </item>
@@ -6594,7 +6756,18 @@
                </layout>
               </item>
               <item row="1" column="3">
-               <widget class="QLineEdit" name="lineResumeAddProj"/>
+               <widget class="QComboBox" name="lineResumeAddProj">
+                <item>
+                 <property name="text">
+                  <string>Urgent</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>N'est pas urgent</string>
+                 </property>
+                </item>
+               </widget>
               </item>
               <item row="2" column="0">
                <widget class="QLabel" name="lblTypeBrevetAddProj">
@@ -6645,7 +6818,23 @@
                <widget class="QLineEdit" name="lineDomaineAddProj"/>
               </item>
               <item row="0" column="3">
-               <widget class="QLineEdit" name="lineInventeursAddProj"/>
+               <widget class="QComboBox" name="lineInventeursAddProj">
+                <item>
+                 <property name="text">
+                  <string>N'a pas encore commencé</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>En cours</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Terminé</string>
+                 </property>
+                </item>
+               </widget>
               </item>
               <item row="0" column="0">
                <widget class="QLabel" name="lblTitreAddProj">
@@ -6713,7 +6902,18 @@
                </widget>
               </item>
               <item row="3" column="3">
-               <widget class="QLineEdit" name="lineResumeEditProj"/>
+               <widget class="QComboBox" name="lineResumeEditProj">
+                <item>
+                 <property name="text">
+                  <string>Urgent</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>N'est pas urgent</string>
+                 </property>
+                </item>
+               </widget>
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="lblDomaineEditProj">
@@ -6761,7 +6961,23 @@
                </layout>
               </item>
               <item row="2" column="3">
-               <widget class="QLineEdit" name="lineInventeursEditProj"/>
+               <widget class="QComboBox" name="lineInventeursEditProj">
+                <item>
+                 <property name="text">
+                  <string>N'a pas encore commencé</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>En cours</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Terminé</string>
+                 </property>
+                </item>
+               </widget>
               </item>
               <item row="0" column="2">
                <widget class="QLabel" name="lblDateDepotEditProj">
@@ -6811,16 +7027,43 @@
             <widget class="QWidget" name="page_proj_empty">
              <layout class="QVBoxLayout" name="verticalLayoutProjEmpty">
               <item>
-               <widget class="QLabel" name="stat_pub_8">
+               <widget class="QLabel" name="lblStatsTitleProj">
                 <property name="text">
-                 <string/>
+                 <string>Statistiques des Projets</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
                 </property>
                </widget>
               </item>
               <item>
+               <layout class="QHBoxLayout" name="hLayoutProjStats">
+                <item>
+                 <widget class="QWidget" name="statsWidgetProjStatus" native="true">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>300</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QWidget" name="statsWidgetProjPrio" native="true">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>300</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
                <widget class="QPushButton" name="retour_statn">
                 <property name="text">
-                 <string>retour</string>
+                 <string>Retour</string>
                 </property>
                </widget>
               </item>
@@ -6842,7 +7085,7 @@
      <x>0</x>
      <y>0</y>
      <width>1528</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

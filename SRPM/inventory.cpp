@@ -5,6 +5,7 @@
 #include <QSqlRecord>
 #include <QVariant>
 #include <QDebug>
+#include <algorithm>
 
 static void setErr(QString *err, const QString &msg) {
     if (err) *err = msg;
@@ -213,8 +214,30 @@ bool Inventory::chargerTout(QVector<Row> &out, const QString &orderBy, QString *
     return true;
 }
 
+bool Inventory::typesDistincts(QVector<QString> &out, QString *err)
+{
+    out.clear();
+    QSqlQuery q;
+    if (!q.exec("SELECT DISTINCT TYPE FROM PRODUCT "
+                "WHERE TYPE IS NOT NULL AND LENGTH(TRIM(TYPE)) > 0 "
+                "ORDER BY TYPE")) {
+        setErr(err, q.lastError().text());
+        return false;
+    }
+    while (q.next()) {
+        const QString t = q.value(0).toString().trimmed();
+        if (!t.isEmpty() && !out.contains(t))
+            out.push_back(t);
+    }
+    std::sort(out.begin(), out.end(), [](const QString &a, const QString &b) {
+        return QString::localeAwareCompare(a, b) < 0;
+    });
+    return true;
+}
+
 // ── SEARCH ───────────────────────────────────────────────────────────────────
-bool Inventory::chercher(QVector<Row> &out, const QString &keyword, const QString &zone, const QString &status, const QString &orderBy, QString *err)
+bool Inventory::chercher(QVector<Row> &out, const QString &keyword, const QString &zone,
+                         const QString &status, const QString &type, const QString &orderBy, QString *err)
 {
     out.clear();
 
@@ -238,6 +261,11 @@ bool Inventory::chercher(QVector<Row> &out, const QString &keyword, const QStrin
         // Status stored as-is (mixed case in DB), do case-insensitive compare
         sql += QString(" AND UPPER(STATUS) = '%1'").arg(esc(status));
     }
+    if (!type.isEmpty()) {
+        QString t = type;
+        t.replace(QLatin1Char('\''), QLatin1String("''"));
+        sql += QString(" AND TYPE = '%1'").arg(t);
+    }
 
     const QString order = orderBy.isEmpty() ? "SKU" : orderBy;
     sql += " ORDER BY " + order;
@@ -250,8 +278,15 @@ bool Inventory::chercher(QVector<Row> &out, const QString &keyword, const QStrin
             const QString k = esc(keyword);
             sql2 += QString(" AND (TO_CHAR(ID_PRODUCT) LIKE '%%%1%%' OR UPPER(SKU) LIKE '%%%1%%')").arg(k);
         }
+        if (!zone.isEmpty())
+            sql2 += QString(" AND UPPER(ZONE) = '%1'").arg(esc(zone));
         if (!status.isEmpty())
             sql2 += QString(" AND UPPER(STATUS) = '%1'").arg(esc(status));
+        if (!type.isEmpty()) {
+            QString t = type;
+            t.replace(QLatin1Char('\''), QLatin1String("''"));
+            sql2 += QString(" AND TYPE = '%1'").arg(t);
+        }
         sql2 += " ORDER BY SKU";
 
         if (!q.exec(sql2)) {

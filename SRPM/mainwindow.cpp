@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "ocrscanner.h"
 #include "session.h"  // <--- INDISPENSABLE pour lire le rôle
+#include "projet.h"
 #include <QGraphicsDropShadowEffect>
 #include <QDir> // Ajoutez ceci en haut du fichier si absent
 #include "ui_mainwindow.h"
@@ -168,8 +169,28 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     //employee
 
-    ui->lineCINAdd->setInputMask("99999999");
-    ui->lineCIN_emp->setInputMask("99999999");
+    // 1. Créer un validateur qui n'accepte que les chiffres (0-9)
+    // La regex [0-9]* signifie : autoriser n'importe quelle quantité de chiffres uniquement
+    QRegularExpressionValidator *chiffresSeulement = new QRegularExpressionValidator(QRegularExpression("[0-9]*"), this);
+
+    // 2. Appliquer le validateur aux champs
+    ui->lineCINAdd->setValidator(chiffresSeulement);
+    ui->lineCIN_emp->setValidator(chiffresSeulement);
+
+    // 3. Limiter la longueur à 8 (pour éviter de dépasser la taille du CIN)
+    ui->lineCINAdd->setMaxLength(8);
+    ui->lineCIN_emp->setMaxLength(8);
+
+    // 4. Supprimer l'InputMask pour éviter les barres verticales/soulignements
+    ui->lineCINAdd->setInputMask("");
+    ui->lineCIN_emp->setInputMask("");
+    // Dans le constructeur de votre MainWindow
+    ui->dateEmbaucheAdd->setCalendarPopup(true);
+    ui->dateEmbaucheEmp->setCalendarPopup(true);
+
+    // Optionnel : Définir la date actuelle par défaut au lieu de 1/1/2000
+    ui->dateEmbaucheAdd->setDate(QDate::currentDate());
+    ui->dateEmbaucheEmp->setDate(QDate::currentDate());
 
     // --- CONTROLE SALAIRE (Nombres décimaux uniquement) ---
     // Autorise les nombres de 0 à 999,999.99
@@ -265,6 +286,19 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     initLabsUi();
     initInventoryUi();
     loadEmployees();
+    initProjetsUi();
+
+    // --- Explicit project button connections ---
+    connect(ui->btnAjouterProj,          &QPushButton::clicked, this, &MainWindow::on_btnAjouterProj_clicked);
+    connect(ui->btnModifierProj,         &QPushButton::clicked, this, &MainWindow::on_btnModifierProj_clicked);
+    connect(ui->btnSupprimerProj,        &QPushButton::clicked, this, &MainWindow::on_btnSupprimerProj_clicked);
+    connect(ui->btnAddProj,              &QPushButton::clicked, this, &MainWindow::on_btnAddProj_clicked);
+    connect(ui->btnConfirmEditProj,      &QPushButton::clicked, this, &MainWindow::on_btnConfirmEditProj_clicked);
+    connect(ui->btnRetourAddProj,        &QPushButton::clicked, this, &MainWindow::on_btnRetourAddProj_clicked);
+    connect(ui->btnRetourEditProj,       &QPushButton::clicked, this, &MainWindow::on_btnRetourEditProj_clicked);
+    connect(ui->btnAppliquerProj,        &QPushButton::clicked, this, &MainWindow::on_btnAppliquerProj_clicked);
+    connect(ui->btnFiltrerDateProj,      &QPushButton::clicked, this, &MainWindow::on_btnFiltrerDateProj_clicked);
+    connect(ui->btnVoirStatistiquesProj, &QPushButton::clicked, this, &MainWindow::on_btnVoirStatistiquesProj_clicked);
 
     // --- Connexions Signaux/Slots ---
     connect(ui->lineSearchEmp, &QLineEdit::textChanged, this, &MainWindow::filterEmployees);
@@ -1168,6 +1202,7 @@ void MainWindow::goInventaire()
 {
     ui->stackedWidget->setCurrentIndex(1);
     setActiveButton(ui->btnInventaire);
+    refreshInventoryTypeFilter();
 }
 
 void MainWindow::goPublication()
@@ -1354,23 +1389,24 @@ void MainWindow::on_BtnExportLabsDirect_clicked()
 
     out << "└─────────────────────────────────────────────────────────────────┘\n\n";
 
-    // ========== CARACTÉRISTIQUES TECHNIQUES ==========
+    // ========== INFORMATIONS COMPLÉMENTAIRES ==========
+
+// PAR :
+    out << "└─────────────────────────────────────────────────────────────────┘\n\n";
+
+    // ========== INFORMATIONS FINANCIÈRES ==========
     out << "┌─────────────────────────────────────────────────────────────────┐\n";
-    out << "│                 CARACTÉRISTIQUES TECHNIQUES                     │\n";
+    out << "│                    INFORMATIONS FINANCIÈRES                     │\n";
     out << "├─────────────────────────────────────────────────────────────────┤\n";
 
-    QString ligne5 = QString("│ %1 : %2").arg("Spécialité", -40).arg(ui->aff3->currentText());
-    out << ligne5.leftJustified(67, ' ') << "│\n";
-
-    QString ligne6 = QString("│ %1 : %2").arg("Disponibilité", -40).arg(ui->aff7->currentText());
-    out << ligne6.leftJustified(67, ' ') << "│\n";
-
-    QString ligne7 = QString("│ %1 : %2").arg("Résultat actuel", -40).arg(ui->aff3_2->currentText());
-    out << ligne7.leftJustified(67, ' ') << "│\n";
-
-    QString ligne8 = QString("│ %1 : %2").arg("Statut de paiement", -40).arg(ui->aff7_2->currentText());
-    out << ligne8.leftJustified(67, ' ') << "│\n";
-
+    {
+        QString ligneM  = QString("│ %1 : %2 DT").arg("Montant total", -40).arg(ui->aff_montant->text().remove(" DT"));
+        out << ligneM.leftJustified(67, ' ') << "│\n";
+        QString ligneMP = QString("│ %1 : %2 DT").arg("Montant payé", -40).arg(ui->aff_montant_paye->text().remove(" DT"));
+        out << ligneMP.leftJustified(67, ' ') << "│\n";
+        QString ligneR  = QString("│ %1 : %2 DT").arg("Reste à payer", -40).arg(ui->aff_reste->text().remove(" DT"));
+        out << ligneR.leftJustified(67, ' ') << "│\n";
+    }
     out << "└─────────────────────────────────────────────────────────────────┘\n\n";
 
     // ========== INFORMATIONS COMPLÉMENTAIRES ==========
@@ -1455,8 +1491,8 @@ void MainWindow::on_btnVoirStatistiquesPub_2_clicked()
 // ── Statistiques paiement ──
 void MainWindow::showLabsPaymentStats()
 {
-    // Valeurs exactes en BD : 'payer' / 'non payer' (minuscules)
-    QSqlQuery query(R"(
+    // ─── Graphique Paiement (Payé / Non payé) ───────────────────────
+    QSqlQuery queryPmt(R"(
         SELECT NOMLABO,
                SUM(CASE WHEN LOWER(PAIEMENT) = 'payer'     THEN 1 ELSE 0 END) AS Paye,
                SUM(CASE WHEN LOWER(PAIEMENT) = 'non payer' THEN 1 ELSE 0 END) AS NonPaye,
@@ -1467,67 +1503,114 @@ void MainWindow::showLabsPaymentStats()
     )");
 
     QStringList categories;
-    QVector<double> payePercent;
-    QVector<double> nonPayePercent;
+    QVector<double> payePercent, nonPayePercent;
     bool hasData = false;
 
-    while (query.next()) {
+    while (queryPmt.next()) {
         hasData = true;
-        const QString nomLabo = query.value(0).toString();
-        const int paye        = query.value(1).toInt();
-        const int nonPaye     = query.value(2).toInt();
-        const int total       = query.value(3).toInt();
-        const double pPaye    = total > 0 ? (static_cast<double>(paye)    / total) * 100.0 : 0.0;
-        const double pNonPaye = total > 0 ? (static_cast<double>(nonPaye) / total) * 100.0 : 0.0;
+        const QString nomLabo = queryPmt.value(0).toString();
+        const int paye        = queryPmt.value(1).toInt();
+        const int nonPaye     = queryPmt.value(2).toInt();
+        const int total       = queryPmt.value(3).toInt();
         categories     << nomLabo;
-        payePercent    << pPaye;
-        nonPayePercent << pNonPaye;
+        payePercent    << (total > 0 ? (paye    * 100.0 / total) : 0.0);
+        nonPayePercent << (total > 0 ? (nonPaye * 100.0 / total) : 0.0);
     }
 
     if (!hasData) {
-        QMessageBox::warning(this, "Statistiques Laboratoires", "Aucune donnée de paiement trouvée.");
+        QMessageBox::warning(this, "Statistiques Laboratoires", "Aucune donnée trouvée.");
         return;
     }
 
-    QBarSet *setPaye    = new QBarSet("Payé (%)");   setPaye->setColor(QColor(39, 174, 96)); 
-    QBarSet *setNonPaye = new QBarSet("Non Payé (%)"); setNonPaye->setColor(QColor(231, 76, 60));
+    // ─── Graphique Montant / Payé / Reste ───────────────────────────
+    QSqlQuery queryFin(R"(
+        SELECT NOMLABO, SUM(MONTANT), SUM(MONTANT_PAYE), SUM(RESTE)
+        FROM LABS
+        GROUP BY NOMLABO
+        ORDER BY NOMLABO
+    )");
 
-    for (int i = 0; i < payePercent.size(); ++i) {
-        *setPaye    << payePercent[i];
-        *setNonPaye << nonPayePercent[i];
+    QBarSet *setMontant      = new QBarSet("Montant Total (DT)");
+    QBarSet *setMontantPaye  = new QBarSet("Montant Payé (DT)");
+    QBarSet *setReste        = new QBarSet("Reste (DT)");
+    setMontant->setColor(QColor(52, 152, 219));
+    setMontantPaye->setColor(QColor(39, 174, 96));
+    setReste->setColor(QColor(231, 76, 60));
+
+    QStringList catsFin;
+    while (queryFin.next()) {
+        catsFin    << queryFin.value(0).toString();
+        *setMontant     << queryFin.value(1).toDouble();
+        *setMontantPaye << queryFin.value(2).toDouble();
+        *setReste       << queryFin.value(3).toDouble();
     }
 
-    QBarSeries *series = new QBarSeries();
-    series->append(setPaye);
-    series->append(setNonPaye);
-    series->setLabelsVisible(true);
-    series->setLabelsFormat("@value %");
+    // ── Fenêtre graphique Paiement (%) ──
+    {
+        QBarSet *setPaye    = new QBarSet("Payé (%)");
+        QBarSet *setNonPaye = new QBarSet("Non Payé (%)");
+        setPaye->setColor(QColor(39, 174, 96));
+        setNonPaye->setColor(QColor(231, 76, 60));
+        for (int i = 0; i < payePercent.size(); ++i) {
+            *setPaye    << payePercent[i];
+            *setNonPaye << nonPayePercent[i];
+        }
+        QBarSeries *s = new QBarSeries();
+        s->append(setPaye); s->append(setNonPaye);
+        s->setLabelsVisible(true); s->setLabelsFormat("@value %");
 
-    QChart *chart = new QChart();
-    chart->addSeries(series);
-    chart->setTitle("Pourcentage de Paiement par Laboratoire");
-    chart->setAnimationOptions(QChart::SeriesAnimations);
-    chart->legend()->setVisible(true);
-    chart->legend()->setAlignment(Qt::AlignBottom);
+        QChart *chart = new QChart();
+        chart->addSeries(s);
+        chart->setTitle("Statut de Paiement par Laboratoire (%)");
+        chart->setAnimationOptions(QChart::SeriesAnimations);
+        chart->legend()->setVisible(true);
+        chart->legend()->setAlignment(Qt::AlignBottom);
 
-    QBarCategoryAxis *axisX = new QBarCategoryAxis();
-    axisX->append(categories);
-    chart->addAxis(axisX, Qt::AlignBottom);
-    series->attachAxis(axisX);
+        QBarCategoryAxis *axisX = new QBarCategoryAxis();
+        axisX->append(categories);
+        chart->addAxis(axisX, Qt::AlignBottom); s->attachAxis(axisX);
 
-    QValueAxis *axisY = new QValueAxis();
-    axisY->setRange(0, 100);
-    axisY->setTitleText("Pourcentage (%)");
-    axisY->setLabelFormat("%.1f%%");
-    chart->addAxis(axisY, Qt::AlignLeft);
-    series->attachAxis(axisY);
+        QValueAxis *axisY = new QValueAxis();
+        axisY->setRange(0, 100); axisY->setTitleText("Pourcentage (%)");
+        axisY->setLabelFormat("%.1f%%");
+        chart->addAxis(axisY, Qt::AlignLeft); s->attachAxis(axisY);
 
-    QChartView *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->setMinimumSize(950, 620);
-    chartView->setWindowTitle("Statistiques Paiement (%) - Laboratoires");
-    chartView->setAttribute(Qt::WA_DeleteOnClose);
-    chartView->show();
+        QChartView *cv = new QChartView(chart);
+        cv->setRenderHint(QPainter::Antialiasing);
+        cv->setMinimumSize(950, 550);
+        cv->setWindowTitle("Statistiques Paiement (%) - Laboratoires");
+        cv->setAttribute(Qt::WA_DeleteOnClose);
+        cv->show();
+    }
+
+    // ── Fenêtre graphique Montants (DT) ──
+    if (!catsFin.isEmpty()) {
+        QBarSeries *s2 = new QBarSeries();
+        s2->append(setMontant); s2->append(setMontantPaye); s2->append(setReste);
+        s2->setLabelsVisible(true); s2->setLabelsFormat("@value DT");
+
+        QChart *chart2 = new QChart();
+        chart2->addSeries(s2);
+        chart2->setTitle("Montants par Laboratoire (DT)");
+        chart2->setAnimationOptions(QChart::SeriesAnimations);
+        chart2->legend()->setVisible(true);
+        chart2->legend()->setAlignment(Qt::AlignBottom);
+
+        QBarCategoryAxis *axX = new QBarCategoryAxis();
+        axX->append(catsFin);
+        chart2->addAxis(axX, Qt::AlignBottom); s2->attachAxis(axX);
+
+        QValueAxis *axY = new QValueAxis();
+        axY->setTitleText("Montant (DT)"); axY->setLabelFormat("%.2f");
+        chart2->addAxis(axY, Qt::AlignLeft); s2->attachAxis(axY);
+
+        QChartView *cv2 = new QChartView(chart2);
+        cv2->setRenderHint(QPainter::Antialiasing);
+        cv2->setMinimumSize(950, 550);
+        cv2->setWindowTitle("Statistiques Financières - Laboratoires");
+        cv2->setAttribute(Qt::WA_DeleteOnClose);
+        cv2->show();
+    }
 }
 
 // ── Navigation ──
@@ -1661,10 +1744,366 @@ void MainWindow::on_BtnPopupCancelLabs_7_clicked() { ui->stack_emp->setCurrentIn
 // Projets - Navigation
 void MainWindow::on_retour_statn_clicked() { ui->stack_proj->setCurrentIndex(0); }
 void MainWindow::on_btnRetourEditProj_clicked() { ui->stack_proj->setCurrentIndex(0); }
-void MainWindow::on_btnRetourAddProj_clicked() { ui->stack_proj->setCurrentIndex(0); }
+void MainWindow::on_btnRetourAddProj_clicked()
+{
+    // clear add form on cancel
+    ui->lineTitreAddProj->clear();
+    ui->lineDomaineAddProj->clear();
+    ui->lineEdit->clear();
+    ui->lineInventeursAddProj->clear();
+    ui->lineResumeAddProj->clear();
+    ui->dateEdit->setDate(QDate::currentDate());
+    ui->dateEdit_2->setDate(QDate::currentDate());
+    ui->dateEdit_3->setDate(QDate::currentDate());
+    ui->stack_proj->setCurrentIndex(0);
+}
 void MainWindow::on_btnAjouterProj_clicked() { ui->stack_proj->setCurrentIndex(1); }
-void MainWindow::on_btnModifierProj_clicked() { ui->stack_proj->setCurrentIndex(2); }
-void MainWindow::on_btnVoirStatistiquesProj_clicked() { ui->stack_proj->setCurrentIndex(3); }
+void MainWindow::on_btnModifierProj_clicked()
+{
+    QString id = selectedProjetId();
+    if (id.isEmpty()) {
+        QMessageBox::warning(this, "Sélection", "Veuillez sélectionner un projet à modifier.");
+        return;
+    }
+    int r = ui->tableProjets->currentRow();
+    ui->lineTitreEditProj->setText(ui->tableProjets->item(r,0)->text());
+    ui->lineDomaineEditProj->setText(ui->tableProjets->item(r,1)->text());
+    ui->lineEdit_2->setText(ui->tableProjets->item(r,2)->text());
+    ui->dateEdit_5->setDate(QDate::fromString(ui->tableProjets->item(r,3)->text(), "yyyy-MM-dd"));
+    ui->dateEdit_6->setDate(QDate::fromString(ui->tableProjets->item(r,4)->text(), "yyyy-MM-dd"));
+    QString dfr = ui->tableProjets->item(r,5)->text();
+    ui->dateEdit_4->setDate(dfr.isEmpty() ? QDate::currentDate() : QDate::fromString(dfr, "yyyy-MM-dd"));
+    ui->lineInventeursEditProj->setCurrentText(ui->tableProjets->item(r,6)->text());
+    ui->lineResumeEditProj->setCurrentText(ui->tableProjets->item(r,7)->text());
+    idProjetToEdit = id;
+    ui->stack_proj->setCurrentIndex(2);
+}
+void MainWindow::on_btnVoirStatistiquesProj_clicked()
+{
+    showProjetsStats();
+    ui->stack_proj->setCurrentIndex(3);
+}
+
+void MainWindow::showProjetsStats()
+{
+    // --- Chart 1: Pie chart - Répartition par Statut ---
+    QVector<Projet::Row> rows;
+    QString err;
+    if (!Projet::chargerTout(rows, &err) || rows.isEmpty()) return;
+
+    // count by statut
+    QMap<QString, int> statutCount;
+    QMap<QString, int> prioCount;
+    for (const auto &r : rows) {
+        statutCount[r.statut.isEmpty() ? "Non défini" : r.statut]++;
+        prioCount[r.priorite.isEmpty() ? "Non défini" : r.priorite]++;
+    }
+
+    // --- Pie: Statut ---
+    QPieSeries *pieSeries = new QPieSeries();
+    for (auto it = statutCount.begin(); it != statutCount.end(); ++it) {
+        QPieSlice *slice = pieSeries->append(
+            QString("%1 (%2)").arg(it.key()).arg(it.value()), it.value());
+        slice->setLabelVisible(true);
+    }
+
+    QChart *pieChart = new QChart();
+    pieChart->addSeries(pieSeries);
+    pieChart->setTitle("Répartition par Statut");
+    pieChart->setAnimationOptions(QChart::SeriesAnimations);
+    pieChart->legend()->setAlignment(Qt::AlignBottom);
+
+    QChartView *pieView = new QChartView(pieChart);
+    pieView->setRenderHint(QPainter::Antialiasing);
+
+    // clear old layout and set new one
+    QLayout *oldLayout1 = ui->statsWidgetProjStatus->layout();
+    if (oldLayout1) {
+        QLayoutItem *item;
+        while ((item = oldLayout1->takeAt(0)) != nullptr) {
+            delete item->widget();
+            delete item;
+        }
+        delete oldLayout1;
+    }
+    QVBoxLayout *l1 = new QVBoxLayout(ui->statsWidgetProjStatus);
+    l1->addWidget(pieView);
+
+    // --- Bar: Priorité ---
+    QBarSet *barSet = new QBarSet("Nombre de projets");
+    QStringList prioLabels;
+    for (auto it = prioCount.begin(); it != prioCount.end(); ++it) {
+        prioLabels << it.key();
+        *barSet << it.value();
+    }
+
+    QBarSeries *barSeries = new QBarSeries();
+    barSeries->append(barSet);
+    barSeries->setLabelsVisible(true);
+    barSeries->setLabelsFormat("@value");
+
+    QChart *barChart = new QChart();
+    barChart->addSeries(barSeries);
+    barChart->setTitle("Projets par Priorité");
+    barChart->setAnimationOptions(QChart::SeriesAnimations);
+    barChart->legend()->setVisible(false);
+
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    axisX->append(prioLabels);
+    barChart->addAxis(axisX, Qt::AlignBottom);
+    barSeries->attachAxis(axisX);
+
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setLabelFormat("%d");
+    axisY->setTitleText("Nombre");
+    barChart->addAxis(axisY, Qt::AlignLeft);
+    barSeries->attachAxis(axisY);
+
+    QChartView *barView = new QChartView(barChart);
+    barView->setRenderHint(QPainter::Antialiasing);
+
+    QLayout *oldLayout2 = ui->statsWidgetProjPrio->layout();
+    if (oldLayout2) {
+        QLayoutItem *item;
+        while ((item = oldLayout2->takeAt(0)) != nullptr) {
+            delete item->widget();
+            delete item;
+        }
+        delete oldLayout2;
+    }
+    QVBoxLayout *l2 = new QVBoxLayout(ui->statsWidgetProjPrio);
+    l2->addWidget(barView);
+}
+
+// Projets - Init & Load
+void MainWindow::initProjetsUi()
+{
+    ui->tableProjets->setColumnCount(8);
+    ui->tableProjets->setHorizontalHeaderLabels({
+        "Nom Projet","Description","Objectifs",
+        "Date Début","Date Fin Prévue","Date Fin Réelle",
+        "Statut","Priorité"
+    });
+    ui->tableProjets->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableProjets->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableProjets->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableProjets->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->tableProjets->verticalHeader()->setVisible(false);
+
+    ui->dateEdit->setDate(QDate::currentDate());
+    ui->dateEdit_2->setDate(QDate::currentDate());
+    ui->dateEdit_3->setDate(QDate::currentDate());
+
+    // filter date default
+    ui->dateDuProj->setDate(QDate(2000, 1, 1));
+
+    // live search
+    connect(ui->lineSearchProj, &QLineEdit::textChanged, this, [this]() {
+        on_btnAppliquerProj_clicked();
+    });
+
+    loadProjets();
+}
+
+void MainWindow::loadProjets()
+{
+    QVector<Projet::Row> rows;
+    QString err;
+    if (!Projet::chargerTout(rows, &err)) {
+        QMessageBox::critical(this, "Erreur", err);
+        return;
+    }
+    ui->tableProjets->setRowCount(0);
+    for (const auto &row : rows) {
+        int r = ui->tableProjets->rowCount();
+        ui->tableProjets->insertRow(r);
+        auto setItem = [&](int col, const QString &val) {
+            auto *item = new QTableWidgetItem(val);
+            item->setData(Qt::UserRole, row.id);
+            ui->tableProjets->setItem(r, col, item);
+        };
+        setItem(0, row.nom);
+        setItem(1, row.description);
+        setItem(2, row.objectifs);
+        setItem(3, row.dateDebut);
+        setItem(4, row.dateFinPrevue);
+        setItem(5, row.dateFinReelle);
+        setItem(6, row.statut);
+        setItem(7, row.priorite);
+    }
+}
+
+QString MainWindow::selectedProjetId() const
+{
+    int r = ui->tableProjets->currentRow();
+    if (r < 0) return {};
+    auto *item = ui->tableProjets->item(r, 0);
+    return item ? item->data(Qt::UserRole).toString() : QString();
+}
+
+// Projets - Add
+void MainWindow::on_btnAddProj_clicked()
+{
+    QString nom    = ui->lineTitreAddProj->text().trimmed();
+    QString desc   = ui->lineDomaineAddProj->text().trimmed();
+    QString obj    = ui->lineEdit->text().trimmed();
+    QString statut = ui->lineInventeursAddProj->currentText();
+    QString prio   = ui->lineResumeAddProj->currentText();
+    QDate   dd     = ui->dateEdit->date();
+    QDate   dfp    = ui->dateEdit_2->date();
+    QDate   dfr    = ui->dateEdit_3->date();
+
+    // controle de saisie - tous les champs obligatoires
+    if (nom.isEmpty() || desc.isEmpty() || obj.isEmpty()) {
+        QMessageBox::warning(this, "Champs manquants",
+            "Nom, Description et Objectifs sont obligatoires.");
+        return;
+    }
+    if (dfp < dd) {
+        QMessageBox::warning(this, "Dates invalides",
+            "La date de fin prévue doit être après la date de début.");
+        return;
+    }
+
+    Projet p(nom, desc, obj, dd, dfp, dfr, statut, prio);
+    QString err;
+    if (!p.ajouter(Session::instance().getId().toInt(), &err)) {
+        QMessageBox::critical(this, "Erreur", err);
+        return;
+    }
+
+    ui->lineTitreAddProj->clear();
+    ui->lineDomaineAddProj->clear();
+    ui->lineEdit->clear();
+    ui->dateEdit->setDate(QDate::currentDate());
+    ui->dateEdit_2->setDate(QDate::currentDate());
+    ui->dateEdit_3->setDate(QDate::currentDate());
+
+    loadProjets();
+    ui->stack_proj->setCurrentIndex(0);
+    QMessageBox::information(this, "Succès", "Projet ajouté avec succès.");
+}
+
+// Projets - Edit confirm
+void MainWindow::on_btnConfirmEditProj_clicked()
+{
+    if (idProjetToEdit.isEmpty()) return;
+
+    QString nom    = ui->lineTitreEditProj->text().trimmed();
+    QString desc   = ui->lineDomaineEditProj->text().trimmed();
+    QString obj    = ui->lineEdit_2->text().trimmed();
+    QString statut = ui->lineInventeursEditProj->currentText();
+    QString prio   = ui->lineResumeEditProj->currentText();
+    QDate   dd     = ui->dateEdit_5->date();
+    QDate   dfp    = ui->dateEdit_6->date();
+    QDate   dfr    = ui->dateEdit_4->date();
+
+    // controle de saisie
+    if (nom.isEmpty() || desc.isEmpty() || obj.isEmpty()) {
+        QMessageBox::warning(this, "Champs manquants",
+            "Nom, Description et Objectifs sont obligatoires.");
+        return;
+    }
+    if (dfp < dd) {
+        QMessageBox::warning(this, "Dates invalides",
+            "La date de fin prévue doit être après la date de début.");
+        return;
+    }
+
+    QString err;
+    if (!Projet::modifier(idProjetToEdit, nom, desc, obj, dd, dfp, dfr, statut, prio, &err)) {
+        QMessageBox::critical(this, "Erreur", err);
+        return;
+    }
+
+    idProjetToEdit.clear();
+    loadProjets();
+    ui->stack_proj->setCurrentIndex(0);
+    QMessageBox::information(this, "Succès", "Projet modifié avec succès.");
+}
+
+// Projets - Delete
+void MainWindow::on_btnSupprimerProj_clicked()
+{
+    QString id = selectedProjetId();
+    if (id.isEmpty()) {
+        QMessageBox::warning(this, "Sélection", "Veuillez sélectionner un projet à supprimer.");
+        return;
+    }
+    auto reply = QMessageBox::question(this, "Confirmation",
+        "Voulez-vous vraiment supprimer ce projet ?",
+        QMessageBox::Yes | QMessageBox::No);
+    if (reply != QMessageBox::Yes) return;
+
+    QString err;
+    if (!Projet::supprimer(id, &err)) {
+        QMessageBox::critical(this, "Erreur", err);
+        return;
+    }
+    loadProjets();
+    QMessageBox::information(this, "Succès", "Projet supprimé.");
+}
+
+// Projets - Sort (Trier)
+void MainWindow::on_btnAppliquerProj_clicked()
+{
+    // first unhide all rows
+    for (int r = 0; r < ui->tableProjets->rowCount(); ++r)
+        ui->tableProjets->setRowHidden(r, false);
+
+    // apply live search filter
+    QString search = ui->lineSearchProj->text().trimmed().toLower();
+    if (!search.isEmpty()) {
+        for (int r = 0; r < ui->tableProjets->rowCount(); ++r) {
+            auto *nomItem = ui->tableProjets->item(r, 0);
+            bool match = nomItem && nomItem->text().toLower().contains(search);
+            ui->tableProjets->setRowHidden(r, !match);
+        }
+    }
+
+    // sort
+    QString sortBy = ui->comboCategorieProj->currentText().toLower();
+    if (sortBy == "titre")
+        ui->tableProjets->sortItems(0, Qt::AscendingOrder);
+    else if (sortBy == "date")
+        ui->tableProjets->sortItems(3, Qt::AscendingOrder);
+}
+
+// Projets - Filter by date (closest match)
+void MainWindow::on_btnFiltrerDateProj_clicked()
+{
+    QDate target = ui->dateDuProj->date();
+
+    // collect all visible row dates
+    int bestRow = -1;
+    int bestDiff = INT_MAX;
+
+    for (int r = 0; r < ui->tableProjets->rowCount(); ++r) {
+        auto *dateItem = ui->tableProjets->item(r, 3);
+        if (!dateItem || dateItem->text().isEmpty()) continue;
+        QDate rowDate = QDate::fromString(dateItem->text(), "yyyy-MM-dd");
+        if (!rowDate.isValid()) continue;
+
+        int diff = qAbs(rowDate.daysTo(target));
+        if (diff < bestDiff) {
+            bestDiff = diff;
+            bestRow = r;
+        }
+    }
+
+    if (bestRow < 0) {
+        QMessageBox::information(this, "Résultat", "Aucun projet trouvé.");
+        return;
+    }
+
+    // hide all rows except the best match
+    for (int r = 0; r < ui->tableProjets->rowCount(); ++r)
+        ui->tableProjets->setRowHidden(r, r != bestRow);
+
+    ui->tableProjets->selectRow(bestRow);
+    ui->tableProjets->scrollToItem(ui->tableProjets->item(bestRow, 0));
+}
+
 
 // ==================== FINANCE HELPERS ====================
 
@@ -3048,7 +3487,7 @@ void MainWindow::on_btnExporterPub_clicked()
 
             painter.setFont(titleFont);
             painter.drawText(margin, y, "Liste des Publications");
-            y += 40;
+            y += 40; // espace avant le titre "Suite"
 
             painter.setFont(QFont("Arial", 9));
             painter.drawText(margin, y, "Suite");
@@ -4316,12 +4755,12 @@ void MainWindow::setupTableLabs()
     // IMPORTANT: Activer le tri
     ui->TableLabs_2->setSortingEnabled(true);
 
-    ui->TableLabs_2->setColumnCount(9);
-    ui->TableLabs_2->setHorizontalHeaderLabels({
-        "IDLABO", "Nom Laboratoire", "Responsable", "Numéro",
-        "Localisation", "Disponibilité", "Spécialité", "Résultat", "Paiement"
-    });
-
+    ui->TableLabs_2->setColumnCount(12);
+        ui->TableLabs_2->setHorizontalHeaderLabels({
+            "IDLABO", "Nom Laboratoire", "Responsable", "Numéro",
+            "Localisation", "Disponibilité", "Spécialité", "Résultat", "Paiement",
+            "Montant (DT)", "Montant Payé (DT)", "Reste (DT)"
+        });
     // Masquer la colonne ID si vous voulez (optionnel)
     // ui->TableLabs_2->hideColumn(0);
 }
@@ -4365,6 +4804,24 @@ void MainWindow::loadLabs()
         ui->TableLabs_2->setItem(i, 6, new QTableWidgetItem(r.specialite));
         ui->TableLabs_2->setItem(i, 7, new QTableWidgetItem(r.resultat));
         ui->TableLabs_2->setItem(i, 8, new QTableWidgetItem(r.paiement));
+
+        // Colonnes financières — tri numérique correct
+        auto *itMontant = new QTableWidgetItem();
+        itMontant->setData(Qt::DisplayRole, r.montant);
+        ui->TableLabs_2->setItem(i, 9, itMontant);
+
+        auto *itMontantPaye = new QTableWidgetItem();
+        itMontantPaye->setData(Qt::DisplayRole, r.montantPaye);
+        ui->TableLabs_2->setItem(i, 10, itMontantPaye);
+
+        auto *itReste = new QTableWidgetItem();
+        itReste->setData(Qt::DisplayRole, r.reste);
+        // Colorier en rouge si reste > 0
+        if (r.reste > 0.0)
+            itReste->setForeground(QBrush(QColor(220, 50, 50)));
+        else
+            itReste->setForeground(QBrush(QColor(39, 174, 96)));
+        ui->TableLabs_2->setItem(i, 11, itReste);
     }
 
     ui->TableLabs_2->setSortingEnabled(true);
@@ -4504,8 +4961,6 @@ void MainWindow::initLabsUi()
     connect(ui->btnSupprimerPub_2,   &QPushButton::clicked, this, &MainWindow::on_btnSupprimerPub_2_clicked);
     connect(ui->BtnExportLabsDirect, &QPushButton::clicked, this, &MainWindow::on_BtnExportLabsDirect_clicked);
 
-    connect(ui->BtnPopupCancelLabs_3, &QPushButton::clicked, this, [this](){ ui->stacked_L->setCurrentIndex(0); });
-    connect(ui->BtnPopupCancelLabs_5, &QPushButton::clicked, this, [this](){ ui->stacked_L->setCurrentIndex(0); });
 }
 void MainWindow::onMapLocationSelected(const QString& title)
 {
@@ -4526,8 +4981,10 @@ void MainWindow::on_BtnPopupResetLabs_3_clicked()
     ui->LabCap_3->setCurrentIndex(0);
     ui->LabSpec_4->setCurrentIndex(0);
     ui->LabCap_4->setCurrentIndex(0);
+    ui->LabMontant_3->setText("0.000");
+    ui->LabMontantPaye_3->setText("0.000");
+    ui->LabReste_3->setText("0.000");
 }
-
 void MainWindow::on_BtnPopupSaveLabs_3_clicked()
 {
     const QString nomLabo       = ui->LabName_3->text().trimmed();
@@ -4538,6 +4995,17 @@ void MainWindow::on_BtnPopupSaveLabs_3_clicked()
     const QString disponibilite = ui->LabCap_3->currentText();
     const QString resultat      = ui->LabSpec_4->currentText();
     const QString paiement      = ui->LabCap_4->currentText();
+    bool okM3 = false, okMP3 = false;
+    const double montant     = ui->LabMontant_3->text().trimmed().replace(",", ".").toDouble(&okM3);
+    const double montantPaye = ui->LabMontantPaye_3->text().trimmed().replace(",", ".").toDouble(&okMP3);
+    if (!okM3) {
+        QMessageBox::warning(this, "Validation", "Le montant total est invalide (ex: 1500.000).");
+        return;
+    }
+    if (!okMP3) {
+        QMessageBox::warning(this, "Validation", "Le montant payé est invalide (ex: 750.000).");
+        return;
+    }
 
     if (nomLabo.isEmpty() || localisation.isEmpty() || responsable.isEmpty() || numero.isEmpty()) {
         QMessageBox::warning(this, "Validation", "Veuillez remplir tous les champs texte !");
@@ -4548,20 +5016,39 @@ void MainWindow::on_BtnPopupSaveLabs_3_clicked()
         QMessageBox::warning(this, "Validation", "Veuillez faire un choix valide dans toutes les listes déroulantes !");
         return;
     }
+    if (montant < 0.0) {
+        QMessageBox::warning(this, "Validation", "Le montant total ne peut pas être négatif.");
+        return;
+    }
+    if (montantPaye < 0.0) {
+        QMessageBox::warning(this, "Validation", "Le montant payé ne peut pas être négatif.");
+        return;
+    }
+    if (montantPaye > montant) {
+        QMessageBox::warning(this, "Validation",
+                             QString("Le montant payé (%1 DT) ne peut pas dépasser le montant total (%2 DT).")
+                                 .arg(montantPaye, 0, 'f', 3).arg(montant, 0, 'f', 3));
+        return;
+    }
 
-    Labs lab(nomLabo, responsable, numero, localisation, specialite, disponibilite, resultat, paiement, "1");
+    Labs lab(nomLabo, responsable, numero, localisation, specialite, disponibilite,
+             resultat, paiement, montant, montantPaye, "1");
     QString err;
     if (!lab.ajouter(&err)) {
         QMessageBox::critical(this, "Échec de l'ajout", "Impossible d'ajouter le laboratoire :\n" + err);
         return;
     }
 
-    QMessageBox::information(this, "Succès", "Laboratoire ajouté avec succès !");
+    QMessageBox::information(this, "Succès",
+                             QString("Laboratoire ajouté avec succès !\n"
+                                     "Montant : %1 DT | Payé : %2 DT | Reste : %3 DT")
+                                 .arg(montant, 0, 'f', 3)
+                                 .arg(montantPaye, 0, 'f', 3)
+                                 .arg(montant - montantPaye, 0, 'f', 3));
     ui->stacked_L->setCurrentIndex(0);
     loadLabs();
     on_BtnPopupResetLabs_3_clicked();
 }
-
 // ====================== PAGE 1 – MODIFICATION ======================
 void MainWindow::on_BtnPopupResetLabs_5_clicked()
 {
@@ -4580,8 +5067,10 @@ void MainWindow::on_BtnPopupResetLabs_5_clicked()
     setComboValue(ui->LabSpec_5, r.specialite);
     setComboValue(ui->LabSpec_6, r.resultat);
     setComboValue(ui->LabCap_6,  r.paiement);
+    ui->LabMontant_5->setText(QString::number(r.montant, 'f', 3));
+    ui->LabMontantPaye_5->setText(QString::number(r.montantPaye, 'f', 3));
+    ui->LabReste_5->setText(QString::number(r.reste, 'f', 3));
 }
-
 void MainWindow::on_BtnPopupSaveLabs_5_clicked()
 {
     if (idLabsToEdit.isEmpty()) {
@@ -4597,6 +5086,17 @@ void MainWindow::on_BtnPopupSaveLabs_5_clicked()
     const QString disponibilite = ui->LabCap_5->currentText();
     const QString resultat      = ui->LabSpec_6->currentText();
     const QString paiement      = ui->LabCap_6->currentText();
+    bool okM5 = false, okMP5 = false;
+    const double montant     = ui->LabMontant_5->text().trimmed().replace(",", ".").toDouble(&okM5);
+    const double montantPaye = ui->LabMontantPaye_5->text().trimmed().replace(",", ".").toDouble(&okMP5);
+    if (!okM5) {
+        QMessageBox::warning(this, "Validation", "Le montant total est invalide (ex: 1500.000).");
+        return;
+    }
+    if (!okMP5) {
+        QMessageBox::warning(this, "Validation", "Le montant payé est invalide (ex: 750.000).");
+        return;
+    }
 
     if (nomLabo.isEmpty() || localisation.isEmpty() || responsable.isEmpty() || numero.isEmpty()) {
         QMessageBox::warning(this, "Validation", "Tous les champs textes sont obligatoires !");
@@ -4607,20 +5107,39 @@ void MainWindow::on_BtnPopupSaveLabs_5_clicked()
         QMessageBox::warning(this, "Validation", "Veuillez faire un choix valide dans toutes les listes déroulantes !");
         return;
     }
+    if (montant < 0.0) {
+        QMessageBox::warning(this, "Validation", "Le montant total ne peut pas être négatif.");
+        return;
+    }
+    if (montantPaye < 0.0) {
+        QMessageBox::warning(this, "Validation", "Le montant payé ne peut pas être négatif.");
+        return;
+    }
+    if (montantPaye > montant) {
+        QMessageBox::warning(this, "Validation",
+                             QString("Le montant payé (%1 DT) ne peut pas dépasser le montant total (%2 DT).")
+                                 .arg(montantPaye, 0, 'f', 3).arg(montant, 0, 'f', 3));
+        return;
+    }
 
     QString err;
     if (!Labs::modifier(idLabsToEdit, nomLabo, responsable, numero, localisation,
-                        specialite, disponibilite, resultat, paiement, &err)) {
+                        specialite, disponibilite, resultat, paiement,
+                        montant, montantPaye, &err)) {
         QMessageBox::critical(this, "Erreur de modification", err);
         return;
     }
 
-    QMessageBox::information(this, "Succès", "Laboratoire modifié avec succès !");
+    QMessageBox::information(this, "Succès",
+                             QString("Laboratoire modifié avec succès !\n"
+                                     "Montant : %1 DT | Payé : %2 DT | Reste : %3 DT")
+                                 .arg(montant, 0, 'f', 3)
+                                 .arg(montantPaye, 0, 'f', 3)
+                                 .arg(montant - montantPaye, 0, 'f', 3));
     idLabsToEdit.clear();
     ui->stacked_L->setCurrentIndex(0);
     loadLabs();
 }
-
 // ====================== PAGE 0 – SUPPRESSION ======================
 void MainWindow::on_btnSupprimerPub_2_clicked()
 {
@@ -4765,11 +5284,22 @@ void MainWindow::on_btnModifierPub_2_clicked()
     ui->LabLocation_5->setText(ui->TableLabs_2->item(r, 4)->text());
 
     setComboValue(ui->LabCap_5,  ui->TableLabs_2->item(r, 5)->text()); // Disponibilité
-    setComboValue(ui->LabSpec_5, ui->TableLabs_2->item(r, 6)->text()); // Spécialité
-    setComboValue(ui->LabSpec_6, ui->TableLabs_2->item(r, 7)->text()); // Résultat
-    setComboValue(ui->LabCap_6,  ui->TableLabs_2->item(r, 8)->text()); // Paiement
+        setComboValue(ui->LabSpec_5, ui->TableLabs_2->item(r, 6)->text()); // Spécialité
+        setComboValue(ui->LabSpec_6, ui->TableLabs_2->item(r, 7)->text()); // Résultat
+        setComboValue(ui->LabCap_6,  ui->TableLabs_2->item(r, 8)->text()); // Paiement
 
-    ui->stacked_L->setCurrentIndex(1);
+        // Montants financiers depuis le tableau (colonnes 9, 10, 11)
+        if (ui->TableLabs_2->item(r, 9))
+            ui->LabMontant_5->setText(QString::number(
+                ui->TableLabs_2->item(r, 9)->data(Qt::DisplayRole).toDouble(), 'f', 3));
+        if (ui->TableLabs_2->item(r, 10))
+            ui->LabMontantPaye_5->setText(QString::number(
+                ui->TableLabs_2->item(r, 10)->data(Qt::DisplayRole).toDouble(), 'f', 3));
+        if (ui->TableLabs_2->item(r, 11))
+            ui->LabReste_5->setText(QString::number(
+                ui->TableLabs_2->item(r, 11)->data(Qt::DisplayRole).toDouble(), 'f', 3));
+
+        ui->stacked_L->setCurrentIndex(1);
 }
 
 // ====================== PAGE 4 – AFFICHER DÉTAIL ======================
@@ -4782,16 +5312,32 @@ void MainWindow::on_btnAjouterPub_3_clicked()
     }
 
     ui->aff1->setText(ui->TableLabs_2->item(r, 1)->text()); // Nom
-    ui->aff5->setText(ui->TableLabs_2->item(r, 2)->text()); // Responsable
-    ui->aff6->setText(ui->TableLabs_2->item(r, 3)->text()); // Numéro
-    ui->aff2->setText(ui->TableLabs_2->item(r, 4)->text()); // Localisation
+        ui->aff5->setText(ui->TableLabs_2->item(r, 2)->text()); // Responsable
+        ui->aff6->setText(ui->TableLabs_2->item(r, 3)->text()); // Numéro
+        ui->aff2->setText(ui->TableLabs_2->item(r, 4)->text()); // Localisation
 
-    setComboValue(ui->aff7,   ui->TableLabs_2->item(r, 5)->text()); // Disponibilité
-    setComboValue(ui->aff3,   ui->TableLabs_2->item(r, 6)->text()); // Spécialité
-    setComboValue(ui->aff3_2, ui->TableLabs_2->item(r, 7)->text()); // Résultat
-    setComboValue(ui->aff7_2, ui->TableLabs_2->item(r, 8)->text()); // Paiement
+        setComboValue(ui->aff7,   ui->TableLabs_2->item(r, 5)->text()); // Disponibilité
+        setComboValue(ui->aff3,   ui->TableLabs_2->item(r, 6)->text()); // Spécialité
+        setComboValue(ui->aff3_2, ui->TableLabs_2->item(r, 7)->text()); // Résultat
+        setComboValue(ui->aff7_2, ui->TableLabs_2->item(r, 8)->text()); // Paiement
 
-    ui->stacked_L->setCurrentIndex(4);
+        // Montants financiers en lecture seule sur la page d'affichage
+        if (ui->TableLabs_2->item(r, 9))
+            ui->aff_montant->setText(QString::number(
+                ui->TableLabs_2->item(r, 9)->data(Qt::DisplayRole).toDouble(), 'f', 3) + " DT");
+        if (ui->TableLabs_2->item(r, 10))
+            ui->aff_montant_paye->setText(QString::number(
+                ui->TableLabs_2->item(r, 10)->data(Qt::DisplayRole).toDouble(), 'f', 3) + " DT");
+        if (ui->TableLabs_2->item(r, 11)) {
+            double reste = ui->TableLabs_2->item(r, 11)->data(Qt::DisplayRole).toDouble();
+            ui->aff_reste->setText(QString::number(reste, 'f', 3) + " DT");
+            // Couleur indicative
+            ui->aff_reste->setStyleSheet(
+                reste > 0.0 ? "color: #DC3232; font-weight: bold;"
+                            : "color: #27AE60; font-weight: bold;");
+        }
+
+        ui->stacked_L->setCurrentIndex(4);
 }
 //start inventory crud
 // ==================== INVENTORY HELPERS ====================
@@ -4830,7 +5376,7 @@ void MainWindow::initInventoryUi()
 
     // Filter Status combo
     ui->InventoryStatus->clear();
-    ui->InventoryStatus->addItem("-- Tous --", "");
+    ui->InventoryStatus->addItem(QStringLiteral("-- Tous les statuts --"), QString());
     ui->InventoryStatus->addItem("on hand",   "on hand");
     ui->InventoryStatus->addItem("limited",   "limited");
     ui->InventoryStatus->addItem("stock out", "stock out");
@@ -4851,11 +5397,14 @@ void MainWindow::initInventoryUi()
 
     // Zone filter combo – Zones A B C D
     ui->InventoryZone->clear();
-    ui->InventoryZone->addItem("-- Toutes zones --", "");
+    ui->InventoryZone->addItem(QStringLiteral("-- Toutes les zones --"), QString());
     ui->InventoryZone->addItem("Zone A", "A");
     ui->InventoryZone->addItem("Zone B", "B");
     ui->InventoryZone->addItem("Zone C", "C");
     ui->InventoryZone->addItem("Zone D", "D");
+
+    // Type filter : types distincts en base (liste prédéfinie en secours)
+    refreshInventoryTypeFilter();
 
     // Shelf combo (Add form) – RDC / 1st / 2nd / 3rd floor
     ui->Shelf->clear();
@@ -4926,6 +5475,8 @@ void MainWindow::initInventoryUi()
     connect(ui->BtnInventoryEdit,   &QPushButton::clicked, this, &MainWindow::handleInventoryEdit);
     connect(ui->BtnInventoryAdd_5,  &QPushButton::clicked, this, &MainWindow::handleInventoryStats);
     connect(ui->BtnInventoryDelete, &QPushButton::clicked, this, &MainWindow::handleInventoryDelete);
+    connect(ui->BtnInventoryExport, &QPushButton::clicked, this, &MainWindow::handleInventoryExportPdf);
+    connect(ui->BtnInventoryDetailExportPdf, &QPushButton::clicked, this, &MainWindow::handleInventoryDetailExportPdf);
 
     // Form buttons (manual connections for reliability)
     connect(ui->BtnPopupSaveInventory,   &QPushButton::clicked, this, &MainWindow::on_BtnPopupSaveInventory_clicked);
@@ -4938,6 +5489,7 @@ void MainWindow::initInventoryUi()
 
     // Apply/filter button — explicit connect (auto-connect fails for nested widgets)
     connect(ui->BtnInventoryApply, &QPushButton::clicked, this, &MainWindow::applyInventoryFilter);
+    connect(ui->BtnInventoryReset, &QPushButton::clicked, this, &MainWindow::resetInventoryFilters);
 
     ui->stacked_I->setCurrentIndex(0);
     loadInventory();
@@ -5076,6 +5628,7 @@ void MainWindow::on_BtnPopupSaveInventory_clicked()
 
     QMessageBox::information(this, "Inventaire", "Produit ajouté avec succès.");
     ui->stacked_I->setCurrentIndex(0);
+    refreshInventoryTypeFilter();
     loadInventory();
 }
 
@@ -5145,77 +5698,566 @@ void MainWindow::handleInventoryEdit()
 
 void MainWindow::applyInventoryFilter()
 {
-    // ── Read filter values ────────────────────────────────────────────────────
-    const QString kw     = ui->InventorySearch->text().trimmed().toUpper();
-    const QString zone   = ui->InventoryZone->currentText().trimmed();
-    const QString status = ui->InventoryStatus->currentText().trimmed();
-    const int sortIdx    = ui->InventorySort->currentIndex();
+    // Filtre + tri en SQL : évite sortItems + setRowHidden (indices de lignes
+    // et la visibilité se désynchronisent après un tri → lignes “perdues”).
+    const QString kwRaw = ui->InventorySearch->text().trimmed();
+    const int sortIdx   = ui->InventorySort->currentIndex();
 
-    auto isTous = [](const QString &v) {
-        return v.isEmpty() || v.contains("Tous", Qt::CaseInsensitive);
-    };
-    const bool filterZone   = !isTous(zone);
-    const bool filterStatus = !isTous(status);
-    const bool filterKw     = !kw.isEmpty();
+    // Valeurs filtre = userData des combos (remplies dans setupInventoryCombos).
+    // Ne pas utiliser currentText() : « -- Toutes zones -- » ne contient pas « Tous »
+    // (T-o-u-t-e-s ≠ sous-chaîne T-o-u-s), ce qui envoyait ZONE = '-- TOUTES ZONES --' en SQL → 0 ligne.
+    const QString zoneSql   = ui->InventoryZone->currentData().toString().trimmed();
+    const QString statusSql = ui->InventoryStatus->currentData().toString().trimmed();
+    const QString typeSql   = ui->InventoryType->currentData().toString().trimmed();
 
-    QTableWidget *t = ui->TableInventory;
-    const int rowCount = t->rowCount();
+    QString orderBy = QStringLiteral("SKU");
+    if (sortIdx == 1)      orderBy = QStringLiteral("NAME ASC");
+    else if (sortIdx == 2) orderBy = QStringLiteral("PRICE ASC");
+    else if (sortIdx == 3) orderBy = QStringLiteral("PRICE DESC");
 
-    // ── Step 1: Enable sorting and sort by selected column ───────────────────
-    // col1=SKU, col2=Nom, col3=Prix
-    if (sortIdx > 0) {
-        t->setSortingEnabled(true);
-        if      (sortIdx == 1) t->sortItems(2, Qt::AscendingOrder);  // Nom
-        else if (sortIdx == 2) t->sortItems(3, Qt::AscendingOrder);  // Prix ↑
-        else if (sortIdx == 3) t->sortItems(3, Qt::DescendingOrder); // Prix ↓
-        t->setSortingEnabled(false);
-    } else {
-        // sortIdx==0: sort by SKU
-        t->setSortingEnabled(true);
-        t->sortItems(1, Qt::AscendingOrder);
-        t->setSortingEnabled(false);
+    QVector<Inventory::Row> rows;
+    QString err;
+    if (!Inventory::chercher(rows, kwRaw, zoneSql, statusSql, typeSql, orderBy, &err)) {
+        QMessageBox::critical(this, QStringLiteral("Erreur SQL - Inventaire"), err);
+        return;
     }
 
-    // ── Step 2: Show/hide rows based on filters ───────────────────────────────
-    for (int r = 0; r < rowCount; ++r) {
-        bool visible = true;
+    QTableWidget *t = ui->TableInventory;
+    t->setSortingEnabled(false);
+    t->setRowCount(0);
 
-        if (filterKw) {
-            auto txt = [&](int col) -> QString {
-                auto *it = t->item(r, col);
-                return it ? it->text().toUpper() : QString();
-            };
-            // Search in SKU (col1), Nom (col2), ID (col0 via UserRole)
-            auto *idItem = t->item(r, 0);
-            const QString id = idItem ? idItem->data(Qt::UserRole).toString().toUpper() : QString();
-            if (!txt(1).contains(kw) && !txt(2).contains(kw) && !id.contains(kw))
-                visible = false;
-        }
-
-        if (visible && filterZone) {
-            auto *idItem = t->item(r, 0);
-            const QString rowZone = idItem ? idItem->data(Qt::UserRole + 1).toString() : QString();
-            if (rowZone.compare(zone, Qt::CaseInsensitive) != 0)
-                visible = false;
-        }
-
-        if (visible && filterStatus) {
-            auto *statItem = t->item(r, 5);
-            const QString rowStatus = statItem ? statItem->text() : QString();
-            if (rowStatus.compare(status, Qt::CaseInsensitive) != 0)
-                visible = false;
-        }
-
-        t->setRowHidden(r, !visible);
+    int r = 0;
+    for (const auto &row : std::as_const(rows)) {
+        t->insertRow(r);
+        fillTableInventoryRow(r, row);
+        ++r;
     }
 
     qDebug() << "[INVENTORY] Apply filter done. sortIdx=" << sortIdx
-             << "kw=" << kw << "zone=" << zone << "status=" << status;
+             << "kw=" << kwRaw << "zoneSql=" << zoneSql << "statusSql=" << statusSql
+             << "typeSql=" << typeSql << "rows=" << rows.size();
 }
 
+void MainWindow::refreshInventoryTypeFilter()
+{
+    const QString prev = ui->InventoryType->currentData().toString();
+    ui->InventoryType->clear();
+    ui->InventoryType->addItem(QStringLiteral("-- Tous les types --"), QString());
 
+    QVector<QString> types;
+    if (Inventory::typesDistincts(types, nullptr)) {
+        for (const QString &t : types) {
+            if (t.trimmed().isEmpty()) continue;
+            ui->InventoryType->addItem(t, t);
+        }
+    } else {
+        const QStringList presetTypes = {
+            QStringLiteral("Matière première"),
+            QStringLiteral("Composant"),
+            QStringLiteral("Produit fini"),
+            QStringLiteral("Produit semi-fini"),
+            QStringLiteral("Outil"),
+            QStringLiteral("Équipement"),
+            QStringLiteral("Consommable"),
+            QStringLiteral("Pièce de rechange"),
+        };
+        for (const QString &t : presetTypes)
+            ui->InventoryType->addItem(t, t);
+    }
 
+    const int idx = ui->InventoryType->findData(prev);
+    ui->InventoryType->setCurrentIndex(idx >= 0 ? idx : 0);
+}
 
+void MainWindow::resetInventoryFilters()
+{
+    ui->InventorySearch->clear();
+    ui->InventoryType->setCurrentIndex(0);
+    ui->InventoryZone->setCurrentIndex(0);
+    ui->InventoryStatus->setCurrentIndex(0);
+    ui->InventorySort->setCurrentIndex(0);
+    loadInventory();
+}
+
+void MainWindow::handleInventoryExportPdf()
+{
+    QTableWidget *t = ui->TableInventory;
+    QVector<int> visibleRows;
+    visibleRows.reserve(t->rowCount());
+    for (int r = 0; r < t->rowCount(); ++r) {
+        if (!t->isRowHidden(r))
+            visibleRows.append(r);
+    }
+    if (visibleRows.isEmpty()) {
+        QMessageBox::warning(this, QStringLiteral("Export PDF"),
+                             QStringLiteral("Aucune ligne à exporter. Vérifiez le tableau ou les filtres."));
+        return;
+    }
+
+    // Export "Top 10" selon l'ordre actuel du tableau (après tri / filtre).
+    const int topN = 10;
+    if (visibleRows.size() > topN)
+        visibleRows.resize(topN);
+
+    QString fileName = QFileDialog::getSaveFileName(
+        this,
+        QStringLiteral("Exporter l'inventaire en PDF"),
+        QStringLiteral("Inventaire.pdf"),
+        QStringLiteral("PDF Files (*.pdf)"));
+    if (fileName.isEmpty())
+        return;
+    if (!fileName.endsWith(QStringLiteral(".pdf"), Qt::CaseInsensitive))
+        fileName += QStringLiteral(".pdf");
+
+    QPdfWriter pdf(fileName);
+    pdf.setPageSize(QPageSize(QPageSize::A4));
+    pdf.setPageOrientation(QPageLayout::Portrait);
+    pdf.setResolution(300);
+
+    QPainter painter(&pdf);
+    if (!painter.isActive()) {
+        QMessageBox::critical(this, QStringLiteral("Erreur"),
+                              QStringLiteral("Impossible de créer le fichier PDF."));
+        return;
+    }
+
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::TextAntialiasing, true);
+
+    const int margin = 35;
+    const int pageWidth = pdf.width();
+    const int pageHeight = pdf.height();
+    const int tableWidth = qMax(0, pageWidth - 2 * margin);
+
+    static const int exportCols[] = {1, 2, 3, 4, 5};
+    constexpr int nExportCols = 5;
+
+    QStringList headerLabels;
+    for (int c : exportCols) {
+        QTableWidgetItem *hi = t->horizontalHeaderItem(c);
+        headerLabels << (hi ? hi->text() : QString());
+    }
+
+    QVector<int> colWidths(nExportCols);
+    {
+        const int parts[] = {20, 38, 14, 12, 16};
+        int sum = 0;
+        for (int i = 0; i < nExportCols; ++i) {
+            colWidths[i] = tableWidth * parts[i] / 100;
+            sum += colWidths[i];
+        }
+        colWidths[nExportCols - 1] += (tableWidth - sum);
+    }
+
+    QFont titleFont(QStringLiteral("Arial"), 16, QFont::Bold);
+    QFont headerFont(QStringLiteral("Arial"), 9, QFont::Bold);
+    QFont cellFont(QStringLiteral("Arial"), 7);
+    QFont metaFont(QStringLiteral("Arial"), 9);
+
+    const int rowHeight = 36;
+    const int headerRowHeight = 38;
+    const int titleBlock = 45;
+    const int metaLine = 28;
+
+    // Couleurs (style “propre”, proche des exports UI)
+    const QColor orangeTitle(QStringLiteral("#F59E0B"));      // orange
+    const QColor headerBg(QStringLiteral("#D9E8FF"));          // bleu clair
+    const QColor headerBorder(QStringLiteral("#2563EB"));     // bleu
+    const QColor borderColor(QStringLiteral("#CBD5E1"));      // gris
+    const QColor evenRowBg(Qt::white);
+    const QColor oddRowBg(QStringLiteral("#F3F7FF"));          // bleu très clair
+    const QColor textColor(QStringLiteral("#0F172A"));        // bleu nuit
+
+    auto drawTableHeader = [&](int yHeader) {
+        painter.setFont(headerFont);
+        int x = margin;
+        for (int i = 0; i < nExportCols; ++i) {
+            QRect rect(x, yHeader, colWidths[i], headerRowHeight);
+            painter.setPen(QPen(headerBorder, 1));
+            painter.setBrush(headerBg);
+            painter.drawRect(rect);
+            painter.setBrush(Qt::NoBrush);
+            painter.setPen(QPen(textColor, 1));
+            painter.drawText(rect.adjusted(8, 0, -8, 0),
+                             Qt::AlignVCenter | Qt::AlignLeft | Qt::TextWordWrap,
+                             headerLabels.at(i));
+            x += colWidths[i];
+        }
+        return yHeader + headerRowHeight;
+    };
+
+    int y = margin;
+    painter.setFont(titleFont);
+    // Titre en orange (fond blanc)
+    const QRect titleRect(margin, y, tableWidth, titleBlock - 10);
+    painter.setBrush(Qt::NoBrush);
+    painter.setPen(QPen(orangeTitle, 2));
+    painter.drawText(titleRect.adjusted(16, 0, -16, 0),
+                     Qt::AlignVCenter | Qt::AlignLeft,
+                     QStringLiteral("Exportation de l'inventaire"));
+    // petit trait de séparation
+    painter.setPen(QPen(orangeTitle, 1));
+    painter.drawLine(margin, y + titleBlock - 12, margin + qMax(0, tableWidth), y + titleBlock - 12);
+    y += titleBlock;
+    painter.setPen(QPen(textColor, 1));
+
+    painter.setFont(metaFont);
+    const QString dateStr = QDate::currentDate().toString(QStringLiteral("dd/MM/yyyy"));
+    const QString timeStr = QTime::currentTime().toString(QStringLiteral("hh:mm:ss"));
+
+    const QString ctx = QStringLiteral("Tri par : %1 - Top %2 produit(s) - ordre du tableau actuel")
+                            .arg(ui->InventorySort->currentText())
+                            .arg(visibleRows.size());
+    painter.drawText(QRect(margin, y, qMax(0, tableWidth), metaLine * 2),
+                      Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap,
+                      ctx);
+    y += metaLine * 2 + 8;
+
+    painter.setFont(cellFont);
+    const QFontMetrics fmCell(cellFont);
+    y = drawTableHeader(y);
+
+    // Pied de page (date + heure) en bas de page
+    const int footerHeight = 46;
+    const int footerTopY = pageHeight - margin - footerHeight;
+    const int footerLabelOffset = 95;
+    auto drawFooter = [&]() {
+        painter.setFont(metaFont);
+
+        painter.setPen(QPen(orangeTitle, 1));
+        painter.drawText(margin, footerTopY + 12, QStringLiteral("Date :"));
+        painter.setPen(QPen(textColor, 1));
+        painter.drawText(margin + footerLabelOffset, footerTopY + 12, dateStr);
+
+        painter.setPen(QPen(orangeTitle, 1));
+        painter.drawText(margin, footerTopY + 28, QStringLiteral("Heure :"));
+        painter.setPen(QPen(textColor, 1));
+        painter.drawText(margin + footerLabelOffset, footerTopY + 28, timeStr);
+    };
+
+    for (int rowIndex = 0; rowIndex < visibleRows.size(); ++rowIndex) {
+        const int vr = visibleRows[rowIndex];
+        const QColor rowBg = (rowIndex % 2 == 0) ? evenRowBg : oddRowBg;
+        if (y + rowHeight > pageHeight - margin - footerHeight) {
+            drawFooter();
+            pdf.newPage();
+            y = margin;
+            painter.setFont(titleFont);
+            // Titre “suite” en orange (fond blanc)
+            const QRect suiteRect(margin, y, tableWidth, 32);
+            painter.setBrush(Qt::NoBrush);
+            painter.setPen(QPen(orangeTitle, 2));
+            painter.drawText(suiteRect.adjusted(16, 0, -16, 0),
+                             Qt::AlignVCenter | Qt::AlignLeft,
+                             QStringLiteral("Suite - export inventaire"));
+            y += suiteRect.height();
+            painter.setPen(QPen(textColor, 1));
+            painter.setFont(cellFont);
+            y = drawTableHeader(y); // header coloré
+        }
+
+        int x = margin;
+        for (int ci = 0; ci < nExportCols; ++ci) {
+            const int c = exportCols[ci];
+            QRect rect(x, y, colWidths[ci], rowHeight);
+            painter.setPen(QPen(borderColor, 1));
+            painter.setBrush(rowBg);
+            painter.drawRect(rect);
+            painter.setBrush(Qt::NoBrush);
+            painter.setPen(QPen(textColor, 1));
+            QString text;
+            if (QTableWidgetItem *it = t->item(vr, c))
+                text = it->text();
+            text = fmCell.elidedText(text, Qt::ElideRight, rect.width() - 12);
+            painter.drawText(rect.adjusted(6, 0, -6, 0),
+                             Qt::AlignLeft | Qt::AlignVCenter,
+                             text);
+            x += colWidths[ci];
+        }
+        y += rowHeight;
+    }
+
+    drawFooter();
+    painter.end();
+    QMessageBox::information(this, QStringLiteral("Export PDF"),
+                             QStringLiteral("Le PDF de l'inventaire a été généré."));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
+}
+
+void MainWindow::handleInventoryDetailExportPdf()
+{
+    // ==================== VÉRIFICATION DE LA SÉLECTION ====================
+    const int currentRow = ui->TableInventory->currentRow();
+    if (currentRow < 0) {
+        QMessageBox::warning(this, tr("Exporter PDF"),
+                             tr("Veuillez sélectionner un produit à exporter."));
+        return;
+    }
+
+    QTableWidgetItem *itemId = ui->TableInventory->item(currentRow, 0);
+    if (!itemId) {
+        QMessageBox::warning(this, tr("Exporter PDF"),
+                             tr("Produit introuvable dans le tableau."));
+        return;
+    }
+
+    // ==================== RÉCUPÉRATION DES DONNÉES ====================
+    // Depuis UserRole
+    const QString idProduct  = itemId->data(Qt::UserRole).toString();
+    const QString zone       = itemId->data(Qt::UserRole + 1).toString();
+    const QString shelf      = itemId->data(Qt::UserRole + 2).toString();
+    const QString unit       = itemId->data(Qt::UserRole + 3).toString();
+    const QString type       = itemId->data(Qt::UserRole + 4).toString();
+    const QString desc       = itemId->data(Qt::UserRole + 5).toString();
+    const int qtReserved     = itemId->data(Qt::UserRole + 6).toInt();
+    const int threshold      = itemId->data(Qt::UserRole + 7).toInt();
+
+    // Depuis le tableau
+    const QString sku   = ui->TableInventory->item(currentRow, 1) ? ui->TableInventory->item(currentRow, 1)->text() : "";
+    const QString name  = ui->TableInventory->item(currentRow, 2) ? ui->TableInventory->item(currentRow, 2)->text() : "";
+    const double price  = ui->TableInventory->item(currentRow, 3) ? ui->TableInventory->item(currentRow, 3)->data(Qt::EditRole).toDouble() : 0.0;
+    const int quantity  = ui->TableInventory->item(currentRow, 4) ? ui->TableInventory->item(currentRow, 4)->text().toInt() : 0;
+    const QString status = ui->TableInventory->item(currentRow, 5) ? ui->TableInventory->item(currentRow, 5)->text() : "";
+
+    // ==================== NOM DU FICHIER ====================
+    QString defaultFileName = QStringLiteral("Fiche_produit_%1.pdf").arg(sku.isEmpty() ? idProduct : sku);
+    defaultFileName.replace(QChar('/'), '_');
+    defaultFileName.replace(QChar('\\'), '_');
+
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Exporter la fiche produit"),
+                                                    defaultFileName, tr("PDF Files (*.pdf)"));
+    if (filePath.isEmpty()) return;
+    if (!filePath.endsWith(".pdf", Qt::CaseInsensitive)) filePath += ".pdf";
+
+    // ==================== CRÉATION DU PDF ====================
+    QPdfWriter pdf(filePath);
+    pdf.setPageSize(QPageSize(QPageSize::A4));
+    pdf.setPageOrientation(QPageLayout::Portrait);
+    pdf.setResolution(300);
+
+    QPainter painter(&pdf);
+    if (!painter.isActive()) {
+        QMessageBox::critical(this, tr("Erreur"), tr("Impossible de créer le fichier PDF."));
+        return;
+    }
+
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::TextAntialiasing, true);
+
+    // ==================== COULEURS ====================
+    const QColor colorHeaderBg   = QColor("#004D40");   // Vert foncé
+    const QColor colorAccent     = QColor("#00CED1");   // Turquoise
+    const QColor colorLight      = QColor("#7FFFD4");   // Aquamarine
+    const QColor colorTextDark   = QColor("#1E2A2A");
+    const QColor colorTextLight  = QColor("#FFFFFF");
+    const QColor colorBorder     = QColor("#CBD5E1");
+    const QColor colorSectionBg  = QColor("#F8FAFC");
+
+    // ==================== POLICES ====================
+    QFont fontHeader("Segoe UI", 24, QFont::Bold);
+    QFont fontSubHeader("Segoe UI", 16);
+    QFont fontSection("Segoe UI", 18, QFont::Bold);
+    QFont fontLabel("Segoe UI", 16, QFont::Bold);
+    QFont fontValue("Segoe UI", 16);
+    QFont fontDesc("Segoe UI", 14);
+    QFont fontFooter("Segoe UI", 12);
+
+    const int margin = 40;
+    const int pageWidth = pdf.width();
+    const int pageHeight = pdf.height();
+    const int contentWidth = pageWidth - (2 * margin);
+    const int col1X = margin;           // Colonne 1 (labels)
+    const int col2X = margin + 500;     // Colonne 2 (valeurs)
+    const int col3X = margin + 1500;     // Colonne 3 (labels)
+    const int col4X = margin + 2000;     // Colonne 4 (valeurs)
+
+    int y = margin;
+
+    // ==================== EN-TÊTE ====================
+    QRect headerRect(0, 0, pageWidth, 85);
+    painter.fillRect(headerRect, colorHeaderBg);
+
+    painter.setPen(colorTextLight);
+    painter.setFont(fontHeader);
+    painter.drawText(margin, 75, "FICHE PRODUIT");
+
+    painter.setFont(fontSubHeader);
+    painter.setPen(colorLight);
+    painter.drawText(margin, 200, "Document d'inventaire détaillé");
+
+    y = 600;
+
+    // ==================== SECTION 1 : INFORMATIONS GÉNÉRALES ====================
+    painter.setPen(colorHeaderBg);
+    painter.setFont(fontSection);
+    painter.drawText(margin, y, "INFORMATIONS GÉNÉRALES");
+    y += 20;
+    painter.setPen(QPen(colorAccent, 10));
+    painter.drawLine(margin, y, margin + contentWidth, y);
+    y += 130;
+
+    // Ligne 1 : Nom + SKU
+    painter.setFont(fontLabel);
+    painter.setPen(colorHeaderBg);
+    painter.drawText(col1X, y, "Nom :");
+    painter.setFont(fontValue);
+    painter.setPen(colorTextDark);
+    painter.drawText(col2X, y, name.isEmpty() ? "---" : name);
+
+    painter.setFont(fontLabel);
+    painter.setPen(colorHeaderBg);
+    painter.drawText(col3X, y, "SKU :");
+    painter.setFont(fontValue);
+    painter.setPen(colorTextDark);
+    painter.drawText(col4X, y, sku.isEmpty() ? "---" : sku);
+    y += 90;
+
+    // Ligne 2 : Type + Statut
+    painter.setFont(fontLabel);
+    painter.setPen(colorHeaderBg);
+    painter.drawText(col1X, y, "Type :");
+    painter.setFont(fontValue);
+    painter.setPen(colorTextDark);
+    painter.drawText(col2X, y, type.isEmpty() ? "---" : type);
+
+    painter.setFont(fontLabel);
+    painter.setPen(colorHeaderBg);
+    painter.drawText(col3X, y, "Statut :");
+    painter.setFont(fontValue);
+    painter.setPen(colorTextDark);
+    painter.drawText(col4X, y, status.isEmpty() ? "---" : status);
+    y += 90;
+
+    // Ligne 3 : Prix + ID
+    painter.setFont(fontLabel);
+    painter.setPen(colorHeaderBg);
+    painter.drawText(col1X, y, "Prix :");
+    painter.setFont(fontValue);
+    painter.setPen(colorTextDark);
+    // Le champ "unit" est une caractéristique (affichée à part), pas un suffixe du prix.
+    painter.drawText(col2X, y, QString::number(price, 'f', 2));
+
+    painter.setFont(fontLabel);
+    painter.setPen(colorHeaderBg);
+    painter.drawText(col3X, y, "ID Produit :");
+    painter.setFont(fontValue);
+    painter.setPen(colorTextDark);
+    painter.drawText(col4X, y, idProduct);
+    y += 500;
+
+    // ==================== SECTION 2 : GESTION DE STOCK ====================
+    painter.setFont(fontSection);
+    painter.setPen(colorHeaderBg);
+    painter.drawText(margin, y, "GESTION DE STOCK");
+    y += 20;
+    painter.setPen(QPen(colorAccent, 10));
+    painter.drawLine(margin, y, margin + contentWidth, y);
+    y += 130;
+
+    // Stock disponible avec indicateur visuel
+    painter.setFont(fontLabel);
+    painter.setPen(colorHeaderBg);
+    painter.drawText(col1X, y, "Qt Av :");
+    painter.setFont(fontValue);
+    painter.setPen(colorTextDark);
+    // "unit" est affiché séparément comme caractéristique.
+    painter.drawText(col2X, y, QString::number(quantity));
+
+    // Barre de progression
+    int stockPercent = (threshold > 0) ? qMin(100, (quantity * 100) / threshold) : 100;
+    QColor stockColor = (quantity <= threshold) ? QColor("#EF4444") : colorAccent;
+
+    int barWidth = 180;
+    int barHeight = 10;
+    QRect barBg(col2X + 80, y - 12, barWidth, barHeight);
+    painter.fillRect(barBg, QColor("#E2E8F0"));
+    QRect barFill(col2X + 80, y - 12, (barWidth * quantity) / qMax(1, threshold), barHeight);
+    painter.fillRect(barFill, stockColor);
+    y += 90;
+
+    // Ligne 2 : Qté réservée + Seuil
+    painter.setFont(fontLabel);
+    painter.setPen(colorHeaderBg);
+    painter.drawText(col1X, y, "Qt Rs :");
+    painter.setFont(fontValue);
+    painter.setPen(colorTextDark);
+    painter.drawText(col2X, y, QString::number(qtReserved));
+
+    painter.setFont(fontLabel);
+    painter.setPen(colorHeaderBg);
+    painter.drawText(col3X, y, "Seuil :");
+    painter.setFont(fontValue);
+    painter.setPen(colorTextDark);
+    painter.drawText(col4X, y, QString::number(threshold));
+
+    // Ajout : afficher l'unité comme caractéristique (pas comme suffixe)
+    y += 45;
+    painter.setFont(fontLabel);
+    painter.setPen(colorHeaderBg);
+    painter.drawText(col1X, y, "Unité :");
+    painter.setFont(fontValue);
+    painter.setPen(colorTextDark);
+    painter.drawText(col2X, y, unit.isEmpty() ? "---" : unit);
+    y += 45;
+
+    // Ligne 3 : Zone + Étagère
+    painter.setFont(fontLabel);
+    painter.setPen(colorHeaderBg);
+    painter.drawText(col1X, y, "Zone :");
+    painter.setFont(fontValue);
+    painter.setPen(colorTextDark);
+    painter.drawText(col2X, y, zone.isEmpty() ? "---" : zone);
+
+    painter.setFont(fontLabel);
+    painter.setPen(colorHeaderBg);
+    painter.drawText(col3X, y, "Étagère :");
+    painter.setFont(fontValue);
+    painter.setPen(colorTextDark);
+    painter.drawText(col4X, y, shelf.isEmpty() ? "---" : shelf);
+    y += 500;
+
+    // ==================== SECTION 3 : DESCRIPTION ====================
+    painter.setFont(fontSection);
+    painter.setPen(colorHeaderBg);
+    painter.drawText(margin, y, "DESCRIPTION");
+    y += 20;
+    painter.setPen(QPen(colorAccent, 10));
+    painter.drawLine(margin, y, margin + contentWidth, y);
+    y += 80;
+
+    // Fond clair pour la description
+    QRect descBgRect(margin, y, contentWidth, 70);
+    painter.fillRect(descBgRect, colorSectionBg);
+
+    painter.setFont(fontDesc);
+    painter.setPen(colorTextDark);
+    QRect descRect(margin + 10, y + 10, contentWidth - 20, 70);
+    QString descText = desc.isEmpty() ? "Aucune description disponible pour ce produit." : desc;
+    painter.drawText(descRect, Qt::TextWordWrap, descText);
+    y += 90;
+
+    // ==================== PIED DE PAGE ====================
+    painter.setPen(QPen(colorBorder, 10));
+    painter.drawLine(margin, pageHeight - 110, margin + contentWidth, pageHeight - 110);
+
+    painter.setFont(fontFooter);
+    painter.setPen(colorHeaderBg);
+
+    QString dateStr = QDate::currentDate().toString("dd/MM/yyyy");
+    QString timeStr = QTime::currentTime().toString("HH:mm");
+
+    painter.drawText(margin, pageHeight - 130, "Document généré le : " + dateStr + " à " + timeStr);
+    painter.setPen(colorAccent);
+    painter.drawText(pageWidth - margin - 450, pageHeight - 130, "SmartResearch v1.0");
+
+    painter.end();
+
+    // ==================== CONFIRMATION ====================
+    QMessageBox::information(this, tr("Export PDF"),
+                             tr("La fiche produit a été exportée avec succès.\n\n"
+                                "Fichier : %1").arg(filePath));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+}
 
 void MainWindow::on_BtnPopupSaveInventory_2_clicked()
 {
@@ -5270,6 +6312,7 @@ void MainWindow::on_BtnPopupSaveInventory_2_clicked()
     idProductToEdit.clear();
     skuToEdit.clear();
     ui->stacked_I->setCurrentIndex(0);
+    refreshInventoryTypeFilter();
     loadInventory();
 }
 
@@ -5315,6 +6358,7 @@ void MainWindow::handleInventoryDelete()
     }
 
     QMessageBox::information(this, "Inventaire", "Produit supprimé.");
+    refreshInventoryTypeFilter();
     loadInventory();
 }
 
