@@ -1,5 +1,5 @@
 --------------------------------------------------------
---  Fichier créé - mercredi-avril-01-2026   
+--  Fichier crï¿½ï¿½ - mercredi-avril-01-2026   
 --------------------------------------------------------
 DROP TABLE "HICHEM"."LABS";
 DROP TABLE "HICHEM"."EMPLOYES";
@@ -7,6 +7,7 @@ DROP TABLE "HICHEM"."FINANCE";
 DROP TABLE "HICHEM"."PRODUCT";
 DROP TABLE "HICHEM"."PROJETS";
 DROP TABLE "HICHEM"."PUBLICATIONS";
+-- bnjr--
 --------------------------------------------------------
 --  DDL for Table LABS
 --------------------------------------------------------
@@ -152,8 +153,8 @@ DROP TABLE "HICHEM"."PUBLICATIONS";
 REM INSERTING into HICHEM.LABS
 SET DEFINE OFF;
 Insert into HICHEM.LABS (IDLABO,RESPONSABLE,LOCALISATION,NUMERO,SPECIALITE,DISPONIBILITE,RESULTAT,NOMLABO,IDEMP,PAIEMENT,MONTANT,MONTANT_PAYE) values ('2','zak','morneg','92985300','exterieur','Occupe','En attente','vw','6','non payer','0','0');
-Insert into HICHEM.LABS (IDLABO,RESPONSABLE,LOCALISATION,NUMERO,SPECIALITE,DISPONIBILITE,RESULTAT,NOMLABO,IDEMP,PAIEMENT,MONTANT,MONTANT_PAYE) values ('3','zak','36°49''38.7"N 10°08''50.1"E','44845113','interieur','Occupe','En attente','mercedes','1','payer','0','0');
-Insert into HICHEM.LABS (IDLABO,RESPONSABLE,LOCALISATION,NUMERO,SPECIALITE,DISPONIBILITE,RESULTAT,NOMLABO,IDEMP,PAIEMENT,MONTANT,MONTANT_PAYE) values ('5','zza','36.82216689659118, 10.190769713391115','43','exterieur','Disponible','Prêt','aaa','1','non payer','0','0');
+Insert into HICHEM.LABS (IDLABO,RESPONSABLE,LOCALISATION,NUMERO,SPECIALITE,DISPONIBILITE,RESULTAT,NOMLABO,IDEMP,PAIEMENT,MONTANT,MONTANT_PAYE) values ('3','zak','36ï¿½49''38.7"N 10ï¿½08''50.1"E','44845113','interieur','Occupe','En attente','mercedes','1','payer','0','0');
+Insert into HICHEM.LABS (IDLABO,RESPONSABLE,LOCALISATION,NUMERO,SPECIALITE,DISPONIBILITE,RESULTAT,NOMLABO,IDEMP,PAIEMENT,MONTANT,MONTANT_PAYE) values ('5','zza','36.82216689659118, 10.190769713391115','43','exterieur','Disponible','Prï¿½t','aaa','1','non payer','0','0');
 Insert into HICHEM.LABS (IDLABO,RESPONSABLE,LOCALISATION,NUMERO,SPECIALITE,DISPONIBILITE,RESULTAT,NOMLABO,IDEMP,PAIEMENT,MONTANT,MONTANT_PAYE) values ('6','saaaaas','36.82216689659118, 10.190769713391115','creec','exterieur','Occupe','En attente','asazas','1','payer','0','0');
 Insert into HICHEM.LABS (IDLABO,RESPONSABLE,LOCALISATION,NUMERO,SPECIALITE,DISPONIBILITE,RESULTAT,NOMLABO,IDEMP,PAIEMENT,MONTANT,MONTANT_PAYE) values ('7','ayari','mourouj 4','92985230','interieur','Occupe','En attente','aynar','1','payer','0','0');
 REM INSERTING into HICHEM.EMPLOYES
