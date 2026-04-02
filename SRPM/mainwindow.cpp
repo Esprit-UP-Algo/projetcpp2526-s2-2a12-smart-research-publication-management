@@ -404,60 +404,103 @@ void MainWindow::on_btnStat_emp_clicked()
     QStringList categories;
     QList<double> valeurs;
 
-    // 2. RÉCUPÉRATION DES DONNÉES (Ajusté selon ta photo SQL Developer)
-    // J'utilise NVL pour transformer les cases vides (NULL) en 0
-    QSqlQuery query("SELECT NOM, NVL(NB_ABSENCES, 0) FROM EMPLOYES ORDER BY NB_ABSENCES DESC");
+    // 1. CALCUL DU DIVISEUR (Mois actuel pour la généralisation)
+    // On récupère le numéro du mois actuel (ex: 4 pour Avril)
+    int moisEnCours = QDate::currentDate().month();
+    // On s'assure que le diviseur est au moins 1.0 pour éviter la division par zéro
+    double diviseurMois = (moisEnCours > 0) ? static_cast<double>(moisEnCours) : 1.0;
+    double joursOuvresParMois = 22.0;
 
-    bool hasData = false;
-    while (query.next()) {
-        hasData = true;
-        QString nom = query.value(0).toString();
-        int nbAbsences = query.value(1).toInt();
-        double taux = (static_cast<double>(nbAbsences) / 22.0) * 100.0;
-        valeurs    << taux;
-        categories << nom;
-    }
+    // 2. REQUÊTE SQL (Récupération du cumul d'absences)
+    QSqlQuery query;
+    query.prepare("SELECT NOM, NVL(NB_ABSENCES, 0) AS TOTAL_ABS "
+                  "FROM EMPLOYES "
+                  "ORDER BY TOTAL_ABS DESC");
 
-    if (!hasData) {
-        QMessageBox::warning(this, "Stats", "Aucune donnée d'absence trouvée dans la base !");
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Erreur SQL", query.lastError().text());
         return;
     }
 
-    // 3. Création de la série
-    QBarSet *set = new QBarSet("Taux d'absentéisme (%)");
-    for (double v : std::as_const(valeurs)) *set << v;
+    // 3. LOGIQUE DE CALCUL DU TAUX MENSUEL MOYEN
+    while (query.next()) {
+        QString nom = query.value("NOM").toString();
+        int totalAbsences = query.value("TOTAL_ABS").toInt();
+
+        // Calcul : (Total / Nb de mois écoulés) / 22 jours ouvrés
+        double moyenneAbsParMois = totalAbsences / diviseurMois;
+        double taux = (moyenneAbsParMois / joursOuvresParMois) * 100.0;
+
+        // Arrondi à 1 décimale pour la clarté (ex: 14.8 au lieu de 14.7727)
+        taux = qRound(taux * 10.0) / 10.0;
+
+        valeurs << (taux > 100.0 ? 100.0 : taux);
+        categories << nom;
+    }
+
+    if (categories.isEmpty()) {
+        QMessageBox::warning(this, "Stats", "Aucune donnée trouvée dans la base !");
+        return;
+    }
+
+    // 4. CRÉATION DES SÉRIES (Barres)
+    QBarSet *set = new QBarSet("Taux Moyen Mensuel %");
+    for (double v : valeurs) *set << v;
+
+    set->setColor(QColor(127, 255, 212)); // Aquamarine (#7FFFD4)
+    set->setBorderColor(QColor(0, 77, 64)); // Dark Cyan pour le contour
+
     QBarSeries *series = new QBarSeries();
     series->append(set);
-
-    // Optionnel : Afficher la valeur au-dessus de chaque barre
     series->setLabelsVisible(true);
-    series->setLabelsFormat("@value%");
+    series->setLabelsPosition(QAbstractBarSeries::LabelsOutsideEnd);
+    series->setLabelsFormat("@value %");
 
-    // 4. Configuration du Graphique
+    // 5. LIGNE DE SEUIL CRITIQUE (Alerte à 15%)
+    QLineSeries *alertLine = new QLineSeries();
+    alertLine->setName("Seuil Critique (15%)");
+    QPen pen(Qt::red);
+    pen.setWidth(2);
+    pen.setStyle(Qt::DashLine);
+    alertLine->setPen(pen);
+
+    for(int i = 0; i < categories.count(); ++i) {
+        alertLine->append(i, 15); // Ligne horizontale à 15%
+    }
+
+    // 6. CONFIGURATION DU GRAPHIQUE (Chart)
     QChart *chart = new QChart();
     chart->addSeries(series);
-    chart->setTitle("Analyse de l'Absentéisme par Employé");
+    chart->addSeries(alertLine);
+
+    // Titre dynamique avec QLocale (Corrected)
+    QString nomMoisActuel = QLocale(QLocale::French).monthName(moisEnCours);
+    chart->setTitle(QString("Analyse de l'Absentéisme (Janvier - %1 2026)").arg(nomMoisActuel));
+
     chart->setAnimationOptions(QChart::SeriesAnimations);
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
 
-    // 5. Axes
+    // Axe X (Noms des employés)
     QBarCategoryAxis *axisX = new QBarCategoryAxis();
     axisX->append(categories);
     chart->addAxis(axisX, Qt::AlignBottom);
     series->attachAxis(axisX);
+    alertLine->attachAxis(axisX);
 
+    // Axe Y (Pourcentage)
     QValueAxis *axisY = new QValueAxis();
     axisY->setRange(0, 100);
-    axisY->setTitleText("Taux d'absentéisme (%)");
+    axisY->setTitleText("Taux d'absence (%)");
     chart->addAxis(axisY, Qt::AlignLeft);
     series->attachAxis(axisY);
+    alertLine->attachAxis(axisY);
 
-    // 6. Affichage
+    // 7. AFFICHAGE DANS UNE VUE
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->setMinimumSize(800, 500);
-    chartView->setWindowTitle("Statistiques RH - Vortex");
+    chartView->setMinimumSize(900, 500);
+    chartView->setWindowTitle("Statistiques RH - Système Vortex");
     chartView->show();
 }
 void MainWindow::simulerPointage() {
