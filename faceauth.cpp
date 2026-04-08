@@ -1,74 +1,60 @@
 #include "faceauth.h"
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
 #include <QHttpMultiPart>
-#include <QHttpPart>
+#include <QNetworkReply>
 #include <QEventLoop>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QDebug>
-
-// CORRECTION : Définition du constructeur
-FaceAuth::FaceAuth() {}
-
-bool FaceAuth::identifierUtilisateur(const QString& employeeID) {
+// IL FAUT ABSOLUMENT CETTE PARTIE :
+FaceAuth::FaceAuth() {
+    // Constructeur vide, mais il doit exister !
+}
+bool FaceAuth::identifierUtilisateur(const QString& username) {
     cv::VideoCapture cap(0);
     if (!cap.isOpened()) return false;
 
     cv::Mat frame;
-    for(int i = 0; i < 30; i++) {
+    for(int i = 0; i < 15; i++) { // Stabilisation lumière
         cap >> frame;
-        if (frame.empty()) continue;
         cv::flip(frame, frame, 1);
-        cv::imshow("Scan FaceID - Cadrez votre visage", frame);
-        if (cv::waitKey(30) >= 0) break;
+        cv::imshow("Authentification FaceID...", frame);
+        cv::waitKey(30);
     }
     cv::destroyAllWindows();
+    if (frame.empty()) return false;
 
-    if (frame.empty()) {
-        cap.release();
-        return false;
-    }
-
-    // Encodage JPG
     std::vector<uchar> buf;
     cv::imencode(".jpg", frame, buf);
     QByteArray imageData(reinterpret_cast<const char*>(buf.data()), static_cast<int>(buf.size()));
 
-    // Envoi HTTP
-    QNetworkAccessManager manager;
-    QEventLoop loop;
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 
-    QHttpPart idPart;
-    idPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"id\""));
-    idPart.setBody(employeeID.toUtf8());
+    // Envoi du Username
+    QHttpPart namePart;
+    namePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"username\""));
+    namePart.setBody(username.toUtf8());
 
+    // Envoi de l'image
     QHttpPart imagePart;
     imagePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"face\"; filename=\"face.jpg\""));
-    imagePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("image/jpeg"));
     imagePart.setBody(imageData);
 
-    multiPart->append(idPart);
+    multiPart->append(namePart);
     multiPart->append(imagePart);
 
-    QNetworkRequest request(QUrl("http://127.0.0.1:5000/verify"));
-    QNetworkReply *reply = manager.post(request, multiPart);
+    QNetworkAccessManager manager;
+    QEventLoop loop;
+    QNetworkReply *reply = manager.post(QNetworkRequest(QUrl("http://127.0.0.1:5000/verify")), multiPart);
     multiPart->setParent(reply);
 
     QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
     loop.exec();
 
-    bool isVerified = false;
+    bool result = false;
     if (reply->error() == QNetworkReply::NoError) {
-        QJsonDocument json = QJsonDocument::fromJson(reply->readAll());
-        isVerified = json.object().value("verified").toBool();
-        qDebug() << "FaceID Score Result:" << isVerified;
-    } else {
-        qDebug() << "Erreur Réseau:" << reply->errorString();
+        result = QJsonDocument::fromJson(reply->readAll()).object().value("verified").toBool();
     }
 
     reply->deleteLater();
     cap.release();
-    return isVerified;
+    return result;
 }

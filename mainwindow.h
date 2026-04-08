@@ -13,6 +13,8 @@
 #include "inventory.h"
 #include "projet.h"
 #include <QSqlTableModel>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -31,6 +33,8 @@ private:
     Ui::MainWindow *ui;
     QSqlQueryModel *model; // <--- C'est ce type qu'il faut utiliser
     QString currentUser;
+    QNetworkAccessManager *networkManager;
+    QString m_tempFaceEncoding; // Pour stocker la signature
 
     // ===== FINANCE =====
     Finance::Row selectedFinanceRowFromTable(bool *ok=nullptr) const;
@@ -188,6 +192,8 @@ private slots:
     void filterLabsDynamic();
     void resetLabsFilters();
     void on_pointage_pressed();
+
+    void on_btnScanFace_clicked();
 
 protected:
     // Le filtre pour capturer le double-clic sur aff2

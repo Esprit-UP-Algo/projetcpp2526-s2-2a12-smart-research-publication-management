@@ -94,6 +94,30 @@
 #include <QFile>
 #include <QRandomGenerator>
 
+
+
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QNetworkReply>
+
+#include <QBuffer>
+#include <QHttpMultiPart>
+#include <QHttpPart>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QMessageBox>
+
+
+#include <QCamera>
+#include <QImageCapture>  // <-- En Qt 6, c'est QImageCapture (sans "Camera")
+#include <QMediaDevices>  // Utile pour trouver la caméra par défaut
+#include <QMediaCaptureSession> // NOUVEAU en Qt 6 : c'est le "cerveau" qui lie tout
+#include <QTimer>
+#include <QEventLoop>
+
 class QProgressBar;
 class QLabel;
 static void updatePasswordStrengthUiAddEmp(const QString &, QProgressBar *, QLabel *);
@@ -478,6 +502,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
             this, &MainWindow::on_BtnPopupCancelLabs_8_clicked);
     connect(ui->BtnPopupCancelLabs_10, &QPushButton::clicked,
             this, &MainWindow::on_BtnPopupCancelLabs_10_clicked);
+    networkManager = new QNetworkAccessManager(this);
 }
 
 
@@ -4750,178 +4775,138 @@ void MainWindow::loadEmployees()
 }
 void MainWindow::on_btnSaveEmployee_clicked()
 {
-    // 1. Récupération des données (Trim pour nettoyer les espaces inutiles)
+    // --- 1. RÉCUPÉRATION DES DONNÉES ---
     QString cin         = ui->lineCINAdd->text().trimmed();
     QString username    = ui->lineUsernameAdd->text().trimmed();
-    QString password    = ui->linePasswordAdd->text(); // Pas de trim pour le pass
+    QString password    = ui->linePasswordAdd->text();
     QString email       = ui->lineEmailAdd->text().trimmed();
     QString nom         = ui->lineNomAdd->text().trimmed();
     QString prenom      = ui->linePrenomAdd->text().trimmed();
-    int roleIndex       = ui->comboRoleAdd->currentIndex();
     QString role        = ui->comboRoleAdd->currentText();
-
     QString departement = ui->comboDepartementAdd->currentText().trimmed();
     QString poste       = ui->comboPosteAdd->currentText().trimmed();
-    int idxDept         = ui->comboDepartementAdd->currentIndex();
-    int idxPoste        = ui->comboPosteAdd->currentIndex();
     QDate dateEmb       = ui->dateEmbaucheAdd->date();
     QString salaireStr  = ui->lineSalaireAdd->text().trimmed();
 
-    // --- ÉTAPE 2 : CONTRÔLES DANS L'ORDRE DU VISUEL ---
+    // --- 2. CONTRÔLES DE SÉCURITÉ & SAISIE ---
 
-    // --- COLONNE GAUCHE ---
-    // CIN
-    if (cin.isEmpty()) {
-        QMessageBox::warning(this, "Saisie incomplète", "Le champ CIN est vide.");
-        ui->lineCINAdd->setFocus(); return;
-    }
-    if (!QRegularExpression("^[0-9]{8}$").match(cin).hasMatch()) {
-        QMessageBox::warning(this, "Format Incorrect", "Le CIN doit comporter 8 chiffres.");
-        ui->lineCINAdd->setFocus(); return;
-    }
-    if (Employe::existe(cin)) {
-        QMessageBox::critical(this, "Doublon", "Ce CIN est déjà utilisé.");
-        ui->lineCINAdd->setFocus(); return;
-    }
-
-    // Username
-    if (username.isEmpty()) {
-        QMessageBox::warning(this, "Saisie incomplète", "Le Username est obligatoire.");
-        ui->lineUsernameAdd->setFocus(); return;
-    }
-    if (Employe::usernameExiste(username)) {
-        QMessageBox::warning(this, "Doublon", "Ce nom d'utilisateur est déjà pris.");
-        ui->lineUsernameAdd->setFocus(); return;
-    }
-
-    // Password
-    if (password.isEmpty()) {
-        QMessageBox::warning(this, "Saisie incomplète", "Veuillez définir un mot de passe.");
-        ui->linePasswordAdd->setFocus(); return;
-    }
-    if (!Employe::motDePasseAcceptable(password)) {
-        QMessageBox::warning(
-            this,
-            "Mot de passe trop faible",
-            "Le mot de passe doit être fort pour valider le compte : au moins 10 caractères, avec "
-            "minuscules, majuscules, chiffres et un caractère spécial. La barre à côté du champ doit "
-            "atteindre au moins le niveau « Fort ».");
-        ui->linePasswordAdd->setFocus();
+    // A. Vérification des champs vides obligatoires
+    if (cin.isEmpty() || username.isEmpty() || password.isEmpty() || nom.isEmpty() || prenom.isEmpty() || email.isEmpty()) {
+        QMessageBox::warning(this, "Champs manquants", "Tous les champs obligatoires doivent être remplis.");
         return;
     }
 
-    // Email
-    if (email.isEmpty()) {
-        QMessageBox::warning(this, "Saisie incomplète", "L'Email est obligatoire.");
-        ui->lineEmailAdd->setFocus(); return;
+    // B. Contrôle CIN (8 chiffres exactement)
+    QRegularExpression rxCin("^[0-9]{8}$");
+    if (!rxCin.match(cin).hasMatch()) {
+        QMessageBox::warning(this, "Erreur CIN", "Le CIN doit contenir exactement 8 chiffres.");
+        ui->lineCINAdd->setFocus();
+        return;
     }
-    if (!QRegularExpression("^[\\w\\.-]+@[\\w\\.-]+\\.[a-z]{2,4}$").match(email).hasMatch()) {
-        QMessageBox::warning(this, "Format Incorrect", "L'adresse email est invalide.");
-        ui->lineEmailAdd->setFocus(); return;
+    if (Employe::existe(cin)) {
+        QMessageBox::critical(this, "Erreur Doublon", "Ce CIN est déjà enregistré dans le système.");
+        ui->lineCINAdd->setFocus();
+        return;
     }
-    if (Employe::emailExiste(email)) {
-        QMessageBox::warning(this, "Doublon", "Cet e-mail est déjà utilisé par un autre employé.");
+
+    // C. Contrôle Nom et Prénom (Lettres uniquement)
+    QRegularExpression rxAlpha("^[A-Za-zÀ-ÿ\\s-]+$");
+    if (!rxAlpha.match(nom).hasMatch() || !rxAlpha.match(prenom).hasMatch()) {
+        QMessageBox::warning(this, "Format Nom/Prénom", "Le nom et le prénom ne doivent contenir que des lettres.");
+        return;
+    }
+
+    // D. Contrôle Email (Format standard)
+    QRegularExpression rxEmail("^[\\w\\.-]+@[\\w\\.-]+\\.[a-z]{2,4}$");
+    if (!rxEmail.match(email).hasMatch()) {
+        QMessageBox::warning(this, "Format Email", "L'adresse email n'est pas valide.");
         ui->lineEmailAdd->setFocus();
         return;
     }
+    if (Employe::emailExiste(email)) {
+            QMessageBox::critical(this, "Doublon détecté",
+                                   "Cet email est déjà utilisé par un autre employé.\nVeuillez en saisir un autre.");
+            ui->lineEmailAdd->setFocus();
+            return;
+        }
 
-    // Nom
-    if (nom.isEmpty()) {
-        QMessageBox::warning(this, "Saisie incomplète", "Le champ Nom est vide.");
-        ui->lineNomAdd->setFocus(); return;
-    }
-
-    // Prénom
-    if (prenom.isEmpty()) {
-        QMessageBox::warning(this, "Saisie incomplète", "Le champ Prénom est vide.");
-        ui->linePrenomAdd->setFocus(); return;
-    }
-
-    // Role
-    if (roleIndex == 0) {
-        QMessageBox::warning(this, "Choix manquant", "Veuillez choisir un rôle dans la liste.");
-        ui->comboRoleAdd->showPopup(); return;
-    }
-
-    // --- COLONNE DROITE ---
-    // Département
-    if (idxDept == 0 || departement.isEmpty()
-        || departement == QStringLiteral("Choisir un département")) {
-        QMessageBox::warning(this, "Saisie incomplète", "Veuillez choisir un département dans la liste.");
-        ui->comboDepartementAdd->setFocus(); return;
-    }
-
-    // Poste
-    if (idxPoste == 0 || poste.isEmpty()
-        || poste == QStringLiteral("Choisir un poste")) {
-        QMessageBox::warning(this, "Saisie incomplète", "Veuillez choisir un poste dans la liste.");
-        ui->comboPosteAdd->setFocus(); return;
-    }
-
-    // Salaire
-    if (salaireStr.isEmpty()) {
-        QMessageBox::warning(this, "Saisie incomplète", "Veuillez entrer le montant du salaire.");
-        ui->lineSalaireAdd->setFocus(); return;
-    }
-    bool ok;
-    double salaire = salaireStr.toDouble(&ok);
-    if (!ok || salaire < 0) {
-        QMessageBox::warning(this, "Format Incorrect", "Le salaire doit être un nombre valide.");
-        ui->lineSalaireAdd->setFocus(); return;
-    }
-
-    if (!verifierEmailEmployeParCode(email, this))
+    // E. Contrôle Salaire (Doit être un nombre positif)
+    bool okSalaire;
+    double salaire = salaireStr.toDouble(&okSalaire);
+    if (!okSalaire || salaire < 0) {
+        QMessageBox::warning(this, "Erreur Salaire", "Veuillez saisir un salaire valide (nombre positif).");
+        ui->lineSalaireAdd->setFocus();
         return;
+    }
 
-    // --- ÉTAPE 3 : TOUT EST OK -> ENREGISTREMENT ---
+    // F. Vérification de la BIOMÉTRIE
+    if (this->m_tempFaceEncoding.isEmpty()) {
+        QMessageBox::warning(this, "Biométrie manquante", "Veuillez scanner le visage de l'employé avant l'enregistrement.");
+        return;
+    }
+
+    // --- 3. SYSTÈME DE VÉRIFICATION PAR MAIL (OTP) ---
+
+    int codeGenere = QRandomGenerator::global()->bounded(100000, 999999);
+    QString codeStr = QString::number(codeGenere);
+
+    QApplication::setOverrideCursor(Qt::WaitCursor); // Curseur d'attente
+    QString errMail;
+    bool mailEnvoye = envoyerMailServiceRh(email, "Vérification de sécurité",
+                                           "Bonjour " + prenom + ",\n\nVotre code de confirmation est : " + codeStr,
+                                           errMail);
+    QApplication::restoreOverrideCursor();
+
+    if (!mailEnvoye) {
+        QMessageBox::critical(this, "Erreur Mail", "Échec de l'envoi du code à " + email + ".\nErreur : " + errMail);
+        return;
+    }
+
+    // Demander le code à l'utilisateur
+    bool okInput;
+    QString codeSaisi = QInputDialog::getText(this, "Vérification Email",
+                                              "Un code a été envoyé à : " + email + "\nVeuillez le saisir :",
+                                              QLineEdit::Normal, "", &okInput);
+
+    if (!okInput || codeSaisi != codeStr) {
+        QMessageBox::warning(this, "Vérification échouée", "Code incorrect ou opération annulée.");
+        return;
+    }
+
+    // --- 4. TRAITEMENT ET ENREGISTREMENT FINAL ---
+
+    // Hachage du mot de passe
     QString passHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256).toHex();
 
-    Employe e(cin, nom, prenom, username, passHash, email, poste, departement, dateEmb, salaire, role);
+    // Création et insertion
+    Employe e(cin, nom, prenom, username, passHash, email, poste, departement, dateEmb, salaire, role, this->m_tempFaceEncoding);
 
     QString errMsg;
     if (e.ajouter(&errMsg)) {
-        QString errMail;
-        const QString sujetBienvenue = QStringLiteral("Votre compte employé a été créé — SmartResearchLab");
-        const QString corpsBienvenue = QStringLiteral(
-            "Bonjour %1 %2,\n\n"
-            "Votre compte employé a été créé avec succès dans SmartResearchLab.\n\n"
-            "Nom d'utilisateur : %3\n"
-            "E-mail enregistré : %4\n"
-            "Poste : %5\n"
-            "Département : %6\n\n"
-            "Conservez vos identifiants en lieu sûr. Ne communiquez jamais votre mot de passe.\n\n"
-            "Cordialement,\n"
-            "Service RH — SmartResearchLab\n"
-        ).arg(prenom, nom, username, email, poste, departement);
+        QMessageBox::information(this, "Succès", "L'employé " + nom + " a été ajouté avec succès !");
 
-        const bool mailOk = envoyerMailServiceRh(email, sujetBienvenue, corpsBienvenue, errMail);
-        if (mailOk) {
-            QMessageBox::information(this, "Succès",
-                QStringLiteral("L'employé %1 a été enregistré.\nUn courriel de confirmation a été envoyé à %2.")
-                    .arg(nom, email));
-        } else {
-            QMessageBox::warning(this, "Succès (courriel non envoyé)",
-                QStringLiteral("L'employé %1 a été enregistré, mais l'envoi du courriel de confirmation a échoué :\n%2")
-                    .arg(nom, errMail));
-        }
+        // RESET
+        this->m_tempFaceEncoding.clear();
+        loadEmployees();
+        ajouterNotification("SYSTÈME", "Nouvel employé : " + username);
 
-        loadEmployees(); // Rafraîchir ton tableau SQL
-        ajouterNotification("AJOUT", "Nouvel employé : " + username); // Ta notification 🔔
-
-        // Vider tous les champs (Reset)
-        ui->lineCINAdd->clear(); ui->lineUsernameAdd->clear(); ui->linePasswordAdd->clear();
-        ui->lineEmailAdd->clear(); ui->lineNomAdd->clear(); ui->linePrenomAdd->clear();
-        ui->comboDepartementAdd->setCurrentIndex(0);
-        ui->comboPosteAdd->setCurrentIndex(0);
+        // Vidage des champs
+        ui->lineCINAdd->clear();
+        ui->lineUsernameAdd->clear();
+        ui->linePasswordAdd->clear();
+        ui->lineEmailAdd->clear();
+        ui->lineNomAdd->clear();
+        ui->linePrenomAdd->clear();
         ui->lineSalaireAdd->clear();
         ui->comboRoleAdd->setCurrentIndex(0);
+        ui->comboDepartementAdd->setCurrentIndex(0);
+        ui->comboPosteAdd->setCurrentIndex(0);
 
-        ui->stack_emp->setCurrentIndex(0); // Retour à l'écran de liste
+        ui->stack_emp->setCurrentIndex(0); // Retour à la liste
     } else {
-        QMessageBox::critical(this, "Erreur SQL", errMsg);
+        QMessageBox::critical(this, "Erreur Base de Données", "L'ajout a échoué :\n" + errMsg);
     }
 }
-
 void MainWindow::on_btnSupprimer_emp_clicked()
 {
     int row = ui->TableEmp->currentRow();
@@ -4967,9 +4952,84 @@ void MainWindow::on_btnSupprimer_emp_clicked()
     }
 }
 
+void MainWindow::on_btnScanFace_clicked()
+{
+    // 0. Récupération du username pour nommer le fichier côté Python
+    QString username = ui->lineUsernameAdd->text().trimmed(); // Remplace par ton vrai nom d'objet UI
+    if (username.isEmpty()) {
+        QMessageBox::warning(this, "Attention", "Veuillez saisir un nom d'utilisateur avant de scanner le visage.");
+        return;
+    }
 
+    // 1. Création des objets pour Qt 6
+    QCamera *camera = new QCamera(QMediaDevices::defaultVideoInput(), this);
+    QImageCapture *capture = new QImageCapture(this);
+    QMediaCaptureSession *session = new QMediaCaptureSession(this);
 
+    session->setCamera(camera);
+    session->setImageCapture(capture);
 
+    camera->start();
+
+    // 2. Attente d'une seconde pour l'initialisation du capteur (Lumière/Focus)
+    QEventLoop loop;
+    QTimer::singleShot(1000, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    // 3. Déclenchement de la capture
+    capture->capture();
+
+    // 4. Une fois l'image capturée
+    connect(capture, &QImageCapture::imageCaptured, [=](int id, const QImage &img) {
+        QByteArray ba;
+        QBuffer buf(&ba);
+        buf.open(QIODevice::WriteOnly);
+        img.save(&buf, "JPG");
+
+        // Préparation de l'envoi Multipart
+        QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+
+        // --- AJOUT DU CHAMP USERNAME ---
+        QHttpPart namePart;
+        namePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"username\""));
+        namePart.setBody(username.toUtf8());
+        multiPart->append(namePart);
+
+        // Champ Image
+        QHttpPart imagePart;
+        imagePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"face\"; filename=\"face.jpg\""));
+        imagePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("image/jpeg"));
+        imagePart.setBody(ba);
+        multiPart->append(imagePart);
+
+        // Envoi vers la route /enroll
+        QNetworkRequest request(QUrl("http://127.0.0.1:5000/enroll"));
+        QNetworkReply *reply = networkManager->post(request, multiPart);
+        multiPart->setParent(reply);
+
+        connect(reply, &QNetworkReply::finished, [=]() {
+            if (reply->error() == QNetworkReply::NoError) {
+                QJsonObject res = QJsonDocument::fromJson(reply->readAll()).object();
+                if (res["success"].toBool()) {
+                    // On stocke le résultat si besoin pour valider l'inscription plus tard
+                    this->m_tempFaceEncoding = "VALIDATED";
+                    QMessageBox::information(this, "Succès", "Visage enregistré pour " + username);
+                } else {
+                    QMessageBox::warning(this, "Erreur", res["error"].toString());
+                }
+            } else {
+                QMessageBox::critical(this, "Erreur Réseau", "Impossible de contacter le serveur Python (app.py)");
+            }
+
+            camera->stop();
+            // Nettoyage des objets dynamiques
+            camera->deleteLater();
+            session->deleteLater();
+            capture->deleteLater();
+            reply->deleteLater();
+        });
+    });
+}
 void MainWindow::on_btnModifier_emp_clicked()
 {
     int row = ui->TableEmp->currentRow();
@@ -7174,6 +7234,9 @@ void MainWindow::handleInventoryDelete()
 
 
 //end
+
+
+
 
 
 
