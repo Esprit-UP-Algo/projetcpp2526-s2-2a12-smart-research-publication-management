@@ -12,6 +12,8 @@
 #include "employe.h"
 #include "inventory.h"
 #include <QSqlTableModel>
+#include <QTimer>
+#include <QLineEdit>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -47,6 +49,8 @@ private:
     QString selectedPublicationId() const;
 
     QString idPublicationToEdit;
+    QTimer *m_pubTimerAdd  = nullptr;
+    QTimer *m_pubTimerEdit = nullptr;
 
     void clearLayout(QLayout *layout);
     void showPublicationStats();

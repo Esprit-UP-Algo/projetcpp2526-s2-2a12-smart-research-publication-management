@@ -65,6 +65,8 @@
 
 
 #include <QSqlQuery>
+#include <QToolTip>
+#include <QTimer>
 #include <QSqlError>
 #include <QMessageBox>
 #include <QDebug>
@@ -1668,17 +1670,46 @@ Finance::Row MainWindow::selectedFinanceRowFromTable(bool *ok) const
     row.code = item(0)->text();
     row.type = item(1) ? item(1)->text() : "";
     row.montant = item(2) ? item(2)->text() : "";
-    row.categorie = item(3) ? item(3)->text() : "";
-    row.description = item(4) ? item(4)->text() : "";
-    row.dateTransaction = item(5) ? item(5)->text() : "";
-    row.modePaiement = item(6) ? item(6)->text() : "";
-    row.dateCreation = item(7) ? item(7)->text() : "";
+    row.description = item(3) ? item(3)->text() : "";
+    row.dateTransaction = item(4) ? item(4)->text() : "";
+    row.modePaiement = item(5) ? item(5)->text() : "";
+    row.dateCreation = item(6) ? item(6)->text() : "";
 
     if (ok) *ok = true;
     return row;
 }
 
 // ==================== FINANCE CRUD ====================
+
+// Génère un code de transaction garanti unique: {TYPE}-{MODE}-{YYYYMMDD}-{NNNN}
+// Cherche le premier numéro séquentiel non encore utilisé en DB.
+static QString generateTxCode(const QString &type, const QString &mode)
+{
+    static const QMap<QString,QString> typeMap = {
+        {"Revenu","REV"}, {"Depense","DEP"}
+    };
+    static const QMap<QString,QString> modeMap = {
+        {"especes","ESP"}, {"cheque","CHQ"}, {"virement","VIR"},
+        {"carte_bancaire","CBK"}, {"facture","FAC"}, {"remboursement","RMB"}
+    };
+
+    const QString tp     = typeMap.value(type, "TRX");
+    const QString mp     = modeMap.value(mode, "TRX");
+    const QString date   = QDate::currentDate().toString("yyyyMMdd");
+    const QString prefix = tp + "-" + mp + "-" + date + "-";
+
+    // Trouver le premier numéro disponible (1 → 9999)
+    for (int seq = 1; seq <= 9999; ++seq) {
+        const QString candidate = prefix + QString::number(seq).rightJustified(4, '0');
+        QSqlQuery q;
+        q.prepare("SELECT COUNT(*) FROM FINANCE WHERE CODETRANSA = :c");
+        q.bindValue(":c", candidate);
+        if (q.exec() && q.next() && q.value(0).toInt() == 0)
+            return candidate;
+    }
+    // Repli extrême : horodatage (HHmmsszzz) → impossible à dupliquer
+    return prefix + QTime::currentTime().toString("HHmmsszzz");
+}
 
 void MainWindow::initFinanceUi()
 {
@@ -1712,6 +1743,76 @@ void MainWindow::initFinanceUi()
 
     ui->DateFrom->setDate(QDate(2000, 1, 1));
     ui->DateTo->setDate(QDate::currentDate());
+
+    // ── Code auto-généré (lecture seule) ────────────────────────────────
+    ui->FormCode->setReadOnly(true);
+    ui->FormCode->setPlaceholderText("Code généré automatiquement");
+    ui->FormCode_2->setReadOnly(true);
+    ui->FormCode_2->setPlaceholderText("Code généré automatiquement");
+
+    // ── Catégorie masquée (auto-dérivée du type) ─────────────────────────
+    ui->FormCategory->setVisible(false);
+    ui->LblCat2->setVisible(false);
+    ui->FormCategory_2->setVisible(false);
+    ui->LblCat2_2->setVisible(false);
+
+    // ── Montant : saisie positive uniquement (pas de signe -) ────────────
+    QRegularExpressionValidator *amtVal = new QRegularExpressionValidator(
+        QRegularExpression(R"(^\d{0,9}(\.\d{0,3})?$)"), this);
+    ui->FormAmount->setValidator(amtVal);
+
+    QRegularExpressionValidator *amtVal2 = new QRegularExpressionValidator(
+        QRegularExpression(R"(^\d{0,9}(\.\d{0,3})?$)"), this);
+    ui->FormAmount_2->setValidator(amtVal2);
+
+    // ── Boutons ±1 DT (form ajout) ──────────────────────────────────────
+    const QString spinBtnStyle =
+        "QPushButton { background:#1F8E95; color:white; border:none; border-radius:6px;"
+        "  font-size:16px; font-weight:900; min-width:28px; max-width:30px; }"
+        "QPushButton:hover  { background:#17727a; }"
+        "QPushButton:pressed{ background:#0f5560; }";
+
+    ui->BtnAmountDecr->setStyleSheet(spinBtnStyle);
+    ui->BtnAmountIncr->setStyleSheet(spinBtnStyle);
+    ui->BtnAmountDecr_2->setStyleSheet(spinBtnStyle);
+    ui->BtnAmountIncr_2->setStyleSheet(spinBtnStyle);
+
+    // Helper : lire, modifier de ±step, réécrire — bloqué à 0.001 minimum
+    auto adjustAmount = [](QLineEdit *field, double step) {
+        bool ok = false;
+        double val = field->text().replace(',', '.').toDouble(&ok);
+        if (!ok) val = 0.0;
+        val += step;
+        if (val < 0.001) val = 0.001;
+        field->setText(QString::number(val, 'f', 3));
+    };
+
+    connect(ui->BtnAmountDecr,   &QPushButton::clicked, this, [this, adjustAmount]{ adjustAmount(ui->FormAmount,   -1.0); });
+    connect(ui->BtnAmountIncr,   &QPushButton::clicked, this, [this, adjustAmount]{ adjustAmount(ui->FormAmount,   +1.0); });
+    connect(ui->BtnAmountDecr_2, &QPushButton::clicked, this, [this, adjustAmount]{ adjustAmount(ui->FormAmount_2, -1.0); });
+    connect(ui->BtnAmountIncr_2, &QPushButton::clicked, this, [this, adjustAmount]{ adjustAmount(ui->FormAmount_2, +1.0); });
+
+    // ── Régénération automatique du code (form ajout) ───────────────────
+    auto refreshCodeAdd = [this]() {
+        ui->FormCode->setText(generateTxCode(
+            ui->FormType->currentData().toString(),
+            ui->FormPayMode->currentData().toString()));
+    };
+    connect(ui->FormType,    QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, refreshCodeAdd);
+    connect(ui->FormPayMode, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, refreshCodeAdd);
+
+    // ── Régénération automatique du code (form modifier) ────────────────
+    auto refreshCodeEdit = [this]() {
+        ui->FormCode_2->setText(generateTxCode(
+            ui->FormType_2->currentData().toString(),
+            ui->FormPayMode_2->currentData().toString()));
+    };
+    connect(ui->FormType_2,    QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, refreshCodeEdit);
+    connect(ui->FormPayMode_2, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, refreshCodeEdit);
 
     // Utilise désormais le style global (QSS) défini dans style_light.qss / style.qss
     ui->BtnConvertCurrency->setStyleSheet("");
@@ -1753,11 +1854,11 @@ void MainWindow::setupTableFinance()
     ui->TableFinance->verticalHeader()->setVisible(false);
     ui->TableFinance->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-    // 8 colonnes visibles (ID caché dans UserRole col 0)
-    ui->TableFinance->setColumnCount(8);
+    // 7 colonnes (ID caché dans UserRole col 0 — Catégorie supprimée)
+    ui->TableFinance->setColumnCount(7);
     ui->TableFinance->setSortingEnabled(true);
     ui->TableFinance->setHorizontalHeaderLabels({
-        "Code", "Type", "Montant", "Catégorie",
+        "Code", "Type", "Montant",
         "Description", "Date", "Mode", "Création"
     });
 
@@ -1793,14 +1894,14 @@ void MainWindow::loadFinance()
         ui->TableFinance->setItem(row, 1, itType);
 
         auto *itMontant = new QTableWidgetItem();
-        itMontant->setData(Qt::DisplayRole, r.montant.toDouble()); // tri numérique correct
+        itMontant->setData(Qt::UserRole,    r.montant.toDouble()); // pour le tri numérique
+        itMontant->setData(Qt::DisplayRole, QString::number(r.montant.toDouble(), 'f', 3));
         ui->TableFinance->setItem(row, 2, itMontant);
 
-        ui->TableFinance->setItem(row, 3, new QTableWidgetItem(r.categorie));
-        ui->TableFinance->setItem(row, 4, new QTableWidgetItem(r.description));
-        ui->TableFinance->setItem(row, 5, new QTableWidgetItem(r.dateTransaction));
-        ui->TableFinance->setItem(row, 6, new QTableWidgetItem(r.modePaiement));
-        ui->TableFinance->setItem(row, 7, new QTableWidgetItem(r.dateCreation));
+        ui->TableFinance->setItem(row, 3, new QTableWidgetItem(r.description));
+        ui->TableFinance->setItem(row, 4, new QTableWidgetItem(r.dateTransaction));
+        ui->TableFinance->setItem(row, 5, new QTableWidgetItem(r.modePaiement));
+        ui->TableFinance->setItem(row, 6, new QTableWidgetItem(r.dateCreation));
 
         row++;
     }
@@ -2003,9 +2104,7 @@ void MainWindow::on_BtnAdd_clicked()
 {
     ui->stacked_F->setCurrentIndex(1); // ajouterF
 
-    ui->FormCode->clear();
     ui->FormAmount->clear();
-    ui->FormCategory->clear();
     ui->FormDesc->clear();
 
     ui->FormType->setCurrentIndex(0);
@@ -2013,6 +2112,11 @@ void MainWindow::on_BtnAdd_clicked()
 
     ui->FormDate->setDate(QDate::currentDate());
     ui->FormCreatedAt->setDate(QDate::currentDate());
+
+    // Générer le code initial (type=Depense, mode=especes par défaut)
+    ui->FormCode->setText(generateTxCode(
+        ui->FormType->currentData().toString(),
+        ui->FormPayMode->currentData().toString()));
 }
 
 void MainWindow::on_BtnPopupCancelFinance_clicked()
@@ -2022,46 +2126,26 @@ void MainWindow::on_BtnPopupCancelFinance_clicked()
 
 void MainWindow::on_BtnPopupSaveFinance_clicked()
 {
-    const QString code = ui->FormCode->text().trimmed();
     const QString type = ui->FormType->currentData().toString();
     const QString mode = ui->FormPayMode->currentData().toString();
-    const QString cat  = ui->FormCategory->text().trimmed();
     const QString desc = ui->FormDesc->text().trimmed();
     const QDate   dt   = ui->FormDate->date();
     const QDate   dc   = ui->FormCreatedAt->date();
 
-    // --- Validation CODE ---
-    if (code.isEmpty()) {
-        QMessageBox::warning(this, "Ajout", "Le code transaction est obligatoire.");
-        ui->FormCode->setFocus();
-        return;
-    }
-    // Exemple de format conseillé: TRX001 / FIN-2026-01 ...
-    static const QRegularExpression reCode(R"(^[A-Za-z0-9_-]{3,20}$)");
-    if (!reCode.match(code).hasMatch()) {
-        QMessageBox::warning(this, "Ajout",
-                             "Code invalide.\nUtilise 3 à 20 caractères (lettres/chiffres/_/-).");
-        ui->FormCode->setFocus();
-        return;
-    }
+    // Code auto-généré ; régénérer si vide par sécurité
+    QString code = ui->FormCode->text().trimmed();
+    if (code.isEmpty())
+        code = generateTxCode(type, mode);
 
-    // --- Validation Catégorie ---
-    if (cat.isEmpty()) {
-        QMessageBox::warning(this, "Ajout", "La catégorie est obligatoire.");
-        ui->FormCategory->setFocus();
-        return;
-    }
+    // Catégorie auto-dérivée du type (valeurs ASCII sans accent pour Oracle)
+    const QString cat = (type == "Revenu") ? "Revenu" : "Depense";
 
     // --- Validation Montant ---
     bool okAmount = false;
     const double montant = ui->FormAmount->text().trimmed().toDouble(&okAmount);
-    if (!okAmount) {
-        QMessageBox::warning(this, "Ajout", "Montant invalide (nombre attendu).");
-        ui->FormAmount->setFocus();
-        return;
-    }
-    if (montant <= 0.0) {
-        QMessageBox::warning(this, "Ajout", "Le montant doit être strictement positif.");
+    if (!okAmount || montant <= 0.0) {
+        QMessageBox::warning(this, "Ajout",
+                             "Montant invalide. Entrez un nombre positif.");
         ui->FormAmount->setFocus();
         return;
     }
@@ -2073,12 +2157,11 @@ void MainWindow::on_BtnPopupSaveFinance_clicked()
     }
     if (dc < dt) {
         QMessageBox::warning(this, "Ajout",
-                             "La date de création ne doit pas être avant la date de transaction.");
+                             "La date de création ne peut pas être avant la date de transaction.");
         return;
     }
 
     const QString IDEMP = Session::instance().getId();
-
     Finance f(code, type, montant, cat, desc, dt, mode, dc, IDEMP);
 
     QString err;
@@ -2105,8 +2188,6 @@ void MainWindow::on_BtnEdit_clicked()
         return;
     }
 
-    ui->FormCode_2->setText(ui->TableFinance->item(r,0)->text());
-
     // TYPE : lire la valeur DB depuis UserRole (ex: "Depense") pour findData
     const QString typeDb = ui->TableFinance->item(r,1)->data(Qt::UserRole).toString();
     int idxType = ui->FormType_2->findData(typeDb);
@@ -2114,23 +2195,27 @@ void MainWindow::on_BtnEdit_clicked()
 
     // Montant : stocké en DisplayRole (double), on récupère la chaîne formatée
     const double montantVal = ui->TableFinance->item(r,2)->data(Qt::DisplayRole).toDouble();
-    ui->FormAmount_2->setText(QString::number(montantVal, 'f', 2));
-    ui->FormCategory_2->setText(ui->TableFinance->item(r,3)->text());
-    ui->FormDesc_2->setText(ui->TableFinance->item(r,4)->text());
+    ui->FormAmount_2->setText(QString::number(montantVal, 'f', 3));
+    ui->FormDesc_2->setText(ui->TableFinance->item(r,3)->text());
 
     // Date transaction safe
-    QDate dt = QDate::fromString(ui->TableFinance->item(r,5)->text(), "yyyy-MM-dd");
+    QDate dt = QDate::fromString(ui->TableFinance->item(r,4)->text(), "yyyy-MM-dd");
     ui->FormDate_2->setDate(dt.isValid() ? dt : QDate::currentDate());
 
     // MODE : data == "especes/cheque/..."
-    const QString modeDb = ui->TableFinance->item(r,6)->text();
+    const QString modeDb = ui->TableFinance->item(r,5)->text();
     int idxMode = ui->FormPayMode_2->findData(modeDb);
     if (idxMode < 0) idxMode = ui->FormPayMode_2->findText(modeDb);
     ui->FormPayMode_2->setCurrentIndex(qMax(0, idxMode));
 
     // Date création safe
-    QDate dc = QDate::fromString(ui->TableFinance->item(r,7)->text(), "yyyy-MM-dd");
+    QDate dc = QDate::fromString(ui->TableFinance->item(r,6)->text(), "yyyy-MM-dd");
     ui->FormCreatedAt_2->setDate(dc.isValid() ? dc : QDate::currentDate());
+
+    // Code généré selon le type+mode chargés
+    ui->FormCode_2->setText(generateTxCode(
+        ui->FormType_2->currentData().toString(),
+        ui->FormPayMode_2->currentData().toString()));
 
     ui->stacked_F->setCurrentIndex(2); // modifierF
 }
@@ -2148,42 +2233,26 @@ void MainWindow::on_BtnPopupSaveFinance_2_clicked()
         return;
     }
 
-    const QString code = ui->FormCode_2->text().trimmed();
     const QString type = ui->FormType_2->currentData().toString();
     const QString mode = ui->FormPayMode_2->currentData().toString();
-    const QString cat  = ui->FormCategory_2->text().trimmed();
     const QString desc = ui->FormDesc_2->text().trimmed();
     const QDate   dt   = ui->FormDate_2->date();
     const QDate   dc   = ui->FormCreatedAt_2->date();
 
-    if (code.isEmpty()) {
-        QMessageBox::warning(this, "Modifier", "Le code transaction est obligatoire.");
-        ui->FormCode_2->setFocus();
-        return;
-    }
-    static const QRegularExpression reCode(R"(^[A-Za-z0-9_-]{3,20}$)");
-    if (!reCode.match(code).hasMatch()) {
-        QMessageBox::warning(this, "Modifier",
-                             "Code invalide.\nUtilise 3 à 20 caractères (lettres/chiffres/_/-).");
-        ui->FormCode_2->setFocus();
-        return;
-    }
+    // Code auto-généré ; régénérer si vide par sécurité
+    QString code = ui->FormCode_2->text().trimmed();
+    if (code.isEmpty())
+        code = generateTxCode(type, mode);
 
-    if (cat.isEmpty()) {
-        QMessageBox::warning(this, "Modifier", "La catégorie est obligatoire.");
-        ui->FormCategory_2->setFocus();
-        return;
-    }
+    // Catégorie auto-dérivée du type (valeurs ASCII sans accent pour Oracle)
+    const QString cat = (type == "Revenu") ? "Revenu" : "Depense";
 
+    // --- Validation Montant ---
     bool okAmount = false;
     const double montant = ui->FormAmount_2->text().trimmed().toDouble(&okAmount);
-    if (!okAmount) {
-        QMessageBox::warning(this, "Modifier", "Montant invalide (nombre attendu).");
-        ui->FormAmount_2->setFocus();
-        return;
-    }
-    if (montant <= 0.0) {
-        QMessageBox::warning(this, "Modifier", "Le montant doit être strictement positif.");
+    if (!okAmount || montant <= 0.0) {
+        QMessageBox::warning(this, "Modifier",
+                             "Montant invalide. Entrez un nombre positif.");
         ui->FormAmount_2->setFocus();
         return;
     }
@@ -2194,7 +2263,7 @@ void MainWindow::on_BtnPopupSaveFinance_2_clicked()
     }
     if (dc < dt) {
         QMessageBox::warning(this, "Modifier",
-                             "La date de création ne doit pas être avant la date de transaction.");
+                             "La date de création ne peut pas être avant la date de transaction.");
         return;
     }
 
@@ -2261,10 +2330,8 @@ bool MainWindow::exportInternalInvoicePdf_19(const QString& filePath, const Fina
     const bool    isDepense   = (row.type == "Depense" || row.type == "Dépense");
     const QString typeLabel   = isDepense ? "DÉPENSE" : "REVENU";
 
-    QString designation = row.categorie.trimmed();
-    const QString desc = row.description.trimmed();
-    if (!desc.isEmpty() && desc != "(null)") designation += " — " + desc;
-    if (designation.isEmpty()) designation = "Transaction interne";
+    QString designation = row.description.trimmed();
+    if (designation.isEmpty() || designation == "(null)") designation = "Transaction interne";
 
     QPdfWriter pdf(filePath);
     pdf.setPageSize(QPageSize(QPageSize::A4));
@@ -2510,10 +2577,9 @@ void MainWindow::on_BtnApply_clicked()
         const QDate dt = QDate::fromString(r.dateTransaction, "yyyy-MM-dd");
         if (dt.isValid() && (dt < dateFrom || dt > dateTo)) continue;
 
-        // Filtre texte libre (code, catégorie, description)
+        // Filtre texte libre (code, description)
         if (!search.isEmpty()) {
             const bool match = r.code.toLower().contains(search)
-                            || r.categorie.toLower().contains(search)
                             || r.description.toLower().contains(search);
             if (!match) continue;
         }
@@ -2529,14 +2595,14 @@ void MainWindow::on_BtnApply_clicked()
         ui->TableFinance->setItem(row, 1, itType);
 
         auto *itMontant = new QTableWidgetItem();
-        itMontant->setData(Qt::DisplayRole, r.montant.toDouble());
+        itMontant->setData(Qt::UserRole,    r.montant.toDouble());
+        itMontant->setData(Qt::DisplayRole, QString::number(r.montant.toDouble(), 'f', 3));
         ui->TableFinance->setItem(row, 2, itMontant);
 
-        ui->TableFinance->setItem(row, 3, new QTableWidgetItem(r.categorie));
-        ui->TableFinance->setItem(row, 4, new QTableWidgetItem(r.description));
-        ui->TableFinance->setItem(row, 5, new QTableWidgetItem(r.dateTransaction));
-        ui->TableFinance->setItem(row, 6, new QTableWidgetItem(r.modePaiement));
-        ui->TableFinance->setItem(row, 7, new QTableWidgetItem(r.dateCreation));
+        ui->TableFinance->setItem(row, 3, new QTableWidgetItem(r.description));
+        ui->TableFinance->setItem(row, 4, new QTableWidgetItem(r.dateTransaction));
+        ui->TableFinance->setItem(row, 5, new QTableWidgetItem(r.modePaiement));
+        ui->TableFinance->setItem(row, 6, new QTableWidgetItem(r.dateCreation));
         row++;
     }
     ui->TableFinance->setSortingEnabled(true);
@@ -2600,6 +2666,44 @@ QString MainWindow::selectedPublicationId() const
     return item->data(Qt::UserRole).toString();
 }
 
+// --- Publication duplicate-check helpers -----------------------------------
+static bool pubTitreExists(const QString &titre, const QString &excludeId)
+{
+    if (titre.trimmed().isEmpty()) return false;
+    QSqlQuery q;
+    q.prepare("SELECT COUNT(*) FROM PUBLICATIONS "
+              "WHERE UPPER(TITRE) = UPPER(:v) AND TO_CHAR(ID_PUBLICATION) != :eid");
+    q.bindValue(":v", titre.trimmed());
+    q.bindValue(":eid", excludeId.isEmpty() ? "-1" : excludeId);
+    return q.exec() && q.next() && q.value(0).toInt() > 0;
+}
+
+static bool pubNumeroExists(const QString &numStr, const QString &excludeId)
+{
+    bool ok = false;
+    int num = numStr.trimmed().toInt(&ok);
+    if (!ok || num <= 0) return false;
+    QSqlQuery q;
+    q.prepare("SELECT COUNT(*) FROM PUBLICATIONS "
+              "WHERE NUMERO_BREVET = :v AND TO_CHAR(ID_PUBLICATION) != :eid");
+    q.bindValue(":v", num);
+    q.bindValue(":eid", excludeId.isEmpty() ? "-1" : excludeId);
+    return q.exec() && q.next() && q.value(0).toInt() > 0;
+}
+
+static void applyDupStyle(QLineEdit *f, bool dup, const QString &msg)
+{
+    if (dup) {
+        f->setStyleSheet("QLineEdit { border: 2px solid #e05050; background-color: #fff0f0; }");
+        f->setToolTip(msg);
+        QToolTip::showText(f->mapToGlobal(QPoint(0, f->height())), msg, f, QRect(), 3000);
+    } else {
+        f->setStyleSheet("");
+        f->setToolTip("");
+    }
+}
+// ---------------------------------------------------------------------------
+
 void MainWindow::initPublicationUi()
 {
     ui->tablePublication->setColumnCount(8);
@@ -2619,6 +2723,48 @@ void MainWindow::initPublicationUi()
     ui->tablePublication->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tablePublication->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tablePublication->verticalHeader()->setVisible(false);
+
+    // Explicit connect (safety net over auto-connect)
+    connect(ui->btnModifierPub, &QPushButton::clicked,
+            this, &MainWindow::on_btnModifierPub_clicked);
+
+    // Double-click on row opens edit form directly
+    connect(ui->tablePublication, &QTableWidget::cellDoubleClicked,
+            this, [this](int, int){ on_btnModifierPub_clicked(); });
+
+    // --- Duplicate check – Add form (500 ms debounce) ---
+    m_pubTimerAdd = new QTimer(this);
+    m_pubTimerAdd->setSingleShot(true);
+    m_pubTimerAdd->setInterval(500);
+    connect(ui->lineTitreAdd,        &QLineEdit::textChanged,
+            m_pubTimerAdd, QOverload<>::of(&QTimer::start));
+    connect(ui->lineNumeroBrevetAdd, &QLineEdit::textChanged,
+            m_pubTimerAdd, QOverload<>::of(&QTimer::start));
+    connect(m_pubTimerAdd, &QTimer::timeout, this, [this](){
+        applyDupStyle(ui->lineTitreAdd,
+                      pubTitreExists(ui->lineTitreAdd->text(), ""),
+                      "Ce titre existe déjà");
+        applyDupStyle(ui->lineNumeroBrevetAdd,
+                      pubNumeroExists(ui->lineNumeroBrevetAdd->text(), ""),
+                      "Ce numéro de brevet existe déjà");
+    });
+
+    // --- Duplicate check – Edit form (500 ms debounce) ---
+    m_pubTimerEdit = new QTimer(this);
+    m_pubTimerEdit->setSingleShot(true);
+    m_pubTimerEdit->setInterval(500);
+    connect(ui->lineTitreEdit,        &QLineEdit::textChanged,
+            m_pubTimerEdit, QOverload<>::of(&QTimer::start));
+    connect(ui->lineNumeroBrevetEdit, &QLineEdit::textChanged,
+            m_pubTimerEdit, QOverload<>::of(&QTimer::start));
+    connect(m_pubTimerEdit, &QTimer::timeout, this, [this](){
+        applyDupStyle(ui->lineTitreEdit,
+                      pubTitreExists(ui->lineTitreEdit->text(), idPublicationToEdit),
+                      "Ce titre existe déjà");
+        applyDupStyle(ui->lineNumeroBrevetEdit,
+                      pubNumeroExists(ui->lineNumeroBrevetEdit->text(), idPublicationToEdit),
+                      "Ce numéro de brevet existe déjà");
+    });
 }
 
 void MainWindow::loadPublications()
@@ -2714,7 +2860,7 @@ void MainWindow::on_btnAddPub_clicked()
         }
     }
 
-    QString idEmp = "7"; // remplace par l'id de l'utilisateur connecté si tu l'as
+    QString idEmp = Session::instance().getId();
 
     Publication p(
         titre,
@@ -2753,43 +2899,48 @@ void MainWindow::on_btnModifierPub_clicked()
 {
     int row = ui->tablePublication->currentRow();
     if (row < 0) {
-        QMessageBox::warning(this, "Modification", "Veuillez selectionner une publication.");
-        return;
+        if (ui->tablePublication->rowCount() == 0) {
+            QMessageBox::information(this, "Modifier", "Aucune publication disponible.");
+            return;
+        }
+        ui->tablePublication->selectRow(0);
+        row = 0;
     }
 
     idPublicationToEdit = selectedPublicationId();
     if (idPublicationToEdit.isEmpty()) {
-        QMessageBox::warning(this, "Modification", "ID publication introuvable.");
+        QMessageBox::warning(this, "Modifier", "ID publication introuvable.");
         return;
     }
 
-    ui->lineTitreEdit->setText(ui->tablePublication->item(row, 0)->text());
-    ui->lineInventeursEdit->setText(ui->tablePublication->item(row, 1)->text());
-    ui->lineDomaineEdit->setText(ui->tablePublication->item(row, 2)->text());
+    // Null-safe item access
+    auto txt = [&](int col) -> QString {
+        auto *it = ui->tablePublication->item(row, col);
+        return it ? it->text() : "";
+    };
+
+    ui->lineTitreEdit->setText(txt(0));
+    ui->lineInventeursEdit->setText(txt(1));
+    ui->lineDomaineEdit->setText(txt(2));
 
     {
-        QString type = ui->tablePublication->item(row, 3)->text();
-        int idx = ui->comboTypeBrevetEdit->findText(type);
+        int idx = ui->comboTypeBrevetEdit->findText(txt(3));
         if (idx >= 0) ui->comboTypeBrevetEdit->setCurrentIndex(idx);
     }
 
-    ui->lineNumeroBrevetEdit->setText(ui->tablePublication->item(row, 4)->text());
+    ui->lineNumeroBrevetEdit->setText(txt(4));
 
     {
-        QDate d = QDate::fromString(ui->tablePublication->item(row, 5)->text(), "yyyy-MM-dd");
-        if (d.isValid())
-            ui->dateDepotEdit->setDate(d);
-        else
-            ui->dateDepotEdit->setDate(QDate::currentDate());
+        QDate d = QDate::fromString(txt(5), "yyyy-MM-dd");
+        ui->dateDepotEdit->setDate(d.isValid() ? d : QDate::currentDate());
     }
 
     {
-        QString statut = ui->tablePublication->item(row, 6)->text();
-        int idx = ui->comboStatusBrevetEdit->findText(statut);
+        int idx = ui->comboStatusBrevetEdit->findText(txt(6));
         if (idx >= 0) ui->comboStatusBrevetEdit->setCurrentIndex(idx);
     }
 
-    ui->lineResumeEdit->setText(ui->tablePublication->item(row, 7)->text());
+    ui->lineResumeEdit->setText(txt(7));
 
     ui->stack_pub->setCurrentIndex(2);
 }
@@ -2830,7 +2981,7 @@ void MainWindow::on_btnConfirmEditPub_clicked()
         }
     }
 
-    QString idEmp = "7"; // remplace par l'id session si disponible
+    QString idEmp = Session::instance().getId();
 
     Publication p(
         titre,
