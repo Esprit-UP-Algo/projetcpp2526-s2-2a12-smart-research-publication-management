@@ -49,10 +49,15 @@ public:
 
     static bool chargerTout(QVector<Row> &out, const QString &orderBy = "SKU", QString *err = nullptr);
 
+    /// Types distincts présents en base (pour le filtre inventaire).
+    static bool typesDistincts(QVector<QString> &out, QString *err = nullptr);
+
     // ── Search / filter ───────────────────────────────────────────────────────
     static bool chercher(QVector<Row> &out,
                          const QString &keyword,
+                         const QString &zone,
                          const QString &status,
+                         const QString &type,
                          const QString &orderBy = "SKU",
                          QString *err = nullptr);
 

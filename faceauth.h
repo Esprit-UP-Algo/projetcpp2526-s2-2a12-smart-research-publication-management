@@ -6,11 +6,9 @@
 
 class FaceAuth {
 public:
-    FaceAuth(); // Le constructeur
 
-    // CETTE LIGNE DOIT ÊTRE EXACTEMENT COMME ÇA :
+    FaceAuth(); // <-- Vérifie que cette ligne est bien là !
     bool identifierUtilisateur(const QString& employeeID);
-
 private:
     cv::CascadeClassifier faceCascade;
 };

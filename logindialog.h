@@ -20,6 +20,8 @@ private slots:
 
     void on_Quitter_clicked();
     void on_btnFaceID_clicked();
+    void on_btnForgotPass_clicked();
+
 
 
 private:

@@ -1,81 +1,74 @@
 #include "faceauth.h"
-#include <QCoreApplication>
-#include <QDir>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QHttpMultiPart>
+#include <QHttpPart>
+#include <QEventLoop>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QDebug>
 
-FaceAuth::FaceAuth() {
-    // 1. Chercher le fichier de détection dans le dossier de l'exécutable
-    QString xmlPath = QCoreApplication::applicationDirPath() + "/haarcascade_frontalface_default.xml";
-
-    if (!faceCascade.load(xmlPath.toStdString())) {
-        qDebug() << "!!! ERREUR : Fichier XML introuvable à :" << xmlPath;
-    } else {
-        qDebug() << "Succès : Modèle de détection chargé.";
-    }
-}
+// CORRECTION : Définition du constructeur
+FaceAuth::FaceAuth() {}
 
 bool FaceAuth::identifierUtilisateur(const QString& employeeID) {
     cv::VideoCapture cap(0);
     if (!cap.isOpened()) return false;
 
-    // --- PRÉPARATION DE LA PHOTO DE RÉFÉRENCE ---
-    QString photoPath = QCoreApplication::applicationDirPath() + "/faces/" + employeeID + ".jpg";
-    cv::Mat refImage = cv::imread(photoPath.toStdString(), cv::IMREAD_GRAYSCALE);
+    cv::Mat frame;
+    for(int i = 0; i < 30; i++) {
+        cap >> frame;
+        if (frame.empty()) continue;
+        cv::flip(frame, frame, 1);
+        cv::imshow("Scan FaceID - Cadrez votre visage", frame);
+        if (cv::waitKey(30) >= 0) break;
+    }
+    cv::destroyAllWindows();
 
-    if (refImage.empty()) {
-        qDebug() << "!!! ERREUR : Photo introuvable à :" << photoPath;
+    if (frame.empty()) {
+        cap.release();
         return false;
     }
 
-    // Égalisation pour que la photo ne soit pas trop sombre/claire
-    cv::equalizeHist(refImage, refImage);
+    // Encodage JPG
+    std::vector<uchar> buf;
+    cv::imencode(".jpg", frame, buf);
+    QByteArray imageData(reinterpret_cast<const char*>(buf.data()), static_cast<int>(buf.size()));
 
-    cv::Mat frame, gray;
-    for (int i = 0; i < 200; i++) { // Environ 6-7 secondes de scan
-        cap >> frame;
-        if (frame.empty()) continue;
+    // Envoi HTTP
+    QNetworkAccessManager manager;
+    QEventLoop loop;
+    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 
-        cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
-        // Égalisation du flux direct pour matcher avec la photo
-        cv::equalizeHist(gray, gray);
+    QHttpPart idPart;
+    idPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"id\""));
+    idPart.setBody(employeeID.toUtf8());
 
-        std::vector<cv::Rect> faces;
-        faceCascade.detectMultiScale(gray, faces, 1.1, 5, 0, cv::Size(100, 100));
+    QHttpPart imagePart;
+    imagePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"face\"; filename=\"face.jpg\""));
+    imagePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("image/jpeg"));
+    imagePart.setBody(imageData);
 
-        for (const auto& area : faces) {
-            // Extraction et redimensionnement
-            cv::Mat faceROI = gray(area);
-            cv::resize(faceROI, faceROI, refImage.size());
+    multiPart->append(idPart);
+    multiPart->append(imagePart);
 
-            // Comparaison
-            cv::Mat result;
-            cv::matchTemplate(faceROI, refImage, result, cv::TM_CCOEFF_NORMED);
-            double minVal, maxVal;
-            cv::minMaxLoc(result, &minVal, &maxVal);
+    QNetworkRequest request(QUrl("http://127.0.0.1:5000/verify"));
+    QNetworkReply *reply = manager.post(request, multiPart);
+    multiPart->setParent(reply);
 
-            qDebug() << "SCORE : " << maxVal;
+    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
 
-            // --- SEUIL AJUSTÉ À 0.25 (Plus réaliste pour matchTemplate) ---
-            if (maxVal > 0.25) {
-                qDebug() << "MATCH RÉUSSI !";
-                cv::rectangle(frame, area, cv::Scalar(0, 255, 0), 4); // Rectangle Vert épais
-                cv::imshow("Scan FaceID", frame);
-                cv::waitKey(500); // Petite pause pour voir le succès
-                cap.release();
-                cv::destroyAllWindows();
-                return true;
-            }
-
-            // Rectangle Rouge tant que ce n'est pas bon
-            cv::rectangle(frame, area, cv::Scalar(0, 0, 255), 2);
-        }
-
-        cv::imshow("Scan FaceID - Restez face à l'objectif", frame);
-        if (cv::waitKey(30) == 27) break; // Echap pour quitter
+    bool isVerified = false;
+    if (reply->error() == QNetworkReply::NoError) {
+        QJsonDocument json = QJsonDocument::fromJson(reply->readAll());
+        isVerified = json.object().value("verified").toBool();
+        qDebug() << "FaceID Score Result:" << isVerified;
+    } else {
+        qDebug() << "Erreur Réseau:" << reply->errorString();
     }
 
+    reply->deleteLater();
     cap.release();
-    cv::destroyAllWindows();
-    return false;
+    return isVerified;
 }
-

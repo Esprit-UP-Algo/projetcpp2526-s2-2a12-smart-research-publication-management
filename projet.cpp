@@ -21,7 +21,7 @@ Projet::Projet(QString nom, QString description, QString objectifs,
 bool Projet::nextId(int &outId, QString *err)
 {
     QSqlQuery q;
-    if (!q.exec("SELECT NVL(MAX(ID_PROJET),0)+1 FROM HICHEM.PROJETS")) {
+    if (!q.exec("SELECT NVL(MAX(ID_PROJET),0)+1 FROM PROJETS")) {
         setErr(err, q.lastError().text());
         return false;
     }
@@ -37,7 +37,7 @@ bool Projet::ajouter(int idemp, QString *err) const
 
     QSqlQuery q;
     q.prepare(
-        "INSERT INTO HICHEM.PROJETS "
+        "INSERT INTO PROJETS "
         "(ID_PROJET, NOM_PROJET, DESCRIPTION, OBJECTIFS, DATE_DEBUT, "
         " DATE_FIN_PREVUE, DATE_FIN_REELLE, STATUT, PRIORITE, IDEMP) "
         "VALUES "
@@ -55,7 +55,7 @@ bool Projet::ajouter(int idemp, QString *err) const
     if (m_dateFinReelle.isValid())
         q.bindValue(":dfr", m_dateFinReelle);
     else
-        q.bindValue(":dfr", QVariant(QVariant::Date));
+        q.bindValue(":dfr", QVariant(QMetaType::fromType<QDate>()));
 
     q.bindValue(":statut", m_statut);
     q.bindValue(":prio", m_priorite);
@@ -81,7 +81,7 @@ bool Projet::modifier(const QString& id,
 {
     QSqlQuery q;
     q.prepare(
-        "UPDATE HICHEM.PROJETS SET "
+        "UPDATE PROJETS SET "
         "NOM_PROJET=:nom, DESCRIPTION=:desc, OBJECTIFS=:obj, "
         "DATE_DEBUT=:dd, DATE_FIN_PREVUE=:dfp, DATE_FIN_REELLE=:dfr, "
         "STATUT=:statut, PRIORITE=:prio "
@@ -97,7 +97,7 @@ bool Projet::modifier(const QString& id,
     if (dateFinReelle.isValid())
         q.bindValue(":dfr", dateFinReelle);
     else
-        q.bindValue(":dfr", QVariant(QVariant::Date));
+        q.bindValue(":dfr", QVariant(QMetaType::fromType<QDate>()));
 
     q.bindValue(":statut", statut);
     q.bindValue(":prio", priorite);
@@ -113,7 +113,7 @@ bool Projet::modifier(const QString& id,
 bool Projet::supprimer(const QString& id, QString *err)
 {
     QSqlQuery q;
-    q.prepare("DELETE FROM HICHEM.PROJETS WHERE ID_PROJET=:id");
+    q.prepare("DELETE FROM PROJETS WHERE ID_PROJET=:id");
     q.bindValue(":id", id);
 
     if (!q.exec()) {
@@ -133,7 +133,7 @@ bool Projet::chargerTout(QVector<Row>& out, QString *err)
         "TO_CHAR(DATE_FIN_PREVUE,'YYYY-MM-DD'), "
         "TO_CHAR(DATE_FIN_REELLE,'YYYY-MM-DD'), "
         "STATUT, PRIORITE, IDEMP "
-        "FROM HICHEM.PROJETS "
+        "FROM PROJETS "
         "ORDER BY ID_PROJET DESC"
         );
 

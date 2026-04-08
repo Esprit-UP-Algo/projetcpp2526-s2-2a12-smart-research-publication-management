@@ -63,7 +63,15 @@ public:
 
     // Utilitaires
     static bool usernameExiste(const QString &username);
+    /** \a excludeIdEmploye vide = ajout ; sinon on ignore cette ligne (modification). */
+    static bool emailExiste(const QString &email, const QString &excludeIdEmploye = QString());
 
+    /** Force du mot de passe 0–100 (même règle que la barre de l’UI création employé). */
+    static int motDePasseForcePourcent(const QString &password);
+    /** True si le mot de passe atteint au moins le niveau « Fort » (barre ≥ seuil). */
+    static bool motDePasseAcceptable(const QString &password);
+    //existe
+    static bool existe(const QString &cin, const QString &excludeId = "");
 private:
     // Générateur d'ID interne
     static bool nextId(int &outId, QString *err = nullptr);

@@ -5,6 +5,7 @@
 #include <QSqlRecord>
 #include <QVariant>
 #include <QDebug>
+#include <algorithm>
 
 static void setErr(QString *err, const QString &msg) {
     if (err) *err = msg;
@@ -32,7 +33,7 @@ Inventory::Inventory(QString name, QString sku, QString type, int qtAv, int qtRs
 bool Inventory::nextId(int &outId, QString *err)
 {
     QSqlQuery q;
-    if (!q.exec("SELECT NVL(MAX(ID_PRODUCT), 0) + 1 FROM HICHEM.PRODUCT")) {
+    if (!q.exec("SELECT NVL(MAX(ID_PRODUCT), 0) + 1 FROM PRODUCT")) {
         setErr(err, q.lastError().text());
         return false;
     }
@@ -51,46 +52,60 @@ bool Inventory::ajouter(QString *err) const
 
     QSqlQuery q;
     q.prepare(
-        "INSERT INTO HICHEM.PRODUCT "
+        "INSERT INTO PRODUCT "
         "(ID_PRODUCT, SKU, QT_AV, STATUS, IDEMP, NAME, PRICE, TYPE, QT_RS, THRESHOLD, UNIT, ZONE, SHELF, DESCR) "
-        "VALUES (:id, :sku, :qt, :status, (SELECT NVL(MIN(ID_EMPLOYE), 0) FROM EMPLOYES), :name, :price, :type, :qtr, :thr, :unit, :zone, :shelf, :desc)"
+        "VALUES (:id, :sku, :qt, :status, (SELECT NVL(MIN(ID_EMPLOYE), 1) FROM EMPLOYES), :name, :price, :type, :qtr, :thr, :unit, :zone, :shelf, :desc)"
     );
     q.bindValue(":id",     newId);
     q.bindValue(":sku",    m_sku);
-    q.bindValue(":qt",     QString::number(m_qtAv));
+    q.bindValue(":qt",     m_qtAv);
     q.bindValue(":status", m_status);
     q.bindValue(":name",   m_name);
     q.bindValue(":price",  m_price);
     q.bindValue(":type",   m_type);
-    q.bindValue(":qtr",    QString::number(m_qtRs));
-    q.bindValue(":thr",    QString::number(m_threshold));
+    q.bindValue(":qtr",    m_qtRs);
+    q.bindValue(":thr",    m_threshold);
     q.bindValue(":unit",   m_unit);
     q.bindValue(":zone",   m_zone);
 
-    // SHELF is NUMBER in DB, but UI has "RDC", "1st floor" etc.
-    // Try to convert to number, or use 0 if it's text to prevent ORA-01722
-    bool ok;
-    int shelfNum = m_shelf.toInt(&ok);
-    q.bindValue(":shelf", ok ? shelfNum : 0); 
+    // If shelf is text and column is numeric, try a fallback
+    bool shelfOk;
+    int shelfNum = m_shelf.toInt(&shelfOk);
+    if (shelfOk) q.bindValue(":shelf", shelfNum);
+    else q.bindValue(":shelf", m_shelf); // Try string anyway, handler will catch ORA-01722
+
 
     q.bindValue(":desc",   m_description);
 
+
     if (!q.exec()) {
         QString e = q.lastError().text();
-        if (e.contains("ORA-00904")) {
+        if (e.contains("ORA-00904") || e.contains("ORA-01722")) {
              QSqlQuery alter;
-             // Add columns one by one if they might be missing. This avoids failure if some exist.
-             alter.exec("ALTER TABLE HICHEM.PRODUCT ADD NAME VARCHAR2(200)");
-             alter.exec("ALTER TABLE HICHEM.PRODUCT ADD PRICE NUMBER");
-             alter.exec("ALTER TABLE HICHEM.PRODUCT ADD TYPE VARCHAR2(100)");
-             alter.exec("ALTER TABLE HICHEM.PRODUCT ADD QT_RS NUMBER");
-             alter.exec("ALTER TABLE HICHEM.PRODUCT ADD THRESHOLD NUMBER");
-             alter.exec("ALTER TABLE HICHEM.PRODUCT ADD UNIT VARCHAR2(50)");
-             alter.exec("ALTER TABLE HICHEM.PRODUCT ADD ZONE VARCHAR2(100)");
-             alter.exec("ALTER TABLE HICHEM.PRODUCT ADD SHELF VARCHAR2(100)");
-             alter.exec("ALTER TABLE HICHEM.PRODUCT ADD DESCR VARCHAR2(2000)");
+             // Ensure columns exist and have correct types
+             alter.exec("ALTER TABLE PRODUCT ADD NAME VARCHAR2(200)");
+             alter.exec("ALTER TABLE PRODUCT ADD PRICE NUMBER");
+             alter.exec("ALTER TABLE PRODUCT ADD TYPE VARCHAR2(100)");
+             alter.exec("ALTER TABLE PRODUCT ADD QT_RS NUMBER");
+             alter.exec("ALTER TABLE PRODUCT ADD THRESHOLD NUMBER");
+             alter.exec("ALTER TABLE PRODUCT ADD UNIT VARCHAR2(50)");
+             alter.exec("ALTER TABLE PRODUCT ADD ZONE VARCHAR2(100)");
+             
+             // Fix SHELF: If it's already a NUMBER, ORA-01722 occurs if we try to insert "1st floor".
+             // We attempt to change it to VARCHAR2(100) if it already exists as NUMBER.
+             if (!alter.exec("ALTER TABLE PRODUCT ADD SHELF VARCHAR2(100)")) {
+                 // If it fails because column already exists, try MODIFY
+                 alter.exec("ALTER TABLE PRODUCT MODIFY SHELF VARCHAR2(100)");
+             }
+
+             alter.exec("ALTER TABLE PRODUCT ADD DESCR VARCHAR2(2000)");
+
+             // Finally try adding IDEMP if missing
+             alter.exec("ALTER TABLE PRODUCT ADD IDEMP NUMBER");
+
              if (q.exec()) return true;
         }
+
         setErr(err, q.lastError().text());
         return false;
     }
@@ -106,33 +121,35 @@ bool Inventory::modifier(const QString &idProduct,
 {
     QSqlQuery q;
     q.prepare(
-        "UPDATE HICHEM.PRODUCT SET "
+        "UPDATE PRODUCT SET "
         "QT_AV=:qt, STATUS=:status, SKU=:sku, NAME=:name, PRICE=:price, TYPE=:type, QT_RS=:qtr, THRESHOLD=:thr, UNIT=:unit, ZONE=:zone, SHELF=:shelf, DESCR=:desc "
         "WHERE ID_PRODUCT=:id"
     );
-    q.bindValue(":qt",     QString::number(qtAv));
+    q.bindValue(":qt",     qtAv);
     q.bindValue(":status", status);
     q.bindValue(":sku",    sku);
     q.bindValue(":name",   name);
     q.bindValue(":price",  price);
     q.bindValue(":type",   type);
-    q.bindValue(":qtr",    QString::number(qtRs));
-    q.bindValue(":thr",    QString::number(threshold));
+    q.bindValue(":qtr",    qtRs);
+    q.bindValue(":thr",    threshold);
     q.bindValue(":unit",   unit);
     q.bindValue(":zone",   zone);
 
-    bool ok;
-    int shelfNum = shelf.toInt(&ok);
-    q.bindValue(":shelf", ok ? shelfNum : 0);
+    bool shelfOk;
+    int shelfNum = shelf.toInt(&shelfOk);
+    if (shelfOk) q.bindValue(":shelf", shelfNum);
+    else q.bindValue(":shelf", shelf);
 
     q.bindValue(":desc",   description);
     q.bindValue(":id",     idProduct);
 
+
     if (!q.exec()) {
         QString e = q.lastError().text();
-        if (e.contains("ORA-00904")) {
+        if (e.contains("ORA-00904") || e.contains("ORA-01722")) {
              QSqlQuery alter;
-             alter.exec("ALTER TABLE HICHEM.PRODUCT ADD DESCR VARCHAR2(2000)");
+             alter.exec("ALTER TABLE PRODUCT ADD DESCR VARCHAR2(2000)");
              if (q.exec()) return true;
         }
         setErr(err, q.lastError().text());
@@ -141,13 +158,14 @@ bool Inventory::modifier(const QString &idProduct,
     return true;
 }
 
+
 // ── DELETE ───────────────────────────────────────────────────────────────────
 bool Inventory::supprimer(const QString &idProduct,
                            const QString &sku,
                            QString *err)
 {
     QSqlQuery q;
-    q.prepare("DELETE FROM HICHEM.PRODUCT WHERE ID_PRODUCT=:id");
+    q.prepare("DELETE FROM PRODUCT WHERE ID_PRODUCT=:id");
     q.bindValue(":id",  idProduct);
     if (!q.exec()) {
         setErr(err, q.lastError().text());
@@ -182,7 +200,7 @@ bool Inventory::chargerTout(QVector<Row> &out, const QString &orderBy, QString *
     out.clear();
     QSqlQuery q;
     // Select all columns with dynamic order
-    QString sql = "SELECT * FROM HICHEM.PRODUCT ORDER BY " + orderBy;
+    QString sql = "SELECT * FROM PRODUCT ORDER BY " + orderBy;
     if (!q.exec(sql)) {
         setErr(err, q.lastError().text());
         return false;
@@ -196,44 +214,85 @@ bool Inventory::chargerTout(QVector<Row> &out, const QString &orderBy, QString *
     return true;
 }
 
-// ── SEARCH ───────────────────────────────────────────────────────────────────
-bool Inventory::chercher(QVector<Row> &out, const QString &keyword, const QString &status, const QString &orderBy, QString *err)
+bool Inventory::typesDistincts(QVector<QString> &out, QString *err)
 {
     out.clear();
-    QString sql = "SELECT * FROM HICHEM.PRODUCT WHERE 1=1";
-    
-    // Search in ID, SKU, and NAME
+    QSqlQuery q;
+    if (!q.exec("SELECT DISTINCT TYPE FROM PRODUCT "
+                "WHERE TYPE IS NOT NULL AND LENGTH(TRIM(TYPE)) > 0 "
+                "ORDER BY TYPE")) {
+        setErr(err, q.lastError().text());
+        return false;
+    }
+    while (q.next()) {
+        const QString t = q.value(0).toString().trimmed();
+        if (!t.isEmpty() && !out.contains(t))
+            out.push_back(t);
+    }
+    std::sort(out.begin(), out.end(), [](const QString &a, const QString &b) {
+        return QString::localeAwareCompare(a, b) < 0;
+    });
+    return true;
+}
+
+// ── SEARCH ───────────────────────────────────────────────────────────────────
+bool Inventory::chercher(QVector<Row> &out, const QString &keyword, const QString &zone,
+                         const QString &status, const QString &type, const QString &orderBy, QString *err)
+{
+    out.clear();
+
+    // Safely escape a string for inline SQL (prevent injection in read queries)
+    auto esc = [](const QString &s) -> QString {
+        return s.toUpper().replace("'", "''");
+    };
+
+    QString sql = "SELECT * FROM PRODUCT WHERE 1=1";
+
     if (!keyword.isEmpty()) {
-        sql += " AND (TO_CHAR(ID_PRODUCT) LIKE :kw OR UPPER(SKU) LIKE UPPER(:kw2) OR UPPER(NAME) LIKE UPPER(:kw3))";
+        const QString k = esc(keyword);
+        sql += QString(" AND (TO_CHAR(ID_PRODUCT) LIKE '%%%1%%'"
+                       " OR UPPER(SKU) LIKE '%%%1%%'"
+                       " OR UPPER(NAME) LIKE '%%%1%%')").arg(k);
+    }
+    if (!zone.isEmpty()) {
+        sql += QString(" AND UPPER(ZONE) = '%1'").arg(esc(zone));
     }
     if (!status.isEmpty()) {
-        sql += " AND STATUS=:status";
+        // Status stored as-is (mixed case in DB), do case-insensitive compare
+        sql += QString(" AND UPPER(STATUS) = '%1'").arg(esc(status));
     }
-    sql += " ORDER BY " + orderBy;
+    if (!type.isEmpty()) {
+        QString t = type;
+        t.replace(QLatin1Char('\''), QLatin1String("''"));
+        sql += QString(" AND TYPE = '%1'").arg(t);
+    }
+
+    const QString order = orderBy.isEmpty() ? "SKU" : orderBy;
+    sql += " ORDER BY " + order;
 
     QSqlQuery q;
-    q.prepare(sql);
-    if (!keyword.isEmpty()) {
-        QString like = "%" + keyword + "%";
-        q.bindValue(":kw",  like);
-        q.bindValue(":kw2", like);
-        q.bindValue(":kw3", like);
-    }
-    if (!status.isEmpty()) q.bindValue(":status", status);
-
-    if (!q.exec()) { 
-        // Fallback search if NAME doesn't exist yet
-        sql = "SELECT * FROM HICHEM.PRODUCT WHERE 1=1";
-        if (!keyword.isEmpty()) sql += " AND (UPPER(SKU) LIKE UPPER(:kw))";
-        if (!status.isEmpty()) sql += " AND STATUS=:status";
-        sql += " ORDER BY SKU";
-        q.prepare(sql);
+    if (!q.exec(sql)) {
+        // Fallback: try without NAME column (older schema) and simpler sort
+        QString sql2 = "SELECT * FROM PRODUCT WHERE 1=1";
         if (!keyword.isEmpty()) {
-            QString l = "%" + keyword + "%";
-            q.bindValue(":kw",  l);
+            const QString k = esc(keyword);
+            sql2 += QString(" AND (TO_CHAR(ID_PRODUCT) LIKE '%%%1%%' OR UPPER(SKU) LIKE '%%%1%%')").arg(k);
         }
-        if (!status.isEmpty()) q.bindValue(":status", status);
-        if (!q.exec()) { setErr(err, q.lastError().text()); return false; }
+        if (!zone.isEmpty())
+            sql2 += QString(" AND UPPER(ZONE) = '%1'").arg(esc(zone));
+        if (!status.isEmpty())
+            sql2 += QString(" AND UPPER(STATUS) = '%1'").arg(esc(status));
+        if (!type.isEmpty()) {
+            QString t = type;
+            t.replace(QLatin1Char('\''), QLatin1String("''"));
+            sql2 += QString(" AND TYPE = '%1'").arg(t);
+        }
+        sql2 += " ORDER BY SKU";
+
+        if (!q.exec(sql2)) {
+            setErr(err, q.lastError().text());
+            return false;
+        }
     }
 
     while (q.next()) {

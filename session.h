@@ -28,6 +28,7 @@ public:
 
     QString getRole() const { return m_role; }
     QString getNom()  const { return m_nomComplet; }
+    QString getId()   const { return m_id; }
 
 private:
     Session() : m_isConnected(false) {}
