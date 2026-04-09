@@ -8,6 +8,7 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
+#include <QtCharts/QSplineSeries>
 
 class QComboBox;
 class QLineEdit;

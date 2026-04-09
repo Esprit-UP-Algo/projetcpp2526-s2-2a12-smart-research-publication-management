@@ -11,7 +11,7 @@ static void setErr(QString *err, const QString& msg) {
 bool Finance::nextId(int &outId, QString *err)
 {
     QSqlQuery qid;
-    if (!qid.exec("SELECT NVL(MAX(IDFINANCE),0)+1 FROM HICHEM.FINANCE")) {
+    if (!qid.exec("SELECT NVL(MAX(IDFINANCE),0)+1 FROM FINANCE")) {
         setErr(err, qid.lastError().text());
         return false;
     }
@@ -30,7 +30,7 @@ bool Finance::ajouter(QString *err) const
 
     QSqlQuery q;
     q.prepare(
-        "INSERT INTO HICHEM.FINANCE "
+        "INSERT INTO FINANCE "
         "(IDFINANCE, CODETRANSA, TYPETRANSACTION, MONTANT, CATEGORIE, DESCRIPTION, "
         " DATETRANSACTION, MODEPAIEMENT, DATECREATION, IDEMP) "
         "VALUES (:id, :code, :type, :montant, :cat, :desc, :dt, :mode, :dc, :cin)"
@@ -67,7 +67,7 @@ bool Finance::modifier(const QString& idFinance,
 {
     QSqlQuery q;
     q.prepare(
-        "UPDATE HICHEM.FINANCE SET "
+        "UPDATE FINANCE SET "
         "CODETRANSA=:code, "
         "TYPETRANSACTION=:type, "
         "MONTANT=:montant, "
@@ -99,7 +99,7 @@ bool Finance::modifier(const QString& idFinance,
 bool Finance::supprimer(const QString& idFinance, QString *err)
 {
     QSqlQuery q;
-    q.prepare("DELETE FROM HICHEM.FINANCE WHERE IDFINANCE=:id");
+    q.prepare("DELETE FROM FINANCE WHERE IDFINANCE=:id");
     q.bindValue(":id", idFinance);
 
     if (!q.exec()) {
@@ -118,7 +118,7 @@ bool Finance::chargerTout(QVector<Row> &out, QString *err)
         "SELECT IDFINANCE, CODETRANSA, TYPETRANSACTION, MONTANT, CATEGORIE, "
         "       DESCRIPTION, TO_CHAR(DATETRANSACTION,'YYYY-MM-DD'), "
         "       MODEPAIEMENT, TO_CHAR(DATECREATION,'YYYY-MM-DD') "
-        "FROM HICHEM.FINANCE "
+        "FROM FINANCE "
         "ORDER BY DATETRANSACTION DESC"
         );
 

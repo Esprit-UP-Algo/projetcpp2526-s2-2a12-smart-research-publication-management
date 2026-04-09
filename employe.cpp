@@ -2,22 +2,53 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
+#include <QRegularExpression>
 #include "session.h"
 
-// Constructeur (Utilisation de std::move pour la performance)
+namespace {
+const int kMotDePasseSeuilFort = 62;
+}
+
+int Employe::motDePasseForcePourcent(const QString &password)
+{
+    if (password.isEmpty()) return 0;
+
+    int pts = 0;
+    if (password.length() >= 6) pts += 1;
+    if (password.length() >= 10) pts += 1;
+    if (password.length() >= 14) pts += 1;
+
+    static const QRegularExpression reLower(QStringLiteral("[a-z]"));
+    static const QRegularExpression reUpper(QStringLiteral("[A-Z]"));
+    static const QRegularExpression reDigit(QStringLiteral("[0-9]"));
+    static const QRegularExpression reSpec(QStringLiteral("[^a-zA-Z0-9]"));
+
+    if (password.contains(reLower)) pts += 1;
+    if (password.contains(reUpper)) pts += 1;
+    if (password.contains(reDigit)) pts += 1;
+    if (password.contains(reSpec)) pts += 1;
+
+    return qBound(0, pts * 13 + (password.length() >= 12 ? 8 : 0), 100);
+}
+
+bool Employe::motDePasseAcceptable(const QString &password)
+{
+    return motDePasseForcePourcent(password) >= kMotDePasseSeuilFort;
+}
+
+// Constructeur mis à jour avec faceEncoding
 Employe::Employe(
     QString cin, QString nom, QString prenom, QString username, QString passwordHash,
     QString email, QString poste, QString departement,
-    QDate dateEmbauche, double salaire, QString role
+    QDate dateEmbauche, double salaire, QString role, QString faceEncoding
     )
     : m_cin(std::move(cin)), m_nom(std::move(nom)), m_prenom(std::move(prenom)),
     m_username(std::move(username)), m_passwordHash(std::move(passwordHash)),
     m_email(std::move(email)), m_poste(std::move(poste)),
     m_departement(std::move(departement)), m_dateEmbauche(dateEmbauche),
-    m_salaire(salaire), m_role(std::move(role))
+    m_salaire(salaire), m_role(std::move(role)), m_faceEncoding(std::move(faceEncoding))
 {}
 
-// Génération d'ID automatique (Oracle/SQLite style)
 bool Employe::nextId(int &outId, QString *err)
 {
     QSqlQuery query;
@@ -33,7 +64,7 @@ bool Employe::nextId(int &outId, QString *err)
     return false;
 }
 
-// CREATE : Ajouter un employé
+// CREATE : Ajouter un employé avec signature faciale
 bool Employe::ajouter(QString *err) const
 {
     int id;
@@ -43,10 +74,10 @@ bool Employe::ajouter(QString *err) const
     query.prepare(
         "INSERT INTO EMPLOYES ("
         "ID_EMPLOYE, CIN, NOM, PRENOM, USERNAME, PASSWORD_HASH, EMAIL, "
-        "POSTE, DEPARTEMENT, DATE_EMBAUCHE, SALAIRE, ROLE"
+        "POSTE, DEPARTEMENT, DATE_EMBAUCHE, SALAIRE, ROLE, FACE_ENCODING"
         ") VALUES ("
         ":id, :cin, :nom, :prenom, :username, :passwordHash, :email, "
-        ":poste, :departement, :dateEmbauche, :salaire, :role)"
+        ":poste, :departement, :dateEmbauche, :salaire, :role, :face)"
         );
 
     query.bindValue(":id",           id);
@@ -61,6 +92,7 @@ bool Employe::ajouter(QString *err) const
     query.bindValue(":dateEmbauche", m_dateEmbauche);
     query.bindValue(":salaire",      m_salaire);
     query.bindValue(":role",         m_role);
+    query.bindValue(":face",         m_faceEncoding); // Stockage de la signature
 
     if (!query.exec()) {
         if (err) *err = "Échec de l'ajout : " + query.lastError().text();
@@ -69,7 +101,7 @@ bool Employe::ajouter(QString *err) const
     return true;
 }
 
-// UPDATE : Modifier un employé (Appelé via l'objet instance dans MainWindow)
+// UPDATE : Modifier un employé (incluant la signature faciale)
 bool Employe::modifier(const QString& idEmploye, QString *err)
 {
     QSqlQuery query;
@@ -77,7 +109,8 @@ bool Employe::modifier(const QString& idEmploye, QString *err)
         "UPDATE EMPLOYES SET "
         "CIN = :cin, NOM = :nom, PRENOM = :prenom, USERNAME = :username, "
         "EMAIL = :email, POSTE = :poste, DEPARTEMENT = :departement, "
-        "DATE_EMBAUCHE = :dateEmbauche, SALAIRE = :salaire, ROLE = :role "
+        "DATE_EMBAUCHE = :dateEmbauche, SALAIRE = :salaire, ROLE = :role, "
+        "FACE_ENCODING = :face "
         "WHERE ID_EMPLOYE = :id"
         );
 
@@ -91,6 +124,7 @@ bool Employe::modifier(const QString& idEmploye, QString *err)
     query.bindValue(":dateEmbauche", m_dateEmbauche);
     query.bindValue(":salaire",      m_salaire);
     query.bindValue(":role",         m_role);
+    query.bindValue(":face",         m_faceEncoding);
     query.bindValue(":id",           idEmploye);
 
     if (!query.exec()) {
@@ -100,7 +134,6 @@ bool Employe::modifier(const QString& idEmploye, QString *err)
     return true;
 }
 
-// DELETE : Supprimer un employé
 bool Employe::supprimer(const QString& idEmploye, QString *err)
 {
     QSqlQuery query;
@@ -114,12 +147,12 @@ bool Employe::supprimer(const QString& idEmploye, QString *err)
     return true;
 }
 
-// READ : Charger la liste complète
+// READ : Charger avec Face Encoding
 bool Employe::chargerTout(QVector<Row> &out, QString *err)
 {
     QSqlQuery query;
     if (!query.exec("SELECT ID_EMPLOYE, CIN, NOM, PRENOM, USERNAME, EMAIL, "
-                    "POSTE, DEPARTEMENT, DATE_EMBAUCHE, SALAIRE, ROLE "
+                    "POSTE, DEPARTEMENT, DATE_EMBAUCHE, SALAIRE, ROLE, FACE_ENCODING "
                     "FROM EMPLOYES ORDER BY ID_EMPLOYE ASC")) {
         if (err) *err = "Impossible de charger : " + query.lastError().text();
         return false;
@@ -139,12 +172,12 @@ bool Employe::chargerTout(QVector<Row> &out, QString *err)
         r.dateEmbauche = query.value(8).toDate().toString("yyyy-MM-dd");
         r.salaire      = query.value(9).toDouble();
         r.role         = query.value(10).toString();
+        r.faceEncoding = query.value(11).toString(); // Chargement de la signature
         out.append(r);
     }
     return true;
 }
 
-// Vérifier si un username est déjà pris
 bool Employe::usernameExiste(const QString &username)
 {
     QSqlQuery query;
@@ -153,7 +186,38 @@ bool Employe::usernameExiste(const QString &username)
     return query.exec() && query.next();
 }
 
-// Authentification classique (Login)
+bool Employe::emailExiste(const QString &email, const QString &excludeIdEmploye)
+{
+    QSqlQuery query;
+    const QString e = email.trimmed();
+    if (e.isEmpty()) return false;
+
+    if (excludeIdEmploye.isEmpty()) {
+        query.prepare("SELECT 1 FROM EMPLOYES WHERE UPPER(TRIM(EMAIL)) = UPPER(TRIM(:email))");
+    } else {
+        query.prepare("SELECT 1 FROM EMPLOYES WHERE UPPER(TRIM(EMAIL)) = UPPER(TRIM(:email)) AND TO_CHAR(ID_EMPLOYE) <> :id");
+        query.bindValue(":id", excludeIdEmploye);
+    }
+    query.bindValue(":email", e);
+
+    return query.exec() && query.next();
+}
+
+bool Employe::existe(const QString &cin, const QString &excludeId)
+{
+    QSqlQuery query;
+    if (excludeId.isEmpty()) {
+        query.prepare("SELECT CIN FROM EMPLOYES WHERE CIN = :cin");
+    } else {
+        query.prepare("SELECT CIN FROM EMPLOYES WHERE CIN = :cin AND CIN != :ex");
+        query.bindValue(":ex", excludeId);
+    }
+    query.bindValue(":cin", cin);
+
+    return (query.exec() && query.next());
+}
+
+// Authentification Login
 bool Employe::authentifier(const QString &username, const QString &passwordHash, QString *err)
 {
     QSqlQuery query;
@@ -168,15 +232,13 @@ bool Employe::authentifier(const QString &username, const QString &passwordHash,
     }
 
     if (query.next()) {
-        QString id = query.value("ID_EMPLOYE").toString();
-        QString nomComplet = query.value("NOM").toString() + " " + query.value("PRENOM").toString();
-        QString role = query.value("ROLE").toString();
-
-        Session::instance().login(id, nomComplet, role);
+        Session::instance().login(query.value("ID_EMPLOYE").toString(),
+                                  query.value("NOM").toString() + " " + query.value("PRENOM").toString(),
+                                  query.value("ROLE").toString());
         return true;
     }
 
-    if (err) *err = "Nom d'utilisateur ou mot de passe incorrect.";
+    if (err) *err = "Identifiants incorrects.";
     return false;
 }
 
@@ -193,14 +255,17 @@ bool Employe::authentifierFaceID(const QString &username, QString *err)
     }
 
     if (query.next()) {
-        QString id = query.value("ID_EMPLOYE").toString();
-        QString nomComplet = query.value("NOM").toString() + " " + query.value("PRENOM").toString();
-        QString role = query.value("ROLE").toString();
-
-        Session::instance().login(id, nomComplet, role);
+        Session::instance().login(query.value("ID_EMPLOYE").toString(),
+                                  query.value("NOM").toString() + " " + query.value("PRENOM").toString(),
+                                  query.value("ROLE").toString());
         return true;
     }
 
-    if (err) *err = "Utilisateur reconnu par FaceID mais introuvable en base.";
+    if (err) *err = "Utilisateur introuvable.";
     return false;
+}
+
+// Setter pour la signature faciale
+void Employe::setFaceEncoding(QString faceEncoding) {
+    m_faceEncoding = std::move(faceEncoding);
 }

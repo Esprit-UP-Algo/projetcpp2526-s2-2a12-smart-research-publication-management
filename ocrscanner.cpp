@@ -43,74 +43,43 @@ OcrScannerDialog::OcrScannerDialog(QWidget *parent)
 // ════════════════════════════════════════════════════════════════════════════
 void OcrScannerDialog::buildUi()
 {
-    setStyleSheet(R"(
-        QDialog { background:#f7fafc; font-family:'Segoe UI'; }
+    QSettings themeSettings("SmartResearchLab", "Theme");
+    const bool isDark = themeSettings.value("darkMode", false).toBool();
 
-        QLabel#title {
-            font-size:15px; font-weight:900; color:#0d5a5f;
-            padding:10px 0 4px 0;
-        }
-        QLabel#subtitle { font-size:10px; color:#718096; padding-bottom:6px; }
+    const QString dlgBg     = isDark ? "#0f172a" : "#f2ebe4";
+    const QString cardBg    = isDark ? "#1e293b" : "#ffffff";
+    const QString cardBord  = isDark ? "#334155" : "#e0be9c";
+    const QString textPri   = isDark ? "#f1f5f9" : "#2c1e16";
+    const QString textSec   = isDark ? "#94a3b8" : "#8b6655";
+    const QString inputBg   = isDark ? "#0f172a" : "#ffffff";
+    const QString statusClr = isDark ? "#10b981" : "#27ae60"; // Vert vif
 
-        QFrame#card {
-            background:white; border:1px solid #e2e8f0;
-            border-radius:12px; padding:4px;
-        }
-        QLabel#sectionTitle {
-            font-size:11px; font-weight:700; color:#1F8E95;
-            padding:6px 0 2px 0;
-        }
-        QLabel#resultKey   { font-size:11px; color:#4a5568; font-weight:600; }
-        QLabel#resultVal   { font-size:11px; color:#1a202c; font-weight:700; }
-        QLabel#statusOk    { color:#27ae60; font-size:10px; font-weight:700; }
-        QLabel#statusErr   { color:#e53e3e; font-size:10px; }
-        QLabel#statusInfo  { color:#718096; font-size:10px; }
-
-        QLineEdit {
-            border:1.5px solid #cbd5e0; border-radius:7px;
-            padding:6px 10px; font-size:11px; background:white;
-        }
-        QLineEdit:focus { border-color:#1F8E95; }
-
-        QPushButton#btnBrowse {
-            background:#edf2f7; color:#2d3748; border:1px solid #cbd5e0;
-            border-radius:7px; padding:6px 14px; font-size:11px;
-        }
-        QPushButton#btnBrowse:hover { background:#e2e8f0; }
-
-        QPushButton#btnAnalyze {
-            background:qlineargradient(x1:0,y1:0,x2:1,y2:0,
-                stop:0 #1F8E95, stop:1 #2ecc71);
-            color:white; border:none; border-radius:9px;
-            font-size:13px; font-weight:800; padding:10px 22px; min-height:38px;
-        }
-        QPushButton#btnAnalyze:hover  { background:#17727a; }
-        QPushButton#btnAnalyze:disabled { background:#a0aec0; }
-
-        QPushButton#btnAccept {
-            background:#27ae60; color:white; border:none; border-radius:9px;
-            font-size:12px; font-weight:700; padding:10px 22px; min-height:38px;
-        }
-        QPushButton#btnAccept:hover    { background:#219a52; }
-        QPushButton#btnAccept:disabled { background:#a0aec0; }
-
-        QPushButton#btnCancel {
-            background:#edf2f7; color:#4a5568; border:none; border-radius:9px;
-            font-size:12px; padding:10px 22px; min-height:38px;
-        }
-        QPushButton#btnCancel:hover { background:#e2e8f0; }
-
-        QTextEdit {
-            border:1px solid #e2e8f0; border-radius:7px;
-            font-size:10px; font-family:'Consolas','Courier New',monospace;
-            background:#f8f9fa; padding:4px;
-        }
-        QProgressBar {
-            border:none; border-radius:4px; background:#e2e8f0;
-            text-align:center; font-size:9px; max-height:8px;
-        }
-        QProgressBar::chunk { background:#1F8E95; border-radius:4px; }
-    )");
+    QString ss = QString("QDialog { background: %1; font-family:'Segoe UI'; }").arg(dlgBg);
+    ss += QString("QLabel#title { font-size:18px; font-weight:900; color:%1; padding:10px 0 4px 0; }").arg(textPri);
+    ss += QString("QLabel#subtitle { font-size:11px; color:%1; padding-bottom:6px; }").arg(textSec);
+    ss += QString("QFrame#card { background:%1; border:1.5px solid %2; border-radius:16px; padding:6px; }").arg(cardBg, cardBord);
+    ss += QString("QLabel#sectionTitle { font-size:12px; font-weight:800; color:%1; padding:6px 0 2px 0; text-transform: uppercase; }").arg(textSec);
+    ss += QString("QLabel#resultKey { font-size:11px; color:%1; font-weight:700; }").arg(textSec);
+    ss += QString("QLabel#resultVal { font-size:11px; color:%1; font-weight:700; }").arg(textPri);
+    ss += QString("QLabel#statusOk { color:%1; font-size:11px; font-weight:700; }").arg(statusClr);
+    ss += QString("QLabel#statusErr { color:#e53e3e; font-size:11px; }");
+    ss += QString("QLabel#statusInfo { color:%1; font-size:11px; }").arg(textSec);
+    ss += QString("QLineEdit { border:1.5px solid %1; border-radius:10px; padding:8px 12px; font-size:12px; background:%2; color:%3; }").arg(cardBord, inputBg, textPri);
+    ss += QString("QLineEdit:focus { border-color:#d1a97d; }");
+    ss += QString("QPushButton#btnBrowse { background:%1; color:%2; border:1.5px solid %3; border-radius:10px; padding:8px 16px; font-size:12px; font-weight:700; }").arg(inputBg, textPri, cardBord);
+    ss += QString("QPushButton#btnBrowse:hover { background: rgba(240, 206, 170, 0.2); }");
+    ss += "QPushButton#btnAnalyze { background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #f0ceaa, stop:1 #e0be9c); color:#2c1e16; border:none; border-radius:12px; font-size:14px; font-weight:800; padding:10px 24px; min-height:42px; }";
+    ss += "QPushButton#btnAnalyze:hover { background:#ebc49a; }";
+    ss += "QPushButton#btnAnalyze:disabled { background:#dcdcdc; color:#999; }";
+    ss += QString("QPushButton#btnAccept { background:#2c1e16; color:#f2ebe4; border:none; border-radius:12px; font-size:13px; font-weight:800; padding:10px 24px; min-height:42px; }");
+    ss += QString("QPushButton#btnAccept:hover { background:#4a3728; }");
+    ss += QString("QPushButton#btnAccept:disabled { background:#dcdcdc; color:#999; }");
+    ss += QString("QPushButton#btnCancel { background: transparent; color:%1; border:1.5px solid %2; border-radius:12px; font-size:13px; font-weight:700; padding:10px 24px; min-height:42px; }").arg(textSec, cardBord);
+    ss += QString("QPushButton#btnCancel:hover { background: rgba(240, 206, 170, 0.2); color:%1; }").arg(textPri);
+    ss += QString("QTextEdit { border:1.5px solid %1; border-radius:12px; font-size:11px; font-family:'Consolas','Courier New',monospace; background:%2; padding:6px; color:%3; }").arg(cardBord, inputBg, textPri);
+    ss += QString("QProgressBar { background:%1; border:1px solid %2; border-radius:6px; text-align:center; font-size:10px; max-height:12px; }").arg(dlgBg, cardBord);
+    ss += "QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #f0ceaa, stop:1 #e0be9c); border-radius:5px; }";
+    setStyleSheet(ss);
 
     auto *root = new QVBoxLayout(this);
     root->setContentsMargins(20, 12, 20, 16);
@@ -147,7 +116,7 @@ void OcrScannerDialog::buildUi()
     m_lblPreview->setFixedSize(64, 64);
     m_lblPreview->setAlignment(Qt::AlignCenter);
     m_lblPreview->setStyleSheet(
-        "border:1px solid #e2e8f0; border-radius:6px; background:#f0f0f0;");
+        "border:1.5px solid #e0be9c; border-radius:10px; background:#ffffff; color:#8b6655;");
     m_lblPreview->setText("🖼");
     m_lblPreview->setFont(QFont("Segoe UI", 20));
 
@@ -538,7 +507,7 @@ OcrResult OcrScannerDialog::parseReceiptText(const QString &text)
         "remboursement", "virement recu", "salaire", "encaissement",
         "avoir", "credit note", "note de crédit"
     };
-    for (const auto &kw : revenuKw) {
+    for (const auto &kw : std::as_const(revenuKw)) {
         if (lower.contains(kw)) { result.type = "Revenu"; break; }
     }
 
@@ -556,8 +525,8 @@ OcrResult OcrScannerDialog::parseReceiptText(const QString &text)
         { "Communication", {"telecom","telephone","internet","mobile","abonnement","operateur"} },
         { "Divers",        {"achat","vente","commerce","magasin","boutique","store"} },
     };
-    for (const auto &entry : catMap) {
-        for (const auto &kw : entry.kws) {
+    for (const auto &entry : std::as_const(catMap)) {
+        for (const auto &kw : std::as_const(entry.kws)) {
             if (lower.contains(kw)) { result.category = entry.cat; break; }
         }
         if (!result.category.isEmpty()) break;
@@ -565,7 +534,7 @@ OcrResult OcrScannerDialog::parseReceiptText(const QString &text)
 
     // ── 5. DESCRIPTION (première ligne significative) ─────────────────────────
     const QStringList lines = text.split('\n', Qt::SkipEmptyParts);
-    for (const auto &line : lines) {
+    for (const auto &line : std::as_const(lines)) {
         const QString t = line.trimmed();
         if (t.length() >= 4 && !t.contains(QRegularExpression(R"(^\d+[\s,\.]*$)"))) {
             result.description = t.left(80);

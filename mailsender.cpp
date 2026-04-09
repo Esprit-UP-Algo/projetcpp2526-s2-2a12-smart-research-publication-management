@@ -14,7 +14,9 @@ bool MailSender::envoyerMail(const QString &smtpUser,
                              const QString &destinataire,
                              const QString &sujet,
                              const QString &contenu,
-                             QString &erreur)
+                             QString &erreur,
+                             const QString &nomExpediteurAffiche,
+                             const QString &adresseExpediteurAffiche)
 {
     QSslSocket socket;
     socket.connectToHostEncrypted("smtp.gmail.com", 465);
@@ -60,8 +62,16 @@ bool MailSender::envoyerMail(const QString &smtpUser,
     if (!envoyerCommande("RCPT TO:<" + destinataire + ">\r\n", "250")) return false;
     if (!envoyerCommande("DATA\r\n", "354")) return false;
 
+    const QString addrFrom = adresseExpediteurAffiche.isEmpty() ? smtpUser : adresseExpediteurAffiche;
+
     QString message;
-    message += "From: <" + smtpUser + ">\r\n";
+    if (nomExpediteurAffiche.isEmpty()) {
+        message += "From: <" + addrFrom + ">\r\n";
+    } else {
+        QString nom = nomExpediteurAffiche;
+        nom.replace(QLatin1Char('"'), QLatin1String("\\\""));
+        message += "From: \"" + nom + "\" <" + addrFrom + ">\r\n";
+    }
     message += "To: <" + destinataire + ">\r\n";
     message += "Subject: " + sujet + "\r\n";
     message += "MIME-Version: 1.0\r\n";

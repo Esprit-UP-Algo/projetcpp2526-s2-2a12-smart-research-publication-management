@@ -68,7 +68,7 @@ bool Publication::ajouter(QString *err) const
     query.bindValue(":typeBrevet", m_typeBrevet);
 
     if (m_numeroBrevet <= 0)
-        query.bindValue(":numeroBrevet", QVariant(QVariant::Int));
+        query.bindValue(":numeroBrevet", QVariant(QMetaType::fromType<int>()));
     else
         query.bindValue(":numeroBrevet", m_numeroBrevet);
 
@@ -107,7 +107,7 @@ bool Publication::modifier(const QString& idPublication, QString *err) const
     query.bindValue(":typeBrevet", m_typeBrevet);
 
     if (m_numeroBrevet <= 0)
-        query.bindValue(":numeroBrevet", QVariant(QVariant::Int));
+        query.bindValue(":numeroBrevet", QVariant(QMetaType::fromType<int>()));
     else
         query.bindValue(":numeroBrevet", m_numeroBrevet);
 

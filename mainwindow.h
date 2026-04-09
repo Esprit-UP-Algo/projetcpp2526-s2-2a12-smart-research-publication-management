@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QPushButton>
+#include <QResizeEvent>
+#include <QPropertyAnimation>
+#include <QGraphicsDropShadowEffect>
 #include <QAction>
 #include <QString>
 #include "finance.h"
@@ -11,7 +14,10 @@
 #include "labs.h"
 #include "employe.h"
 #include "inventory.h"
+#include "projet.h"
 #include <QSqlTableModel>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,10 +30,14 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void notifierConnexion(); // Pour signaler l'entrée de l'utilisateur
 
 private:
     Ui::MainWindow *ui;
     QSqlQueryModel *model; // <--- C'est ce type qu'il faut utiliser
+    QNetworkAccessManager *networkManager;
+    QString m_tempFaceEncoding; // Pour stocker la signature
+
     // ===== FINANCE =====
     Finance::Row selectedFinanceRowFromTable(bool *ok=nullptr) const;
     bool exportInternalInvoicePdf_19(const QString& filePath, const Finance::Row& row);
@@ -68,7 +78,9 @@ private:
     void showLabsPaymentStats();
 
     // ===== EMPLOYEE =====
+    void initEmployeUserGuidance();
     void loadEmployees();
+    QString m_emailEmployeEditOriginal;
     QString ancienCin;
     QString ancienUsername;
     int indexSelectionne = -1;
@@ -78,7 +90,35 @@ private:
     void configurerPermissions();
     void on_btn_reset_clicked();
 
+    // ── Système de notifications ───────────────────────────────────────────
+    struct NotifEntry {
+        QString actionType;
+        QString cible;
+        QString time;
+        QString user;
+        QString role;
+        bool    read = false;
+    };
+    QList<NotifEntry> m_notifications;
+    QLabel  *m_notifBadge  = nullptr;
+    QFrame  *m_notifPanel  = nullptr;
+    int      m_unreadCount = 0;
+
+    void ajouterNotification(const QString &actionType, const QString &cible);
+    void setupNotifButton();
+    void toggleNotifPanel();
+    void rebuildNotifPanel();
+    void updateNotifBadge();
+    void markAllNotifRead();
+    void clearAllNotif();
     // ====================
+
+    // ===== PROJECTS =====
+    void initProjetsUi();
+    void loadProjets();
+    void showProjetsStats();
+    QString selectedProjetId() const;
+    QString idProjetToEdit;
 
     // ===== INVENTORY =====
     void initInventoryUi();
@@ -88,11 +128,36 @@ private:
     QString selectedInventorySku() const;
     QString idProductToEdit;
     QString skuToEdit;
+    bool syncInventoryReservationsFromLabs(QString *err = nullptr);
     // =====================
 
     void updateTopTitle(int index);
+    void updateScaledQss();
     void applyModernStyle();
     void setActiveButton(QPushButton *btn);
+    void toggleTheme();
+    void updateThemeButton();
+    void initAnimations();
+    void animatePageChange(int newIndex);
+    void updateAnimationColors();
+
+    // === NOUVELLES ANIMATIONS & SIDEBAR TOGGLE ===
+    void applyButtonGlowEffects();
+    void toggleSidebar();
+    void animateActiveIndicator(QPushButton *btn);
+    void animateButtonClick(QPushButton *btn);
+
+    bool m_isDarkTheme = false;
+
+    // Animation members
+    QGraphicsDropShadowEffect *m_logoGlowEffect    = nullptr;
+    QPropertyAnimation        *m_logoGlowAnim      = nullptr;
+    bool                       m_sidebarExpanded   = true;
+    QFrame                    *m_activeIndicator   = nullptr;
+    QPushButton               *m_btnToggleSidebar  = nullptr;
+    QGraphicsOpacityEffect    *m_titleFadeEffect   = nullptr;
+    QWidget                   *m_vignetteOverlay   = nullptr;
+    QTimer                    *m_fontScaleTimer    = nullptr;
 
 private slots:
     // Navigation
@@ -168,9 +233,12 @@ private slots:
     void resetLabsFilters();
     void on_pointage_pressed();
 
+    void on_btnScanFace_clicked();
+
 protected:
     // Le filtre pour capturer le double-clic sur aff2
     bool eventFilter(QObject *obj, QEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
     void on_btnPasteLocation_clicked();
     void onMapLocationSelected(const QString& title);
     void on_BtnExportLabs_clicked(); // Remplacez par le vrai nom de votre bouton PDF
@@ -191,10 +259,14 @@ protected:
     void on_btnReinitialiserPub_3_clicked();// reset filtre
     void on_BtnExportLabsDirect_clicked();
     // Inventory slots
-    void on_BtnInventoryAdd_clicked();
-    void on_BtnInventoryAdd_2_clicked();
-    void on_BtnInventoryEdit_clicked();
-    void on_BtnInventoryAdd_5_clicked();
+    void handleInventoryAdd();
+    void handleInventoryView();
+    void handleInventoryEdit();
+    void handleInventoryStats();
+    void handleInventoryDelete();
+    void handleInventoryExportPdf();
+    void handleInventoryDetailExportPdf();
+
     void on_BtnPopupCancelInventory_2_triggered(QAction *arg1);
     void on_BtnPopupCancelInventory_2_clicked();
     void on_BtnPopupCancelInventory_clicked();
@@ -202,8 +274,10 @@ protected:
     void on_BtnPopupResetInventory_clicked();   // ADD reset
     void on_BtnPopupSaveInventory_2_clicked();  // EDIT save
     void on_BtnPopupResetInventory_2_clicked(); // EDIT reset
-    void on_BtnInventoryDelete_clicked();       // DELETE
-    void on_BtnInventoryApply_clicked();        // filter/search
+    void fillTableInventoryRow(int row, const Inventory::Row &data);
+    void applyInventoryFilter();               // filter/search (manual connect)
+    void refreshInventoryTypeFilter();         // DISTINCT TYPE depuis la BD
+    void resetInventoryFilters();              // recherche vierge + tous + tri SKU
 
     // Finance slots
     void on_btnFinance_clicked();
@@ -227,12 +301,20 @@ protected:
     void on_btnAjouterProj_clicked();
     void on_btnModifierProj_clicked();
     void on_btnVoirStatistiquesProj_clicked();
+    void on_btnAddProj_clicked();
+    void on_btnConfirmEditProj_clicked();
+    void on_btnSupprimerProj_clicked();
+    void on_btnAppliquerProj_clicked();
+    void on_btnFiltrerDateProj_clicked();
     void on_btnAnnuler_emp_clicked();
     void on_btnForm_emp_clicked();
     void on_pushButton_clicked();
     void on_pointage_clicked();
     void on_btn_ret_triggered(QAction *arg1);
     void on_BtnPopupCancelLabs_6_triggered(QAction *arg1);
+
+signals:
+    void logoutRequested();
 };
 
 #endif

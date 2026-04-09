@@ -22,73 +22,109 @@ LoginDialog::LoginDialog(QWidget *parent) :
     // Masquer le mot de passe
     ui->lePassword->setEchoMode(QLineEdit::Password);
 
+    ui->leUsername->setPlaceholderText(QStringLiteral("Identifiant (ex. fourni par le RH)"));
+    ui->lePassword->setPlaceholderText(QStringLiteral("Mot de passe du compte"));
+    ui->leUsername->setToolTip(QStringLiteral("Saisissez le nom d’utilisateur attribué à votre compte employé."));
+    ui->lePassword->setToolTip(QStringLiteral("Saisissez le mot de passe associé à cet identifiant."));
+    ui->btnLogin->setToolTip(QStringLiteral("Valide la connexion avec les identifiants saisis."));
+    ui->btnForgotPass->setToolTip(
+        QStringLiteral("Si vous avez oublié le mot de passe : vous devrez confirmer votre identifiant et votre CIN, "
+                        "puis choisir un nouveau mot de passe conforme aux règles de sécurité (mot de passe fort)."));
+    ui->btnFaceID->setToolTip(QStringLiteral("Connexion par reconnaissance faciale (après avoir saisi l’identifiant)."));
+    ui->Quitter->setToolTip(QStringLiteral("Fermer la fenêtre de connexion."));
+
     this->setWindowTitle("Connexion - Smart Research");
 
-    // Application du STYLE CSS (QSS)
+    // Style "Soft Minimalism" (Inspiré du code HTML/CSS fourni, avec écriture Noire)
     this->setStyleSheet(R"(
-        /* Dialog */
-        QDialog#LoginDialog{
-            background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
-                stop:0 #f2fbfb,
-                stop:1 #e6f7f7);
-            font-family: Consolas;
+        QDialog#LoginDialog {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:1, 
+                                        stop:0 #faf9f6, stop:0.5 #f5f3f0, stop:1 #f0ede8);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', system-ui, sans-serif;
         }
-/* Bouton Face ID */
-QPushButton#btnFaceID {
-    background: white;
-    border: 2px solid #00CED1;
-    border-radius: 20px;
-    color: #004D40;
-    font-weight: 900;
-    padding: 10px;
-}
-QPushButton#btnFaceID:hover {
-    background: #e6f7f7;
-}
-        /* Card */
-        QGroupBox#groupBox_2{
-            background: rgba(255,255,255,220);
-            border-radius: 22px;
-            border: 1px solid rgba(0,206,209,90);
+        
+        QGroupBox#groupBox_2 {
+            background-color: rgba(255, 255, 255, 220);
+            border: 1px solid rgba(255, 255, 255, 100);
+            border-radius: 32px;
         }
-        /* Title */
-        QLabel#label{
-            color:#004D40;
-            font-size:24pt;
-            font-weight:900;
+        
+        QLabel#label {
+            color: #2c1e16;
+            font-size: 38px; /* Plus grand pour l'effet WOW */
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            background: transparent;
         }
-        /* Inputs */
-        QLineEdit{
-            background: white;
-            border: 1.5px solid rgba(0,206,209,120);
-            border-radius: 18px;
-            padding: 12px 18px;
-            font-size: 12pt;
+        
+        QLineEdit {
+            background-color: rgba(255, 255, 255, 200);
+            border: 1.5px solid rgba(240, 206, 170, 100);
+            border-radius: 16px;
+            padding: 16px 16px;
+            color: #000000;
+            font-size: 15px;
+            font-weight: 500;
         }
-        QLineEdit:focus{
-            border: 2px solid #00CED1;
+        QLineEdit:focus {
+            border: 1.5px solid #f0ceaa;
+            background-color: #ffffff;
         }
-        /* Buttons */
-        QPushButton#btnLogin{
-            background: qlineargradient(x1:0,y1:0,x2:1,y2:0,
-                stop:0 #00CED1,
-                stop:1 #7FFFD4);
-            border:none;
-            border-radius: 20px;
-            padding: 12px 20px;
-            font-size: 12pt;
-            font-weight:900;
+        
+        QLabel#label_2, QLabel#label_3 {
+            color: #4a3728;
+            font-size: 13px;
+            font-weight: 700;
+            background: transparent;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        QPushButton#btnLogin:hover{
-            opacity:0.9;
+        
+        QPushButton#btnLogin {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #f0ceaa, stop:1 #e0be9c);
+            border: none;
+            border-radius: 16px;
+            padding: 14px;
+            color: #2c1e16;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
         }
-        QPushButton#Quitter{
-            background: rgba(0,77,64,12);
-            border: 1px solid rgba(0,77,64,50);
-            border-radius: 20px;
-            padding: 12px 20px;
+        QPushButton#btnLogin:hover {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #ebc49a, stop:1 #dbb88c);
+            box-shadow: 0 4px 15px rgba(240, 206, 170, 0.4);
+        }
+        
+        QPushButton#Quitter {
+            background-color: #ffffff;
+            border: 1.5px solid rgba(240, 206, 170, 120);
+            border-radius: 16px;
+            padding: 12px;
+            color: #2c1e16;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        
+        QPushButton#btnFaceID, QPushButton#btnForgotPass {
+            background: transparent;
+            border: none;
+            color: #8b6655;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        QPushButton#btnForgotPass {
+            text-align: right;
+        }
+        QPushButton#btnFaceID:hover, QPushButton#btnForgotPass:hover {
+            color: #2c1e16;
+            text-decoration: underline;
         }
     )");
+
+    /* Changer le texte "Log in" par quelque chose de plus accueillant */
+    if(QLabel* titleLabel = this->findChild<QLabel*>("label")) {
+        titleLabel->setText("Bienvenue");
+    }
 
     // Ajout ombre portée
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
@@ -185,26 +221,33 @@ void LoginDialog::on_btnForgotPass_clicked()
     query.bindValue(":cin", cin);
 
     if (query.exec() && query.next()) {
-        // 2. Si l'identité est confirmée, on demande le NOUVEAU mot de passe
-        QString newPass = QInputDialog::getText(this, "Succès",
-                                                "Identité confirmée. Entrez votre nouveau mot de passe :",
-                                                QLineEdit::Password, "", &ok);
+        // 2. Nouveau mot de passe (même règle de force que la création de compte)
+        QString newPass;
+        for (;;) {
+            newPass = QInputDialog::getText(this, "Succès",
+                                            "Identité confirmée. Entrez un mot de passe fort (min. 10 car., "
+                                            "minuscules, majuscules, chiffres, caractère spécial) :",
+                                            QLineEdit::Password, "", &ok);
+            if (!ok || newPass.isEmpty())
+                return;
+            if (Employe::motDePasseAcceptable(newPass))
+                break;
+            QMessageBox::warning(this, "Mot de passe trop faible",
+                                 "Le mot de passe doit atteindre au moins le niveau « Fort » "
+                                 "(comme à la création de compte employé). Réessayez.");
+        }
 
-        if (ok && !newPass.isEmpty()) {
-            // Ici, tu dois utiliser ta fonction de hachage habituelle (ex: QCryptographicHash)
-            // Si tu n'as pas encore de fonction de hash, dis-le moi !
-            QByteArray hashedPass = QCryptographicHash::hash(newPass.toUtf8(), QCryptographicHash::Sha256).toHex();
+        QByteArray hashedPass = QCryptographicHash::hash(newPass.toUtf8(), QCryptographicHash::Sha256).toHex();
 
-            QSqlQuery updateQuery;
-            updateQuery.prepare("UPDATE EMPLOYES SET PASSWORD_HASH = :pass WHERE USERNAME = :user");
-            updateQuery.bindValue(":pass", QString(hashedPass));
-            updateQuery.bindValue(":user", username);
+        QSqlQuery updateQuery;
+        updateQuery.prepare("UPDATE EMPLOYES SET PASSWORD_HASH = :pass WHERE USERNAME = :user");
+        updateQuery.bindValue(":pass", QString(hashedPass));
+        updateQuery.bindValue(":user", username);
 
-            if (updateQuery.exec()) {
-                QMessageBox::information(this, "Succès", "Mot de passe mis à jour avec succès !");
-            } else {
-                QMessageBox::critical(this, "Erreur", "Impossible de mettre à jour la base de données.");
-            }
+        if (updateQuery.exec()) {
+            QMessageBox::information(this, "Succès", "Mot de passe mis à jour avec succès !");
+        } else {
+            QMessageBox::critical(this, "Erreur", "Impossible de mettre à jour la base de données.");
         }
     } else {
         QMessageBox::critical(this, "Erreur", "Username ou CIN incorrect.");
