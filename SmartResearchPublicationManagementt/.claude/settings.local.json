@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(grep -rn \"delete.*ui\\\\|delete.*this\" /c/Users/hicham/Desktop/Projet_C++_git/Integration-branch/SmartResearchPublicationManagementt/*.cpp)"
-    ]
-  }
-}
