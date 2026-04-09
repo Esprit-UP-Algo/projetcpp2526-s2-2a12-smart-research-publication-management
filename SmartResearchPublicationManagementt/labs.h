@@ -18,6 +18,9 @@ public:
         QString specialite;      // SPECIALITE
         QString resultat;        // RESULTAT
         QString paiement;        // PAIEMENT
+        double  montant      = 0.0; // MONTANT
+        double  montantPaye  = 0.0; // MONTANT_PAYE
+        double  reste        = 0.0; // RESTE (colonne virtuelle Oracle)
     };
 
     Labs() = default;
@@ -31,18 +34,22 @@ public:
          const QString& disponibilite,
          const QString& resultat,
          const QString& paiement,
+         double  montant     = 0.0,
+         double  montantPaye = 0.0,
          const QString& idemp = "6");
 
     // Getters
-    QString getId() const { return m_id; }
-    QString getNomlabo() const { return m_nomlabo; }
-    QString getResponsable() const { return m_responsable; }
-    QString getNumero() const { return m_numero; }
+    QString getId()           const { return m_id; }
+    QString getNomlabo()      const { return m_nomlabo; }
+    QString getResponsable()  const { return m_responsable; }
+    QString getNumero()       const { return m_numero; }
     QString getLocalisation() const { return m_localisation; }
-    QString getSpecialite() const { return m_specialite; }
-    QString getDisponibilite() const { return m_disponibilite; }
-    QString getResultat() const { return m_resultat; }
-    QString getPaiement() const { return m_paiement; }
+    QString getSpecialite()   const { return m_specialite; }
+    QString getDisponibilite()const { return m_disponibilite; }
+    QString getResultat()     const { return m_resultat; }
+    QString getPaiement()     const { return m_paiement; }
+    double  getMontant()      const { return m_montant; }
+    double  getMontantPaye()  const { return m_montantPaye; }
 
     // CRUD
     bool ajouter(QString *err = nullptr) const;
@@ -56,6 +63,8 @@ public:
                          const QString& disponibilite,
                          const QString& resultat,
                          const QString& paiement,
+                         double  montant,
+                         double  montantPaye,
                          QString *err = nullptr);
 
     static bool supprimer(const QString& idLabo, QString *err = nullptr);
@@ -75,6 +84,8 @@ private:
     QString m_disponibilite;
     QString m_resultat;
     QString m_paiement;
+    double  m_montant     = 0.0;
+    double  m_montantPaye = 0.0;
     QString m_idemp;
 };
 

@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     // Charger le thème QSS selon la préférence sauvegardée
     QSettings settings("SmartResearchLab", "Theme");
     bool darkMode = settings.value("darkMode", false).toBool();
-    QString themeFile = darkMode ? ":/theme/style.qss" : ":/theme/style_light.qss";
+    QString themeFile = darkMode ? ":/theme/style_dark.qss" : ":/theme/style_light.qss";
     QFile styleFile(themeFile);
     if(styleFile.open(QFile::ReadOnly)) {
         QString styleSheet = QLatin1String(styleFile.readAll());
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
         QObject::connect(&w, &MainWindow::logoutRequested, [&restart]() {
             restart = true;
         });
-
+        w.notifierConnexion();
         w.show();
 
         // Boucle d'événements principale pour la fenêtre MainWindow

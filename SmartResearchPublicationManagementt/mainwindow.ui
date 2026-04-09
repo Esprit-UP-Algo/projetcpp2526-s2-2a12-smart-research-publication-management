@@ -234,43 +234,45 @@
           <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
          </property>
         </widget>
+        <widget class="QPushButton" name="btnNotif">
+         <property name="geometry">
+          <rect>
+           <x>1140</x>
+           <y>20</y>
+           <width>75</width>
+           <height>24</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: none; font-weight: bold; color: #333;</string>
+         </property>
+         <property name="text">
+          <string>🔔 (0)</string>
+         </property>
+        </widget>
        </widget>
       </item>
       <item>
        <widget class="QStackedWidget" name="stackedWidget">
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="pageEmployee">
          <layout class="QVBoxLayout" name="verticalLayoutPage0">
           <item>
            <widget class="QStackedWidget" name="stack_emp">
             <property name="currentIndex">
-             <number>6</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_Emp">
              <layout class="QGridLayout" name="gridLayout_4">
-              <item row="5" column="0">
-               <widget class="QPushButton" name="btnAjouterEmp">
-                <property name="text">
-                 <string>Ajouter</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="4">
-               <widget class="QPushButton" name="btnConge_emp">
-                <property name="text">
-                 <string>Congé</string>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="0" colspan="2">
                <widget class="QLineEdit" name="lineSearchEmp">
                 <property name="text">
                  <string/>
                 </property>
                 <property name="placeholderText">
-                 <string>Rechercher (recherche par CIN ou role...)</string>
+                 <string>Rechercher (recherche par CIN ,Username ou de role ...)</string>
                 </property>
                </widget>
               </item>
@@ -281,35 +283,28 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="4">
-               <widget class="QPushButton" name="btnForm_emp">
-                <property name="text">
-                 <string>Formations</string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="2" colspan="2">
-               <widget class="QPushButton" name="btnSupprimer_emp">
-                <property name="text">
-                 <string>Supprimer</string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="1">
+              <item row="4" column="1">
                <widget class="QPushButton" name="btnModifier_emp">
                 <property name="text">
                  <string>Modifier employé</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="4">
-               <widget class="QPushButton" name="btnStat_emp">
+              <item row="0" column="2">
+               <widget class="QPushButton" name="pointage">
                 <property name="text">
-                 <string>Voir statistique</string>
+                 <string>Pointage</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0" rowspan="3" colspan="4">
+              <item row="4" column="0">
+               <widget class="QPushButton" name="btnAjouterEmp">
+                <property name="text">
+                 <string>Ajouter</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" colspan="4">
                <widget class="QTableWidget" name="TableEmp">
                 <property name="minimumSize">
                  <size>
@@ -384,10 +379,17 @@
                 </column>
                </widget>
               </item>
-              <item row="0" column="2">
-               <widget class="QPushButton" name="pointage">
+              <item row="4" column="2">
+               <widget class="QPushButton" name="btnSupprimer_emp">
                 <property name="text">
-                 <string>pointage</string>
+                 <string>Supprimer</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="3">
+               <widget class="QPushButton" name="btnStat_emp">
+                <property name="text">
+                 <string>Voir statistique</string>
                 </property>
                </widget>
               </item>
@@ -404,7 +406,7 @@
                </rect>
               </property>
               <property name="title">
-               <string>Ajout </string>
+               <string/>
               </property>
               <widget class="QLabel" name="label_8">
                <property name="geometry">
@@ -468,7 +470,7 @@
                 <string>Nom</string>
                </property>
               </widget>
-              <widget class="QLineEdit" name="lineDepartementAdd">
+              <widget class="QComboBox" name="comboDepartementAdd">
                <property name="geometry">
                 <rect>
                  <x>714</x>
@@ -477,6 +479,36 @@
                  <height>40</height>
                 </rect>
                </property>
+               <item>
+                <property name="text">
+                 <string>Choisir un département</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>RH</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Recherche</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Laboratoires</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Administration</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Finance</string>
+                </property>
+               </item>
               </widget>
               <widget class="QLineEdit" name="lineCINAdd">
                <property name="geometry">
@@ -511,7 +543,7 @@
                 <string>CIN</string>
                </property>
               </widget>
-              <widget class="QLineEdit" name="linePosteAdd">
+              <widget class="QComboBox" name="comboPosteAdd">
                <property name="geometry">
                 <rect>
                  <x>710</x>
@@ -520,6 +552,51 @@
                  <height>40</height>
                 </rect>
                </property>
+               <item>
+                <property name="text">
+                 <string>Choisir un poste</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>RH</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Chercheur</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Technicien</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Responsable_laboratoire</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Directeur_de_projet</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Directeur_general</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Responsable_financier</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Responsable_de_stock</string>
+                </property>
+               </item>
               </widget>
               <widget class="QLabel" name="label_3">
                <property name="geometry">
@@ -565,9 +642,41 @@
                 <rect>
                  <x>150</x>
                  <y>150</y>
-                 <width>250</width>
+                 <width>230</width>
                  <height>40</height>
                 </rect>
+               </property>
+              </widget>
+              <widget class="QProgressBar" name="passwordStrengthBarAdd">
+               <property name="geometry">
+                <rect>
+                 <x>390</x>
+                 <y>156</y>
+                 <width>150</width>
+                 <height>16</height>
+                </rect>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>0</number>
+               </property>
+               <property name="textVisible">
+                <bool>false</bool>
+               </property>
+              </widget>
+              <widget class="QLabel" name="passwordStrengthLabelAdd">
+               <property name="geometry">
+                <rect>
+                 <x>548</x>
+                 <y>152</y>
+                 <width>120</width>
+                 <height>24</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>—</string>
                </property>
               </widget>
               <widget class="QLabel" name="label_10">
@@ -652,8 +761,8 @@
               <widget class="QToolButton" name="BtnPopupCancelLabs_8">
                <property name="geometry">
                 <rect>
-                 <x>1090</x>
-                 <y>60</y>
+                 <x>1150</x>
+                 <y>0</y>
                  <width>31</width>
                  <height>27</height>
                 </rect>
@@ -702,7 +811,7 @@
                </property>
                <item>
                 <property name="text">
-                 <string>Employe</string>
+                 <string>Choisir un role</string>
                 </property>
                </item>
                <item>
@@ -741,347 +850,473 @@
                 </property>
                </item>
               </widget>
+              <widget class="QPushButton" name="btnScanFace">
+               <property name="geometry">
+                <rect>
+                 <x>720</x>
+                 <y>350</y>
+                 <width>181</width>
+                 <height>51</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Scanner</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="label_25">
+               <property name="geometry">
+                <rect>
+                 <x>550</x>
+                 <y>350</y>
+                 <width>151</width>
+                 <height>61</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Scanner votre visage</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="label_cam">
+               <property name="geometry">
+                <rect>
+                 <x>930</x>
+                 <y>370</y>
+                 <width>231</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
              </widget>
             </widget>
             <widget class="QWidget" name="page_Edit_Emp">
-             <widget class="QLineEdit" name="linePrenomEmp">
+             <widget class="QGroupBox" name="groupBox_6">
               <property name="geometry">
                <rect>
-                <x>110</x>
-                <y>270</y>
-                <width>351</width>
-                <height>31</height>
+                <x>10</x>
+                <y>20</y>
+                <width>1211</width>
+                <height>581</height>
                </rect>
               </property>
-              <property name="readOnly">
-               <bool>false</bool>
+              <property name="title">
+               <string/>
               </property>
-             </widget>
-             <widget class="QLineEdit" name="lineEmailEmp">
-              <property name="geometry">
-               <rect>
-                <x>110</x>
-                <y>160</y>
-                <width>351</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <property name="readOnly">
-               <bool>false</bool>
-              </property>
-             </widget>
-             <widget class="QDateEdit" name="dateEmbaucheEmp">
-              <property name="geometry">
-               <rect>
-                <x>710</x>
-                <y>50</y>
-                <width>481</width>
-                <height>41</height>
-               </rect>
-              </property>
-              <property name="readOnly">
-               <bool>false</bool>
-              </property>
-             </widget>
-             <widget class="QLabel" name="labelUsernameEdit_3">
-              <property name="geometry">
-               <rect>
-                <x>30</x>
-                <y>110</y>
-                <width>71</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Username</string>
-              </property>
-             </widget>
-             <widget class="QLineEdit" name="linePostemp">
-              <property name="geometry">
-               <rect>
-                <x>710</x>
-                <y>200</y>
-                <width>481</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <property name="readOnly">
-               <bool>false</bool>
-              </property>
-             </widget>
-             <widget class="QLabel" name="labelSalaireEdit_3">
-              <property name="geometry">
-               <rect>
-                <x>600</x>
-                <y>140</y>
-                <width>61</width>
-                <height>21</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Salaire</string>
-              </property>
-             </widget>
-             <widget class="QLineEdit" name="lineCIN_emp">
-              <property name="geometry">
-               <rect>
-                <x>110</x>
-                <y>50</y>
-                <width>351</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-             <widget class="QLabel" name="labelCINEdit_3">
-              <property name="geometry">
-               <rect>
-                <x>29</x>
-                <y>55</y>
-                <width>41</width>
-                <height>21</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>CIN</string>
-              </property>
-             </widget>
-             <widget class="QLabel" name="labelPrenomEdit_3">
-              <property name="geometry">
-               <rect>
-                <x>30</x>
-                <y>270</y>
-                <width>61</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Prénom</string>
-              </property>
-             </widget>
-             <widget class="QLineEdit" name="lineNomEmp">
-              <property name="geometry">
-               <rect>
-                <x>110</x>
-                <y>210</y>
-                <width>351</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <property name="readOnly">
-               <bool>false</bool>
-              </property>
-             </widget>
-             <widget class="QLineEdit" name="lineDepartementEmp">
-              <property name="geometry">
-               <rect>
-                <x>710</x>
-                <y>260</y>
-                <width>481</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <property name="readOnly">
-               <bool>false</bool>
-              </property>
-             </widget>
-             <widget class="QLabel" name="labelDateEmbaucheEdit_3">
-              <property name="geometry">
-               <rect>
-                <x>590</x>
-                <y>60</y>
-                <width>111</width>
-                <height>21</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Date Embauche</string>
-              </property>
-             </widget>
-             <widget class="QLabel" name="labelNomEdit_3">
-              <property name="geometry">
-               <rect>
-                <x>30</x>
-                <y>210</y>
-                <width>61</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Nom</string>
-              </property>
-             </widget>
-             <widget class="QLineEdit" name="lineUsernameEmp">
-              <property name="geometry">
-               <rect>
-                <x>110</x>
-                <y>110</y>
-                <width>351</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <property name="readOnly">
-               <bool>false</bool>
-              </property>
-             </widget>
-             <widget class="QLabel" name="labelPosteEdit_3">
-              <property name="geometry">
-               <rect>
-                <x>600</x>
-                <y>200</y>
-                <width>51</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Poste</string>
-              </property>
-             </widget>
-             <widget class="QLineEdit" name="lineSalaireEmp">
-              <property name="geometry">
-               <rect>
-                <x>710</x>
-                <y>130</y>
-                <width>481</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <property name="readOnly">
-               <bool>false</bool>
-              </property>
-             </widget>
-             <widget class="QLabel" name="labelDepartementEdit_3">
-              <property name="geometry">
-               <rect>
-                <x>590</x>
-                <y>260</y>
-                <width>69</width>
-                <height>16</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Département</string>
-              </property>
-             </widget>
-             <widget class="QLabel" name="labelEmailEdit_3">
-              <property name="geometry">
-               <rect>
-                <x>30</x>
-                <y>160</y>
-                <width>61</width>
-                <height>21</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Email</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnSaveEditEmployee">
-              <property name="geometry">
-               <rect>
-                <x>330</x>
-                <y>510</y>
-                <width>231</width>
-                <height>41</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Enregistrer les modifications</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnCancelEditEmp">
-              <property name="geometry">
-               <rect>
-                <x>660</x>
-                <y>510</y>
-                <width>221</width>
-                <height>41</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Annuler</string>
-              </property>
-             </widget>
-             <widget class="QToolButton" name="BtnPopupCancelLabs_10">
-              <property name="geometry">
-               <rect>
-                <x>1180</x>
-                <y>10</y>
-                <width>31</width>
-                <height>27</height>
-               </rect>
-              </property>
-              <property name="toolTip">
-               <string>Fermer</string>
-              </property>
-              <property name="text">
-               <string>✕</string>
-              </property>
-             </widget>
-             <widget class="QLabel" name="label_13">
-              <property name="geometry">
-               <rect>
-                <x>590</x>
-                <y>330</y>
-                <width>100</width>
-                <height>34</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Role</string>
-              </property>
-             </widget>
-             <widget class="QComboBox" name="comboRoleAdd_2">
-              <property name="geometry">
-               <rect>
-                <x>710</x>
-                <y>330</y>
-                <width>281</width>
-                <height>51</height>
-               </rect>
-              </property>
-              <item>
-               <property name="text">
-                <string>Employe</string>
+              <widget class="QDateEdit" name="dateEmbaucheEmp">
+               <property name="geometry">
+                <rect>
+                 <x>690</x>
+                 <y>40</y>
+                 <width>491</width>
+                 <height>51</height>
+                </rect>
                </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>RH</string>
+               <property name="readOnly">
+                <bool>false</bool>
                </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Responsable_financier</string>
+              </widget>
+              <widget class="QLineEdit" name="lineEmailEmp">
+               <property name="geometry">
+                <rect>
+                 <x>90</x>
+                 <y>160</y>
+                 <width>351</width>
+                 <height>31</height>
+                </rect>
                </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Responsable_de_stock</string>
+               <property name="readOnly">
+                <bool>false</bool>
                </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Chercheur</string>
+              </widget>
+              <widget class="QComboBox" name="comboRoleAdd_2">
+               <property name="geometry">
+                <rect>
+                 <x>690</x>
+                 <y>330</y>
+                 <width>281</width>
+                 <height>51</height>
+                </rect>
                </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Directeur_de_projet</string>
+               <item>
+                <property name="text">
+                 <string>Choisir un role</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>RH</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Responsable_financier</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Responsable_de_stock</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Chercheur</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Directeur_de_projet</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Responsable_Labos</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Admin</string>
+                </property>
+               </item>
+              </widget>
+              <widget class="QPushButton" name="btnCancelEditEmp">
+               <property name="geometry">
+                <rect>
+                 <x>640</x>
+                 <y>510</y>
+                 <width>221</width>
+                 <height>41</height>
+                </rect>
                </property>
-              </item>
-              <item>
                <property name="text">
-                <string>Responsable_Labos</string>
+                <string>Annuler</string>
                </property>
-              </item>
-              <item>
+              </widget>
+              <widget class="QLabel" name="labelPosteEdit_3">
+               <property name="geometry">
+                <rect>
+                 <x>580</x>
+                 <y>200</y>
+                 <width>51</width>
+                 <height>31</height>
+                </rect>
+               </property>
                <property name="text">
-                <string>Admin</string>
+                <string>Poste</string>
                </property>
-              </item>
+              </widget>
+              <widget class="QLineEdit" name="lineUsernameEmp">
+               <property name="geometry">
+                <rect>
+                 <x>90</x>
+                 <y>110</y>
+                 <width>351</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <property name="readOnly">
+                <bool>false</bool>
+               </property>
+              </widget>
+              <widget class="QLabel" name="labelCINEdit_3">
+               <property name="geometry">
+                <rect>
+                 <x>9</x>
+                 <y>55</y>
+                 <width>41</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>CIN</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="labelNomEdit_3">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>210</y>
+                 <width>61</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Nom</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="labelUsernameEdit_3">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>110</y>
+                 <width>71</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Username</string>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="lineSalaireEmp">
+               <property name="geometry">
+                <rect>
+                 <x>690</x>
+                 <y>130</y>
+                 <width>481</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <property name="readOnly">
+                <bool>false</bool>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="lineNomEmp">
+               <property name="geometry">
+                <rect>
+                 <x>90</x>
+                 <y>210</y>
+                 <width>351</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <property name="readOnly">
+                <bool>false</bool>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="btnSaveEditEmployee">
+               <property name="geometry">
+                <rect>
+                 <x>300</x>
+                 <y>510</y>
+                 <width>231</width>
+                 <height>41</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Enregistrer les modifications</string>
+               </property>
+              </widget>
+              <widget class="QComboBox" name="comboPosteEmp">
+               <property name="geometry">
+                <rect>
+                 <x>690</x>
+                 <y>200</y>
+                 <width>481</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Choisir un poste</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>RH</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Chercheur</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Technicien</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Responsable_laboratoire</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Directeur_de_projet</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Admin</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Responsable_financier</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Responsable_de_stock</string>
+                </property>
+               </item>
+              </widget>
+              <widget class="QLabel" name="labelEmailEdit_3">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>160</y>
+                 <width>61</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Email</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="label_13">
+               <property name="geometry">
+                <rect>
+                 <x>570</x>
+                 <y>330</y>
+                 <width>100</width>
+                 <height>34</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Role</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="labelDateEmbaucheEdit_3">
+               <property name="geometry">
+                <rect>
+                 <x>570</x>
+                 <y>60</y>
+                 <width>111</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Date Embauche</string>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="lineCIN_emp">
+               <property name="geometry">
+                <rect>
+                 <x>90</x>
+                 <y>50</y>
+                 <width>351</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+              <widget class="QToolButton" name="BtnPopupCancelLabs_10">
+               <property name="geometry">
+                <rect>
+                 <x>1150</x>
+                 <y>0</y>
+                 <width>31</width>
+                 <height>27</height>
+                </rect>
+               </property>
+               <property name="toolTip">
+                <string>Fermer</string>
+               </property>
+               <property name="text">
+                <string>✕</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="labelDepartementEdit_3">
+               <property name="geometry">
+                <rect>
+                 <x>570</x>
+                 <y>260</y>
+                 <width>69</width>
+                 <height>16</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Département</string>
+               </property>
+              </widget>
+              <widget class="QComboBox" name="comboDepartementEmp">
+               <property name="geometry">
+                <rect>
+                 <x>690</x>
+                 <y>260</y>
+                 <width>481</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Choisir un département</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>RH</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Recherche</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Laboratoires</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Administration</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Finance</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Directeur_general</string>
+                </property>
+               </item>
+              </widget>
+              <widget class="QLabel" name="labelSalaireEdit_3">
+               <property name="geometry">
+                <rect>
+                 <x>580</x>
+                 <y>140</y>
+                 <width>61</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Salaire</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="labelPrenomEdit_3">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>270</y>
+                 <width>61</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Prénom</string>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="linePrenomEmp">
+               <property name="geometry">
+                <rect>
+                 <x>90</x>
+                 <y>270</y>
+                 <width>351</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <property name="readOnly">
+                <bool>false</bool>
+               </property>
+              </widget>
              </widget>
             </widget>
             <widget class="QWidget" name="page_Stat">
@@ -1472,101 +1707,146 @@
                <rect>
                 <x>50</x>
                 <y>30</y>
-                <width>1091</width>
+                <width>1171</width>
                 <height>531</height>
                </rect>
               </property>
               <property name="title">
-               <string>Pointage</string>
+               <string/>
               </property>
-              <widget class="QLineEdit" name="input_badge">
-               <property name="geometry">
-                <rect>
-                 <x>310</x>
-                 <y>450</y>
-                 <width>171</width>
-                 <height>51</height>
-                </rect>
-               </property>
-              </widget>
-              <widget class="QLabel" name="label_9">
-               <property name="geometry">
-                <rect>
-                 <x>90</x>
-                 <y>440</y>
-                 <width>221</width>
-                 <height>61</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>scanner votre badge ici</string>
-               </property>
-              </widget>
               <widget class="QLabel" name="label_feedback">
                <property name="geometry">
                 <rect>
-                 <x>470</x>
-                 <y>410</y>
-                 <width>201</width>
-                 <height>81</height>
+                 <x>510</x>
+                 <y>441</y>
+                 <width>281</width>
+                 <height>41</height>
                 </rect>
                </property>
                <property name="text">
                 <string/>
                </property>
               </widget>
-              <widget class="QPushButton" name="btn_exportt">
+              <widget class="QFrame" name="frame">
                <property name="geometry">
                 <rect>
-                 <x>610</x>
-                 <y>440</y>
-                 <width>191</width>
-                 <height>51</height>
+                 <x>0</x>
+                 <y>20</y>
+                 <width>1171</width>
+                 <height>561</height>
                 </rect>
                </property>
-               <property name="text">
-                <string>Exporter excel</string>
+               <property name="frameShape">
+                <enum>QFrame::Shape::StyledPanel</enum>
                </property>
+               <property name="frameShadow">
+                <enum>QFrame::Shadow::Raised</enum>
+               </property>
+               <widget class="QTableView" name="tableView">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>1171</width>
+                  <height>391</height>
+                 </rect>
+                </property>
+               </widget>
+               <widget class="QPushButton" name="btn_reset">
+                <property name="geometry">
+                 <rect>
+                  <x>750</x>
+                  <y>420</y>
+                  <width>181</width>
+                  <height>51</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Reset pointage</string>
+                </property>
+               </widget>
+               <widget class="QLineEdit" name="input_badge">
+                <property name="geometry">
+                 <rect>
+                  <x>230</x>
+                  <y>420</y>
+                  <width>251</width>
+                  <height>51</height>
+                 </rect>
+                </property>
+               </widget>
+               <widget class="QPushButton" name="btn_exportt">
+                <property name="geometry">
+                 <rect>
+                  <x>950</x>
+                  <y>420</y>
+                  <width>201</width>
+                  <height>51</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Exporter excel</string>
+                </property>
+               </widget>
+               <widget class="QLabel" name="label_9">
+                <property name="geometry">
+                 <rect>
+                  <x>10</x>
+                  <y>410</y>
+                  <width>221</width>
+                  <height>61</height>
+                 </rect>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>15</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Scanner votre badge ici:</string>
+                </property>
+               </widget>
               </widget>
-              <widget class="QTableView" name="tableView">
-               <property name="geometry">
-                <rect>
-                 <x>10</x>
-                 <y>40</y>
-                 <width>951</width>
-                 <height>371</height>
-                </rect>
-               </property>
-              </widget>
-              <widget class="QPushButton" name="btn_reset">
-               <property name="geometry">
-                <rect>
-                 <x>840</x>
-                 <y>440</y>
-                 <width>151</width>
-                 <height>51</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Reset pointage</string>
-               </property>
-              </widget>
-              <widget class="QToolButton" name="btn_ret">
-               <property name="geometry">
-                <rect>
-                 <x>1040</x>
-                 <y>30</y>
-                 <width>31</width>
-                 <height>27</height>
-                </rect>
-               </property>
-               <property name="toolTip">
-                <string>Fermer</string>
-               </property>
-               <property name="text">
-                <string>✕</string>
-               </property>
-              </widget>
+             </widget>
+             <widget class="QLabel" name="label_15">
+              <property name="geometry">
+               <rect>
+                <x>50</x>
+                <y>0</y>
+                <width>111</width>
+                <height>31</height>
+               </rect>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>15</pointsize>
+                <italic>false</italic>
+                <fontweight>DemiBold</fontweight>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string>Pointage</string>
+              </property>
+             </widget>
+             <widget class="QToolButton" name="btn_ret">
+              <property name="geometry">
+               <rect>
+                <x>1190</x>
+                <y>0</y>
+                <width>31</width>
+                <height>27</height>
+               </rect>
+              </property>
+              <property name="toolTip">
+               <string>Fermer</string>
+              </property>
+              <property name="text">
+               <string>✕</string>
+              </property>
              </widget>
             </widget>
            </widget>
@@ -1578,7 +1858,7 @@
           <item>
            <widget class="QStackedWidget" name="stacked_I">
             <property name="currentIndex">
-             <number>2</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="inventory">
              <layout class="QGridLayout" name="gridLayout_3">
@@ -1808,6 +2088,11 @@
                   <widget class="QComboBox" name="InventoryStatus">
                    <item>
                     <property name="text">
+                     <string>-- Tous --</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
                      <string>on_hand</string>
                     </property>
                    </item>
@@ -1850,8 +2135,20 @@
                    </property>
                   </widget>
                  </item>
+                 <item row="1" column="6">
+                  <widget class="QPushButton" name="BtnInventoryReset">
+                   <property name="text">
+                    <string>Réinitialiser</string>
+                   </property>
+                  </widget>
+                 </item>
                  <item row="1" column="3">
                   <widget class="QComboBox" name="InventoryZone">
+                   <item>
+                    <property name="text">
+                     <string>-- Tous --</string>
+                    </property>
+                   </item>
                    <item>
                     <property name="text">
                      <string>A</string>
@@ -2043,7 +2340,7 @@
                   <item row="1" column="1">
                    <widget class="QLineEdit" name="Sku">
                     <property name="placeholderText">
-                     <string>SKU-001</string>
+                     <string>ABC-123</string>
                     </property>
                    </widget>
                   </item>
@@ -2367,7 +2664,7 @@
                   <item row="1" column="1">
                    <widget class="QLineEdit" name="Sku_2">
                     <property name="placeholderText">
-                     <string>SKU-001</string>
+                     <string>ABC-123</string>
                     </property>
                    </widget>
                   </item>
@@ -2871,6 +3168,23 @@
                </widget>
               </item>
               <item>
+               <layout class="QHBoxLayout" name="detailExportButtonsLayout">
+                <property name="spacing">
+                 <number>10</number>
+                </property>
+                <item>
+                 <widget class="QPushButton" name="BtnInventoryDetailExportPdf">
+                  <property name="text">
+                   <string>Exporter PDF</string>
+                  </property>
+                  <property name="property" stdset="0">
+                   <string>primary</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
                <spacer name="vSpacerDetailBottom">
                 <property name="orientation">
                  <enum>Qt::Orientation::Vertical</enum>
@@ -3126,7 +3440,137 @@
               <property name="verticalSpacing">
                <number>20</number>
               </property>
-              <item row="6" column="0" colspan="4">
+              <item row="6" column="0">
+               <widget class="QLabel" name="lblStatusBrevetAdd">
+                <property name="text">
+                 <string>status_brevet :</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="lblTitreAdd">
+                <property name="text">
+                 <string>titre :</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="3">
+               <widget class="QLineEdit" name="lineResumeAdd"/>
+              </item>
+              <item row="5" column="1">
+               <widget class="QDateEdit" name="dateDepotAdd">
+                <property name="calendarPopup">
+                 <bool>true</bool>
+                </property>
+                <property name="date">
+                 <date>
+                  <year>2000</year>
+                  <month>1</month>
+                  <day>1</day>
+                 </date>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QComboBox" name="comboTypeBrevetAdd">
+                <item>
+                 <property name="text">
+                  <string>produit</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>procede</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>amelioration</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="lblTypeBrevetAdd">
+                <property name="text">
+                 <string>type_brevet :</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QLabel" name="lblInventeursAdd">
+                <property name="text">
+                 <string>inventeurs :</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="lblDomaineAdd">
+                <property name="text">
+                 <string>domaine_fabrication :</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="lineDomaineAdd"/>
+              </item>
+              <item row="2" column="2">
+               <widget class="QLabel" name="lblResumeAdd">
+                <property name="text">
+                 <string>resume :</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="lblDateDepotAdd">
+                <property name="text">
+                 <string>date_depot</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="lineNumeroBrevetAdd"/>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="lblNumeroBrevetAdd">
+                <property name="text">
+                 <string>numero_brevet :</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="lineTitreAdd"/>
+              </item>
+              <item row="6" column="1">
+               <widget class="QComboBox" name="comboStatusBrevetAdd">
+                <item>
+                 <property name="text">
+                  <string>En cours</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Depose</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Accepte</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Refuse</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Publie</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="7" column="0" colspan="4">
                <layout class="QHBoxLayout" name="hLayoutAddButtons">
                 <item>
                  <spacer name="spacerAddButtons">
@@ -3157,137 +3601,43 @@
                 </item>
                </layout>
               </item>
-              <item row="1" column="3">
-               <widget class="QLineEdit" name="lineResumeAdd"/>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="lblTypeBrevetAdd">
-                <property name="text">
-                 <string>type_brevet :</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QComboBox" name="comboTypeBrevetAdd">
-                <item>
-                 <property name="text">
-                  <string>produit</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>procede</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>amelioration</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="lblDomaineAdd">
-                <property name="text">
-                 <string>domaine_fabrication :</string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="0">
-               <widget class="QLabel" name="lblStatusBrevetAdd">
-                <property name="text">
-                 <string>status_brevet :</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2">
-               <widget class="QLabel" name="lblResumeAdd">
-                <property name="text">
-                 <string>resume :</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="1">
-               <widget class="QDateEdit" name="dateDepotAdd">
-                <property name="calendarPopup">
-                 <bool>true</bool>
-                </property>
-                <property name="date">
-                 <date>
-                  <year>2000</year>
-                  <month>1</month>
-                  <day>1</day>
-                 </date>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLineEdit" name="lineNumeroBrevetAdd"/>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="lblDateDepotAdd">
-                <property name="text">
-                 <string>date_depot</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLineEdit" name="lineTitreAdd"/>
-              </item>
-              <item row="5" column="1">
-               <widget class="QComboBox" name="comboStatusBrevetAdd">
-                <item>
-                 <property name="text">
-                  <string>En cours</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Depose</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Accepte</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Refuse</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Publie</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="lblNumeroBrevetAdd">
-                <property name="text">
-                 <string>numero_brevet :</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="lineDomaineAdd"/>
-              </item>
               <item row="0" column="3">
-               <widget class="QLineEdit" name="lineInventeursAdd"/>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="lblTitreAdd">
-                <property name="text">
-                 <string>titre :</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2">
-               <widget class="QLabel" name="lblInventeursAdd">
-                <property name="text">
-                 <string>inventeurs :</string>
-                </property>
+               <widget class="QComboBox" name="lineInventeursAdd">
+                <item>
+                 <property name="text">
+                  <string>RH</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Responsable_financier</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Responsable_de_stock</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Chercheur</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Directeur_de_projet</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Responsable_Labos</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Admin</string>
+                 </property>
+                </item>
                </widget>
               </item>
              </layout>
@@ -3312,56 +3662,20 @@
               <property name="verticalSpacing">
                <number>20</number>
               </property>
-              <item row="2" column="2">
-               <widget class="QLabel" name="lblInventeursEdit">
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="lineNumeroBrevetEdit"/>
+              </item>
+              <item row="0" column="2">
+               <widget class="QLabel" name="lblDateDepotEdit">
                 <property name="text">
-                 <string>inventeurs :</string>
+                 <string>date_depot</string>
                 </property>
                </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLineEdit" name="lineTitreEdit"/>
               </item>
               <item row="2" column="0">
                <widget class="QLabel" name="lblTypeBrevetEdit">
                 <property name="text">
                  <string>type_brevet :</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="3">
-               <widget class="QLineEdit" name="lineResumeEdit"/>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="lblDomaineEdit">
-                <property name="text">
-                 <string>domaine_fabrication :</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QComboBox" name="comboTypeBrevetEdit">
-                <item>
-                 <property name="text">
-                  <string>produit</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>procede</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>amelioration</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item row="3" column="2">
-               <widget class="QLabel" name="lblResumeEdit">
-                <property name="text">
-                 <string>resume :</string>
                 </property>
                </widget>
               </item>
@@ -3394,21 +3708,14 @@
                 </item>
                </widget>
               </item>
-              <item row="0" column="3">
-               <widget class="QDateEdit" name="dateDepotEdit">
-                <property name="calendarPopup">
-                 <bool>true</bool>
-                </property>
-                <property name="date">
-                 <date>
-                  <year>2000</year>
-                  <month>1</month>
-                  <day>1</day>
-                 </date>
+              <item row="4" column="2">
+               <widget class="QLabel" name="lblResumeEdit">
+                <property name="text">
+                 <string>resume :</string>
                 </property>
                </widget>
               </item>
-              <item row="5" column="0" colspan="4">
+              <item row="6" column="0" colspan="4">
                <layout class="QHBoxLayout" name="hLayoutEditButtons">
                 <item>
                  <spacer name="spacerEditButtons">
@@ -3439,17 +3746,30 @@
                 </item>
                </layout>
               </item>
-              <item row="2" column="3">
-               <widget class="QLineEdit" name="lineInventeursEdit"/>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLineEdit" name="lineNumeroBrevetEdit"/>
-              </item>
-              <item row="0" column="2">
-               <widget class="QLabel" name="lblDateDepotEdit">
+              <item row="1" column="2">
+               <widget class="QLabel" name="lblStatusBrevetEdit">
                 <property name="text">
-                 <string>date_depot</string>
+                 <string>status_brevet :</string>
                 </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="comboTypeBrevetEdit">
+                <item>
+                 <property name="text">
+                  <string>produit</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>procede</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>amelioration</string>
+                 </property>
+                </item>
                </widget>
               </item>
               <item row="0" column="0">
@@ -3459,21 +3779,87 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="2">
-               <widget class="QLabel" name="lblStatusBrevetEdit">
-                <property name="text">
-                 <string>status_brevet :</string>
+              <item row="0" column="3">
+               <widget class="QDateEdit" name="dateDepotEdit">
+                <property name="calendarPopup">
+                 <bool>true</bool>
+                </property>
+                <property name="date">
+                 <date>
+                  <year>2000</year>
+                  <month>1</month>
+                  <day>1</day>
+                 </date>
                 </property>
                </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="lblDomaineEdit">
+                <property name="text">
+                 <string>domaine_fabrication :</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="lineTitreEdit"/>
               </item>
               <item row="1" column="1">
                <widget class="QLineEdit" name="lineDomaineEdit"/>
               </item>
-              <item row="3" column="0">
+              <item row="2" column="2">
+               <widget class="QLabel" name="lblInventeursEdit">
+                <property name="text">
+                 <string>inventeurs :</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="3">
+               <widget class="QLineEdit" name="lineResumeEdit"/>
+              </item>
+              <item row="4" column="0">
                <widget class="QLabel" name="lblNumeroBrevetEdit">
                 <property name="text">
                  <string>numero_brevet :</string>
                 </property>
+               </widget>
+              </item>
+              <item row="2" column="3">
+               <widget class="QComboBox" name="lineInventeursEdit">
+                <item>
+                 <property name="text">
+                  <string>RH</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Responsable_financier</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Responsable_de_stock</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Chercheur</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Directeur_de_projet</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Responsable_Labos</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Admin</string>
+                 </property>
+                </item>
                </widget>
               </item>
              </layout>
@@ -4224,7 +4610,7 @@
                       <item row="1" column="1">
                        <layout class="QHBoxLayout" name="layoutAmountRow">
                         <property name="spacing">
-                         <number>4</number>
+                         <number>6</number>
                         </property>
                         <item>
                          <widget class="QPushButton" name="BtnAmountDecr">
@@ -4234,12 +4620,6 @@
                             <height>30</height>
                            </size>
                           </property>
-                          <property name="cursor">
-                           <cursorShape>PointingHandCursor</cursorShape>
-                          </property>
-                          <property name="toolTip">
-                           <string>Diminuer de 1 DT</string>
-                          </property>
                           <property name="text">
                            <string>−</string>
                           </property>
@@ -4247,9 +4627,6 @@
                         </item>
                         <item>
                          <widget class="QLineEdit" name="FormAmount">
-                          <property name="alignment">
-                           <set>Qt::AlignmentFlag::AlignCenter</set>
-                          </property>
                           <property name="placeholderText">
                            <string>ex: 2500</string>
                           </property>
@@ -4262,12 +4639,6 @@
                             <width>30</width>
                             <height>30</height>
                            </size>
-                          </property>
-                          <property name="cursor">
-                           <cursorShape>PointingHandCursor</cursorShape>
-                          </property>
-                          <property name="toolTip">
-                           <string>Augmenter de 1 DT</string>
                           </property>
                           <property name="text">
                            <string>+</string>
@@ -4528,7 +4899,7 @@
                      <widget class="QComboBox" name="FormType_2">
                       <item>
                        <property name="text">
-                        <string>Dépense</string>
+                        <string>Depense</string>
                        </property>
                       </item>
                       <item>
@@ -4645,7 +5016,7 @@
                     <item row="1" column="1">
                      <layout class="QHBoxLayout" name="layoutAmountRow_2">
                       <property name="spacing">
-                       <number>4</number>
+                       <number>6</number>
                       </property>
                       <item>
                        <widget class="QPushButton" name="BtnAmountDecr_2">
@@ -4655,12 +5026,6 @@
                           <height>30</height>
                          </size>
                         </property>
-                        <property name="cursor">
-                         <cursorShape>PointingHandCursor</cursorShape>
-                        </property>
-                        <property name="toolTip">
-                         <string>Diminuer de 1 DT</string>
-                        </property>
                         <property name="text">
                          <string>−</string>
                         </property>
@@ -4668,9 +5033,6 @@
                       </item>
                       <item>
                        <widget class="QLineEdit" name="FormAmount_2">
-                        <property name="alignment">
-                         <set>Qt::AlignmentFlag::AlignCenter</set>
-                        </property>
                         <property name="placeholderText">
                          <string/>
                         </property>
@@ -4683,12 +5045,6 @@
                           <width>30</width>
                           <height>30</height>
                          </size>
-                        </property>
-                        <property name="cursor">
-                         <cursorShape>PointingHandCursor</cursorShape>
-                        </property>
-                        <property name="toolTip">
-                         <string>Augmenter de 1 DT</string>
                         </property>
                         <property name="text">
                          <string>+</string>
@@ -4839,10 +5195,10 @@
              <widget class="QTableWidget" name="TableLabs_2">
               <property name="geometry">
                <rect>
-                <x>100</x>
-                <y>160</y>
-                <width>981</width>
-                <height>351</height>
+                <x>20</x>
+                <y>110</y>
+                <width>1191</width>
+                <height>401</height>
                </rect>
               </property>
               <property name="editTriggers">
@@ -4904,6 +5260,21 @@
               </column>
               <column>
                <property name="text">
+                <string>Montant</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Montant_paye</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Reste</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
                 <string>Resultat</string>
                </property>
               </column>
@@ -4942,7 +5313,7 @@
                 <string>payer</string>
                </property>
               </item>
-              <item row="0" column="7">
+              <item row="0" column="10">
                <property name="text">
                 <string>pret</string>
                </property>
@@ -5029,57 +5400,18 @@
                 <x>11</x>
                 <y>11</y>
                 <width>1194</width>
-                <height>141</height>
+                <height>91</height>
                </rect>
               </property>
               <property name="frameShape">
                <enum>QFrame::Shape::NoFrame</enum>
               </property>
-              <widget class="QLabel" name="LblLabsSearch_2">
-               <property name="geometry">
-                <rect>
-                 <x>201</x>
-                 <y>40</y>
-                 <width>150</width>
-                 <height>20</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Recherche</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="LblLabsSpec_2">
-               <property name="geometry">
-                <rect>
-                 <x>450</x>
-                 <y>40</y>
-                 <width>150</width>
-                 <height>20</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Spécialité</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="LblLabsCap_2">
-               <property name="geometry">
-                <rect>
-                 <x>660</x>
-                 <y>20</y>
-                 <width>141</width>
-                 <height>41</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>disponibilite</string>
-               </property>
-              </widget>
               <widget class="QLineEdit" name="LabsSearch_2">
                <property name="geometry">
                 <rect>
-                 <x>181</x>
-                 <y>90</y>
-                 <width>200</width>
+                 <x>21</x>
+                 <y>20</y>
+                 <width>301</width>
                  <height>35</height>
                 </rect>
                </property>
@@ -5090,8 +5422,8 @@
               <widget class="QComboBox" name="LabsSpec_2">
                <property name="geometry">
                 <rect>
-                 <x>431</x>
-                 <y>90</y>
+                 <x>390</x>
+                 <y>20</y>
                  <width>171</width>
                  <height>41</height>
                 </rect>
@@ -5115,8 +5447,8 @@
               <widget class="QComboBox" name="LabsCap_2">
                <property name="geometry">
                 <rect>
-                 <x>650</x>
-                 <y>90</y>
+                 <x>609</x>
+                 <y>20</y>
                  <width>161</width>
                  <height>41</height>
                 </rect>
@@ -5140,8 +5472,8 @@
               <widget class="QPushButton" name="btnReinitialiserPub_3">
                <property name="geometry">
                 <rect>
-                 <x>930</x>
-                 <y>40</y>
+                 <x>880</x>
+                 <y>20</y>
                  <width>190</width>
                  <height>50</height>
                 </rect>
@@ -5159,7 +5491,7 @@
                 <x>10</x>
                 <y>10</y>
                 <width>1191</width>
-                <height>581</height>
+                <height>601</height>
                </rect>
               </property>
               <property name="minimumSize">
@@ -5175,9 +5507,9 @@
                <property name="geometry">
                 <rect>
                  <x>74</x>
-                 <y>120</y>
+                 <y>50</y>
                  <width>1051</width>
-                 <height>331</height>
+                 <height>461</height>
                 </rect>
                </property>
                <property name="frameShape">
@@ -5196,7 +5528,7 @@
                  <string>Bloc B, Salle 204</string>
                 </property>
                </widget>
-               <widget class="QLineEdit" name="LabResponsible_5">
+               <widget class="QComboBox" name="LabResponsible_5">
                 <property name="geometry">
                  <rect>
                   <x>680</x>
@@ -5463,54 +5795,81 @@
                  <string>ghost</string>
                 </property>
                </widget>
-              </widget>
-              <widget class="QWidget" name="layoutWidget">
-               <property name="geometry">
-                <rect>
-                 <x>140</x>
-                 <y>30</y>
-                 <width>921</width>
-                 <height>71</height>
-                </rect>
-               </property>
-               <layout class="QHBoxLayout" name="popupLabsHeader_5">
-                <item>
-                 <widget class="QLabel" name="PopupTitleLabs_5">
-                  <property name="text">
-                   <string>Modifier un laboratoire</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="popupLabsHeaderSpacer_5">
-                  <property name="orientation">
-                   <enum>Qt::Orientation::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <widget class="QToolButton" name="BtnPopupCancelLabs_5">
-                  <property name="toolTip">
-                   <string>Fermer</string>
-                  </property>
-                  <property name="text">
-                   <string>✕</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+               <widget class="QLabel" name="label_22">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>320</y>
+                  <width>130</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Montant</string>
+                </property>
+               </widget>
+               <widget class="QLabel" name="label_23">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>1000</y>
+                  <width>130</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Reste</string>
+                </property>
+               </widget>
+               <widget class="QLabel" name="label_24">
+                <property name="geometry">
+                 <rect>
+                  <x>560</x>
+                  <y>320</y>
+                  <width>130</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Montant_paye</string>
+                </property>
+               </widget>
+               <widget class="QDoubleSpinBox" name="LabMontant_5">
+                <property name="geometry">
+                 <rect>
+                  <x>150</x>
+                  <y>320</y>
+                  <width>300</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+               </widget>
+               <widget class="QLineEdit" name="LabReste_5">
+                <property name="geometry">
+                 <rect>
+                  <x>150</x>
+                  <y>1000</y>
+                  <width>300</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+               </widget>
+               <widget class="QDoubleSpinBox" name="LabMontantPaye_5">
+                <property name="geometry">
+                 <rect>
+                  <x>680</x>
+                  <y>320</y>
+                  <width>300</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+               </widget>
               </widget>
               <widget class="QPushButton" name="BtnPopupSaveLabs_5">
                <property name="geometry">
                 <rect>
-                 <x>220</x>
-                 <y>500</y>
+                 <x>210</x>
+                 <y>540</y>
                  <width>190</width>
                  <height>50</height>
                 </rect>
@@ -5525,8 +5884,8 @@
               <widget class="QPushButton" name="btnAjouterPub_4">
                <property name="geometry">
                 <rect>
-                 <x>500</x>
-                 <y>500</y>
+                 <x>490</x>
+                 <y>540</y>
                  <width>190</width>
                  <height>50</height>
                 </rect>
@@ -5538,14 +5897,38 @@
               <widget class="QPushButton" name="retour_stat_9">
                <property name="geometry">
                 <rect>
-                 <x>800</x>
-                 <y>500</y>
+                 <x>790</x>
+                 <y>540</y>
                  <width>190</width>
                  <height>50</height>
                 </rect>
                </property>
                <property name="text">
                 <string>retour</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="lblPageTitle_4">
+               <property name="geometry">
+                <rect>
+                 <x>430</x>
+                 <y>10</y>
+                 <width>251</width>
+                 <height>51</height>
+                </rect>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Vivaldi</family>
+                 <pointsize>12</pointsize>
+                 <italic>true</italic>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Modifier un laboratoire</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                </property>
               </widget>
              </widget>
@@ -5556,8 +5939,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>1191</width>
-                <height>591</height>
+                <width>1211</width>
+                <height>611</height>
                </rect>
               </property>
               <property name="minimumSize">
@@ -5573,9 +5956,9 @@
                <property name="geometry">
                 <rect>
                  <x>84</x>
-                 <y>100</y>
+                 <y>50</y>
                  <width>1041</width>
-                 <height>371</height>
+                 <height>471</height>
                 </rect>
                </property>
                <property name="frameShape">
@@ -5594,7 +5977,7 @@
                  <string>Bloc B, Salle 204</string>
                 </property>
                </widget>
-               <widget class="QLineEdit" name="LabResponsible_3">
+               <widget class="QComboBox" name="LabResponsible_3">
                 <property name="geometry">
                  <rect>
                   <x>677</x>
@@ -5842,54 +6225,81 @@
                  </property>
                 </item>
                </widget>
-              </widget>
-              <widget class="QWidget" name="layoutWidget_LabsAdd">
-               <property name="geometry">
-                <rect>
-                 <x>90</x>
-                 <y>20</y>
-                 <width>1001</width>
-                 <height>61</height>
-                </rect>
-               </property>
-               <layout class="QHBoxLayout" name="popupLabsHeader_3">
-                <item>
-                 <widget class="QLabel" name="PopupTitleLabs_3">
-                  <property name="text">
-                   <string>Ajouter un laboratoire</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="popupLabsHeaderSpacer_3">
-                  <property name="orientation">
-                   <enum>Qt::Orientation::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <widget class="QToolButton" name="BtnPopupCancelLabs_3">
-                  <property name="toolTip">
-                   <string>Fermer</string>
-                  </property>
-                  <property name="text">
-                   <string>✕</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+               <widget class="QLabel" name="label_19">
+                <property name="geometry">
+                 <rect>
+                  <x>520</x>
+                  <y>350</y>
+                  <width>130</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Montant_paye</string>
+                </property>
+               </widget>
+               <widget class="QLabel" name="label_20">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>350</y>
+                  <width>130</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Montant</string>
+                </property>
+               </widget>
+               <widget class="QLabel" name="label_21">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>1000</y>
+                  <width>130</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Reste</string>
+                </property>
+               </widget>
+               <widget class="QDoubleSpinBox" name="LabMontant_3">
+                <property name="geometry">
+                 <rect>
+                  <x>140</x>
+                  <y>350</y>
+                  <width>300</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+               </widget>
+               <widget class="QLineEdit" name="LabReste_3">
+                <property name="geometry">
+                 <rect>
+                  <x>140</x>
+                  <y>1000</y>
+                  <width>300</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+               </widget>
+               <widget class="QDoubleSpinBox" name="LabMontantPaye_3">
+                <property name="geometry">
+                 <rect>
+                  <x>680</x>
+                  <y>350</y>
+                  <width>300</width>
+                  <height>40</height>
+                 </rect>
+                </property>
+               </widget>
               </widget>
               <widget class="QPushButton" name="BtnPopupSaveLabs_3">
                <property name="geometry">
                 <rect>
                  <x>130</x>
-                 <y>500</y>
+                 <y>550</y>
                  <width>200</width>
                  <height>50</height>
                 </rect>
@@ -5905,7 +6315,7 @@
                <property name="geometry">
                 <rect>
                  <x>690</x>
-                 <y>500</y>
+                 <y>550</y>
                  <width>200</width>
                  <height>50</height>
                 </rect>
@@ -5921,7 +6331,7 @@
                <property name="geometry">
                 <rect>
                  <x>420</x>
-                 <y>500</y>
+                 <y>550</y>
                  <width>190</width>
                  <height>50</height>
                 </rect>
@@ -5934,13 +6344,37 @@
                <property name="geometry">
                 <rect>
                  <x>960</x>
-                 <y>500</y>
+                 <y>550</y>
                  <width>190</width>
                  <height>50</height>
                 </rect>
                </property>
                <property name="text">
                 <string>retour</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="lblPageTitle_3">
+               <property name="geometry">
+                <rect>
+                 <x>460</x>
+                 <y>10</y>
+                 <width>251</width>
+                 <height>51</height>
+                </rect>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Vivaldi</family>
+                 <pointsize>12</pointsize>
+                 <italic>true</italic>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Ajouter un laboratoire</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                </property>
               </widget>
              </widget>
@@ -6003,7 +6437,7 @@
               <property name="geometry">
                <rect>
                 <x>840</x>
-                <y>500</y>
+                <y>550</y>
                 <width>190</width>
                 <height>50</height>
                </rect>
@@ -6016,9 +6450,9 @@
               <property name="geometry">
                <rect>
                 <x>70</x>
-                <y>120</y>
+                <y>70</y>
                 <width>1025</width>
-                <height>351</height>
+                <height>451</height>
                </rect>
               </property>
               <property name="frameShape">
@@ -6184,7 +6618,7 @@
                <property name="geometry">
                 <rect>
                  <x>150</x>
-                 <y>190</y>
+                 <y>200</y>
                  <width>300</width>
                  <height>40</height>
                 </rect>
@@ -6209,7 +6643,7 @@
                <property name="geometry">
                 <rect>
                  <x>680</x>
-                 <y>190</y>
+                 <y>200</y>
                  <width>300</width>
                  <height>40</height>
                 </rect>
@@ -6285,12 +6719,81 @@
                 </property>
                </item>
               </widget>
+              <widget class="QLineEdit" name="aff_montant">
+               <property name="geometry">
+                <rect>
+                 <x>150</x>
+                 <y>340</y>
+                 <width>300</width>
+                 <height>40</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="aff_montant_paye">
+               <property name="geometry">
+                <rect>
+                 <x>680</x>
+                 <y>340</y>
+                 <width>300</width>
+                 <height>40</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QLineEdit" name="aff_reste">
+               <property name="geometry">
+                <rect>
+                 <x>150</x>
+                 <y>400</y>
+                 <width>300</width>
+                 <height>40</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QLabel" name="label_16">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>340</y>
+                 <width>130</width>
+                 <height>40</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Montant</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="label_17">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>400</y>
+                 <width>130</width>
+                 <height>40</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Reste</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="label_18">
+               <property name="geometry">
+                <rect>
+                 <x>550</x>
+                 <y>340</y>
+                 <width>130</width>
+                 <height>40</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Montant_paye</string>
+               </property>
+              </widget>
              </widget>
              <widget class="QLabel" name="lblPageTitle_2">
               <property name="geometry">
                <rect>
-                <x>90</x>
-                <y>30</y>
+                <x>440</x>
+                <y>20</y>
                 <width>251</width>
                 <height>51</height>
                </rect>
@@ -6310,27 +6813,11 @@
                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
              </widget>
-             <widget class="QToolButton" name="BtnPopupCancelLabs_4">
-              <property name="geometry">
-               <rect>
-                <x>1030</x>
-                <y>50</y>
-                <width>41</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <property name="toolTip">
-               <string>Fermer</string>
-              </property>
-              <property name="text">
-               <string>✕</string>
-              </property>
-             </widget>
              <widget class="QPushButton" name="BtnExportLabsDirect">
               <property name="geometry">
                <rect>
                 <x>220</x>
-                <y>505</y>
+                <y>550</y>
                 <width>190</width>
                 <height>50</height>
                </rect>
@@ -6343,7 +6830,7 @@
               <property name="geometry">
                <rect>
                 <x>490</x>
-                <y>500</y>
+                <y>550</y>
                 <width>261</width>
                 <height>51</height>
                </rect>
@@ -6419,7 +6906,14 @@
                 <item row="2" column="0">
                  <widget class="QPushButton" name="btnAppliquerProj">
                   <property name="text">
-                   <string>Appliquer</string>
+                   <string>Trier</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QPushButton" name="btnFiltrerDateProj">
+                  <property name="text">
+                   <string>Chercher par date</string>
                   </property>
                  </widget>
                 </item>
@@ -6606,7 +7100,18 @@
                </layout>
               </item>
               <item row="1" column="3">
-               <widget class="QLineEdit" name="lineResumeAddProj"/>
+               <widget class="QComboBox" name="lineResumeAddProj">
+                <item>
+                 <property name="text">
+                  <string>Urgent</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>N'est pas urgent</string>
+                 </property>
+                </item>
+               </widget>
               </item>
               <item row="2" column="0">
                <widget class="QLabel" name="lblTypeBrevetAddProj">
@@ -6657,7 +7162,23 @@
                <widget class="QLineEdit" name="lineDomaineAddProj"/>
               </item>
               <item row="0" column="3">
-               <widget class="QLineEdit" name="lineInventeursAddProj"/>
+               <widget class="QComboBox" name="lineInventeursAddProj">
+                <item>
+                 <property name="text">
+                  <string>N'a pas encore commencé</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>En cours</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Terminé</string>
+                 </property>
+                </item>
+               </widget>
               </item>
               <item row="0" column="0">
                <widget class="QLabel" name="lblTitreAddProj">
@@ -6725,7 +7246,18 @@
                </widget>
               </item>
               <item row="3" column="3">
-               <widget class="QLineEdit" name="lineResumeEditProj"/>
+               <widget class="QComboBox" name="lineResumeEditProj">
+                <item>
+                 <property name="text">
+                  <string>Urgent</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>N'est pas urgent</string>
+                 </property>
+                </item>
+               </widget>
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="lblDomaineEditProj">
@@ -6773,7 +7305,23 @@
                </layout>
               </item>
               <item row="2" column="3">
-               <widget class="QLineEdit" name="lineInventeursEditProj"/>
+               <widget class="QComboBox" name="lineInventeursEditProj">
+                <item>
+                 <property name="text">
+                  <string>N'a pas encore commencé</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>En cours</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Terminé</string>
+                 </property>
+                </item>
+               </widget>
               </item>
               <item row="0" column="2">
                <widget class="QLabel" name="lblDateDepotEditProj">
@@ -6823,16 +7371,43 @@
             <widget class="QWidget" name="page_proj_empty">
              <layout class="QVBoxLayout" name="verticalLayoutProjEmpty">
               <item>
-               <widget class="QLabel" name="stat_pub_8">
+               <widget class="QLabel" name="lblStatsTitleProj">
                 <property name="text">
-                 <string/>
+                 <string>Statistiques des Projets</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
                 </property>
                </widget>
               </item>
               <item>
+               <layout class="QHBoxLayout" name="hLayoutProjStats">
+                <item>
+                 <widget class="QWidget" name="statsWidgetProjStatus" native="true">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>300</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QWidget" name="statsWidgetProjPrio" native="true">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>300</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
                <widget class="QPushButton" name="retour_statn">
                 <property name="text">
-                 <string>retour</string>
+                 <string>Retour</string>
                 </property>
                </widget>
               </item>

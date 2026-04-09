@@ -22,6 +22,17 @@ LoginDialog::LoginDialog(QWidget *parent) :
     // Masquer le mot de passe
     ui->lePassword->setEchoMode(QLineEdit::Password);
 
+    ui->leUsername->setPlaceholderText(QStringLiteral("Identifiant (ex. fourni par le RH)"));
+    ui->lePassword->setPlaceholderText(QStringLiteral("Mot de passe du compte"));
+    ui->leUsername->setToolTip(QStringLiteral("Saisissez le nom d’utilisateur attribué à votre compte employé."));
+    ui->lePassword->setToolTip(QStringLiteral("Saisissez le mot de passe associé à cet identifiant."));
+    ui->btnLogin->setToolTip(QStringLiteral("Valide la connexion avec les identifiants saisis."));
+    ui->btnForgotPass->setToolTip(
+        QStringLiteral("Si vous avez oublié le mot de passe : vous devrez confirmer votre identifiant et votre CIN, "
+                        "puis choisir un nouveau mot de passe conforme aux règles de sécurité (mot de passe fort)."));
+    ui->btnFaceID->setToolTip(QStringLiteral("Connexion par reconnaissance faciale (après avoir saisi l’identifiant)."));
+    ui->Quitter->setToolTip(QStringLiteral("Fermer la fenêtre de connexion."));
+
     this->setWindowTitle("Connexion - Smart Research");
 
     // Style "Soft Minimalism" (Inspiré du code HTML/CSS fourni, avec écriture Noire)
@@ -210,26 +221,33 @@ void LoginDialog::on_btnForgotPass_clicked()
     query.bindValue(":cin", cin);
 
     if (query.exec() && query.next()) {
-        // 2. Si l'identité est confirmée, on demande le NOUVEAU mot de passe
-        QString newPass = QInputDialog::getText(this, "Succès",
-                                                "Identité confirmée. Entrez votre nouveau mot de passe :",
-                                                QLineEdit::Password, "", &ok);
+        // 2. Nouveau mot de passe (même règle de force que la création de compte)
+        QString newPass;
+        for (;;) {
+            newPass = QInputDialog::getText(this, "Succès",
+                                            "Identité confirmée. Entrez un mot de passe fort (min. 10 car., "
+                                            "minuscules, majuscules, chiffres, caractère spécial) :",
+                                            QLineEdit::Password, "", &ok);
+            if (!ok || newPass.isEmpty())
+                return;
+            if (Employe::motDePasseAcceptable(newPass))
+                break;
+            QMessageBox::warning(this, "Mot de passe trop faible",
+                                 "Le mot de passe doit atteindre au moins le niveau « Fort » "
+                                 "(comme à la création de compte employé). Réessayez.");
+        }
 
-        if (ok && !newPass.isEmpty()) {
-            // Ici, tu dois utiliser ta fonction de hachage habituelle (ex: QCryptographicHash)
-            // Si tu n'as pas encore de fonction de hash, dis-le moi !
-            QByteArray hashedPass = QCryptographicHash::hash(newPass.toUtf8(), QCryptographicHash::Sha256).toHex();
+        QByteArray hashedPass = QCryptographicHash::hash(newPass.toUtf8(), QCryptographicHash::Sha256).toHex();
 
-            QSqlQuery updateQuery;
-            updateQuery.prepare("UPDATE EMPLOYES SET PASSWORD_HASH = :pass WHERE USERNAME = :user");
-            updateQuery.bindValue(":pass", QString(hashedPass));
-            updateQuery.bindValue(":user", username);
+        QSqlQuery updateQuery;
+        updateQuery.prepare("UPDATE EMPLOYES SET PASSWORD_HASH = :pass WHERE USERNAME = :user");
+        updateQuery.bindValue(":pass", QString(hashedPass));
+        updateQuery.bindValue(":user", username);
 
-            if (updateQuery.exec()) {
-                QMessageBox::information(this, "Succès", "Mot de passe mis à jour avec succès !");
-            } else {
-                QMessageBox::critical(this, "Erreur", "Impossible de mettre à jour la base de données.");
-            }
+        if (updateQuery.exec()) {
+            QMessageBox::information(this, "Succès", "Mot de passe mis à jour avec succès !");
+        } else {
+            QMessageBox::critical(this, "Erreur", "Impossible de mettre à jour la base de données.");
         }
     } else {
         QMessageBox::critical(this, "Erreur", "Username ou CIN incorrect.");

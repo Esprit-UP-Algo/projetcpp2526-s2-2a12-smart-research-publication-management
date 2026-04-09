@@ -7,7 +7,7 @@
         <file>images/logo_off.png</file>
     </qresource>
     <qresource prefix="/theme">
-        <file>style.qss</file>
+        <file>style_dark.qss</file>
         <file>style_light.qss</file>
     </qresource>
 </RCC>
