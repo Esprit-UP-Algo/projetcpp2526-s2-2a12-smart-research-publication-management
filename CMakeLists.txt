@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # --- 1. CONFIGURATION QT (AJOUT MULTIMEDIA ICI) ---
 # On a ajouté Multimedia et MultimediaWidgets
-find_package(Qt6 REQUIRED COMPONENTS Widgets Sql Charts Network Multimedia MultimediaWidgets)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Sql Charts Network Multimedia MultimediaWidgets SerialPort WebEngineWidgets WebChannel)
 
 # --- 2. CONFIGURATION OPENCV ---
 set(OpenCV_DIR "C:/OpenCV-MinGW-Build-OpenCV-4.5.5-x64/x64/mingw/lib")
@@ -52,6 +52,12 @@ set(PROJECT_SOURCES
     projet.h
     projet.cpp
     resources.qrc
+    arduino.h
+    arduino.cpp
+    rfidhandler.h
+    rfidhandler.cpp
+    mapdialog.h
+    mapdialog.cpp
 )
 
 # --- 4. CRÉATION DE L'EXÉCUTABLE ---
@@ -71,6 +77,9 @@ target_link_libraries(SmartResearchPublicationManagement
         Qt6::Network
         Qt6::Multimedia         # <--- AJOUTÉ
         Qt6::MultimediaWidgets  # <--- AJOUTÉ
+        Qt6::SerialPort         # <--- AJOUTÉ pour Arduino RFID
+        Qt6::WebEngineWidgets   # <--- AJOUTÉ pour carte embarquée
+        Qt6::WebChannel         # <--- AJOUTÉ pour pont JS↔Qt
         ${OpenCV_LIBS}
 )
 

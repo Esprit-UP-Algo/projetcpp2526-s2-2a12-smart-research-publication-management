@@ -170,34 +170,29 @@ void LoginDialog::on_btnLogin_clicked()
         ui->lePassword->setFocus();
     }
 }
-void LoginDialog::on_btnFaceID_clicked()
-{
+void LoginDialog::on_btnFaceID_clicked() {
     QString user = ui->leUsername->text().trimmed();
-
     if (user.isEmpty()) {
-        QMessageBox::warning(this, "Erreur", "Veuillez saisir votre username.");
+        QMessageBox::warning(this, "Erreur", "Saisissez votre nom !");
         return;
     }
 
     FaceAuth auth;
-    // 1. Reconnaissance faciale OpenCV
+    // 1. Appel de l'IA (Python)
     if (auth.identifierUtilisateur(user)) {
-
         QString errorMsg;
-        // 2. Initialisation de la session (C'est ici que le rôle est fixé)
+        // 2. Appel de la Base de données (SQL)
         if (Employe::authentifierFaceID(user, &errorMsg)) {
-
-            // 3. REDIRECTION IDENTIQUE
-            // On ferme le dialogue, le main.cpp lancera MainWindow
-            this->accept();
-
+            this->accept(); // Succès total !
         } else {
-            QMessageBox::critical(this, "Erreur Session", errorMsg);
+            QMessageBox::critical(this, "Erreur SQL", errorMsg);
         }
     } else {
-        QMessageBox::critical(this, "Échec", "Visage non reconnu pour " + user);
+        // C'est ici que s'affiche l'image que tu m'as montrée
+        QMessageBox::critical(this, "Échec IA", "Visage non reconnu");
     }
 }
+
 void LoginDialog::on_Quitter_clicked()
 {
     this->reject(); // Ferme la fenêtre proprement

@@ -22,6 +22,7 @@ public:
         QString zone;
         QString shelf;
         QString description;
+        int     useCount;
         int     idemp;
     };
 
@@ -60,6 +61,8 @@ public:
                          const QString &type,
                          const QString &orderBy = "SKU",
                          QString *err = nullptr);
+    // Dans la section "Search / filter", après chercher(...)
+    static bool checkThresholdAlerts(QVector<Row> &outAlerts, QString *err = nullptr);
 
 private:
     QString m_idProduct;
