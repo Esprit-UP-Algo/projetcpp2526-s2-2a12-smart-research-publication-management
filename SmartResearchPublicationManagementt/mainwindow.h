@@ -11,6 +11,7 @@
 #include "finance.h"
 #include "ocrscanner.h"
 #include "publication.h"
+#include "arduino.h"
 #include "labs.h"
 #include "employe.h"
 #include "inventory.h"
@@ -18,6 +19,7 @@
 #include <QSqlTableModel>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QProcess>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -28,15 +30,24 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(Arduino *arduino, QWidget *parent = nullptr);
     ~MainWindow();
     void notifierConnexion(); // Pour signaler l'entrée de l'utilisateur
+
+public slots:
+    void onPointageRfid(const QString &prenom, const QString &heure); // rafraîchit le tableau employés après pointage RFID
 
 private:
     Ui::MainWindow *ui;
     QSqlQueryModel *model; // <--- C'est ce type qu'il faut utiliser
-    QNetworkAccessManager *networkManager;
-    QString m_tempFaceEncoding; // Pour stocker la signature
+    QProcess *processIA = nullptr; // Pour lancer Python
+    QNetworkAccessManager *networkManager; // Pour envoyer les requêtes    QString m_tempFaceEncoding; // Pour stocker la signature
+    void lancerServeurIA(); // La fonction qui crée et lance Python
+    QString m_tempFaceEncoding;
+
+    // ===== ARDUINO RFID =====
+    Arduino   *A = nullptr;    // pointeur vers l'Arduino (initialisé dans main.cpp avant login)
+    QByteArray rfidBuffer;     // Tampon pour accumuler les octets série
 
     // ===== FINANCE =====
     Finance::Row selectedFinanceRowFromTable(bool *ok=nullptr) const;
@@ -89,6 +100,8 @@ private:
     bool embaucheAscending = true;
     void configurerPermissions();
     void on_btn_reset_clicked();
+    void genererScriptPython();
+
 
     // ── Système de notifications ───────────────────────────────────────────
     struct NotifEntry {
@@ -121,6 +134,11 @@ private:
     QString idProjetToEdit;
 
     // ===== INVENTORY =====
+    QWidget *m_pageChoixAjoutInv = nullptr;
+    void setupInventoryChoicePage();
+    void goInventoryAddManual();
+    void goInventoryAddAuto();
+    
     void initInventoryUi();
     void setupTableInventory();
     void loadInventory();
@@ -128,7 +146,9 @@ private:
     QString selectedInventorySku() const;
     QString idProductToEdit;
     QString skuToEdit;
-    bool syncInventoryReservationsFromLabs(QString *err = nullptr);
+    bool syncInventoryStatsFromProduct(QString *err = nullptr);
+    void showInventoryLabUsageStats();
+    void checkAndShowInventoryAlerts();
     // =====================
 
     void updateTopTitle(int index);
@@ -186,6 +206,7 @@ private slots:
     void on_btnCancelEditEmp_clicked();
     void on_btn_exportt_clicked();      // Le slot pour ton bouton Export Excel
     void simulerPointage();
+    void traiter_rfid();       // conservé pour compatibilité (logique déplacée dans RfidHandler)
     void on_btnStat_emp_clicked();
     void on_btn_ret_clicked();
 
@@ -250,6 +271,8 @@ protected:
     void on_BtnPopupCancelLabs_9_clicked();
     void on_BtnPopupCancelLabs_10_clicked();
     void on_TableLabs_2_headerClicked(int logicalIndex);
+    void loadLabReserveProductTable();
+    void updateLabReserveSpinMax();
     void on_BtnPopupSaveLabs_3_clicked();   // ajouter
     void on_BtnPopupResetLabs_3_clicked();
     void on_BtnPopupSaveLabs_5_clicked();   // modifier
@@ -258,6 +281,9 @@ protected:
     void on_btnAppliquerPub_3_clicked();    // filtre
     void on_btnReinitialiserPub_3_clicked();// reset filtre
     void on_BtnExportLabsDirect_clicked();
+    void on_btnLabReserveProduct_clicked();
+    void on_btnLabReserveValidate_clicked();
+    void on_btnLabReserveBack_clicked();
     // Inventory slots
     void handleInventoryAdd();
     void handleInventoryView();
@@ -270,6 +296,7 @@ protected:
     void on_BtnPopupCancelInventory_2_triggered(QAction *arg1);
     void on_BtnPopupCancelInventory_2_clicked();
     void on_BtnPopupCancelInventory_clicked();
+    void on_BtnPopupAutoSaveInventory_clicked(); // ADD auto save
     void on_BtnPopupSaveInventory_clicked();    // ADD save
     void on_BtnPopupResetInventory_clicked();   // ADD reset
     void on_BtnPopupSaveInventory_2_clicked();  // EDIT save

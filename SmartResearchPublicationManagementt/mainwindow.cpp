@@ -301,11 +301,19 @@ static void makePageResponsive(QWidget *page)
 // (makeQrLabs supprimé : la colonne QRLABS n'existe pas dans la table)
 
 
-MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
+MainWindow::MainWindow(Arduino *arduino, QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
+    // ─── Récupérer le pointeur Arduino connecté depuis main.cpp ──────────────
+    A = arduino;
 
     // On installe le filtre sur le champ de localisation
     ui->setupUi(this);
+    // Initialisation du manager réseau
+    networkManager = new QNetworkAccessManager(this);
+
+    // C'est cette ligne qui fait tout le travail invisible !
+    this->lancerServeurIA();
+
     ui->textChatPub->setStyleSheet("background-color: white; color: black;");
     connect(ui->btnEnvoyerQuestionPub, &QPushButton::clicked,
             this, &MainWindow::on_btnEnvoyerQuestionPub_clicked);
@@ -324,6 +332,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     // === STATISTIQUES LABORATOIRES ===
     connect(ui->btnVoirStatistiquesPub_2, &QPushButton::clicked,
             this, &MainWindow::showLabsPaymentStats);
+
 
     //employee
 
@@ -599,6 +608,11 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     // ─── Animations ───────────────────────────────────────────────────────────
     QTimer::singleShot(50, this, [this]() { initAnimations(); });
+
+    // ─── Arduino RFID ─────────────────────────────────────────────────────────
+    // La logique RFID est gérée par RfidHandler (actif avant le login).
+    // MainWindow reçoit juste le signal pointageEffectue via onPointageRfid()
+    // pour rafraîchir le tableau employés. Connexion faite dans main.cpp.
 }
 
 
@@ -608,106 +622,98 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
 void MainWindow::on_btnStat_emp_clicked()
 {
-    QStringList categories;
-    QList<double> valeurs;
+    // 1. DÉTERMINATION DE LA PÉRIODE (Janvier à Aujourd'hui)
+    QDate dateActuelle = QDate::currentDate();
+    int moisFin = dateActuelle.month(); // ex: 4 pour Avril
+    int annee = dateActuelle.year();
 
-    // 1. CALCUL DU DIVISEUR (Mois actuel pour la généralisation)
-    // On récupère le numéro du mois actuel (ex: 4 pour Avril)
-    int moisEnCours = QDate::currentDate().month();
-    // On s'assure que le diviseur est au moins 1.0 pour éviter la division par zéro
-    double diviseurMois = (moisEnCours > 0) ? static_cast<double>(moisEnCours) : 1.0;
-    double joursOuvresParMois = 22.0;
+    // Noms des mois en français pour le titre
+    QString nomMoisDebut = QLocale(QLocale::French).monthName(1); // Janvier
+    QString nomMoisFin = QLocale(QLocale::French).monthName(moisFin); // Avril
 
-    // 2. REQUÊTE SQL (Récupération du cumul d'absences)
+    // 2. RÉCUPÉRATION DES DONNÉES SQL
     QSqlQuery query;
-    query.prepare("SELECT NOM, NVL(NB_ABSENCES, 0) AS TOTAL_ABS "
-                  "FROM EMPLOYES "
-                  "ORDER BY TOTAL_ABS DESC");
+    query.prepare("SELECT NOM, NVL(NB_ABSENCES, 0) AS TOTAL FROM EMPLOYES ORDER BY TOTAL DESC");
 
     if (!query.exec()) {
         QMessageBox::critical(this, "Erreur SQL", query.lastError().text());
         return;
     }
 
-    // 3. LOGIQUE DE CALCUL DU TAUX MENSUEL MOYEN
+    // 3. PRÉPARATION DES SÉRIES GRAPHIQUES
+    QBarSet *setNormal = new QBarSet("Taux sous le seuil (Ok)");
+    QBarSet *setAlerte = new QBarSet("Taux Critique (>15%)");
+
+    setNormal->setColor(QColor(127, 255, 212)); // Aquamarine
+    setAlerte->setColor(QColor(255, 69, 0));     // Orange-Rouge vif
+
+    QStringList categories;
+    double diviseurMois = (moisFin > 0) ? static_cast<double>(moisFin) : 1.0;
+
     while (query.next()) {
         QString nom = query.value("NOM").toString();
-        int totalAbsences = query.value("TOTAL_ABS").toInt();
+        int totalAbs = query.value("TOTAL").toInt();
 
-        // Calcul : (Total / Nb de mois écoulés) / 22 jours ouvrés
-        double moyenneAbsParMois = totalAbsences / diviseurMois;
-        double taux = (moyenneAbsParMois / joursOuvresParMois) * 100.0;
+        // CALCUL PRÉCIS : (Total / Nb de mois) / 22 jours ouvrés * 100
+        double taux = ((totalAbs / diviseurMois) / 22.0) * 100.0;
+        taux = qRound(taux * 10.0) / 10.0; // Arrondi à 1 chiffre après la virgule
 
-        // Arrondi à 1 décimale pour la clarté (ex: 14.8 au lieu de 14.7727)
-        taux = qRound(taux * 10.0) / 10.0;
-
-        valeurs << (taux > 100.0 ? 100.0 : taux);
         categories << nom;
+
+        // Segmentation visuelle
+        if (taux >= 15.0) {
+            *setAlerte << taux;
+            *setNormal << 0;
+        } else {
+            *setNormal << taux;
+            *setAlerte << 0;
+        }
     }
 
-    if (categories.isEmpty()) {
-        QMessageBox::warning(this, "Stats", "Aucune donnée trouvée dans la base !");
-        return;
-    }
-
-    // 4. CRÉATION DES SÉRIES (Barres)
-    QBarSet *set = new QBarSet("Taux Moyen Mensuel %");
-    for (double v : valeurs) *set << v;
-
-    set->setColor(QColor(127, 255, 212)); // Aquamarine (#7FFFD4)
-    set->setBorderColor(QColor(0, 77, 64)); // Dark Cyan pour le contour
-
+    // 4. CONFIGURATION DU GRAPH (DÉTAILS MAXIMUM)
     QBarSeries *series = new QBarSeries();
-    series->append(set);
+    series->append(setNormal);
+    series->append(setAlerte);
     series->setLabelsVisible(true);
-    series->setLabelsPosition(QAbstractBarSeries::LabelsOutsideEnd);
+    series->setLabelsPosition(QAbstractBarSeries::LabelsOutsideEnd); // Chiffres en haut
     series->setLabelsFormat("@value %");
 
-    // 5. LIGNE DE SEUIL CRITIQUE (Alerte à 15%)
-    QLineSeries *alertLine = new QLineSeries();
-    alertLine->setName("Seuil Critique (15%)");
-    QPen pen(Qt::red);
-    pen.setWidth(2);
-    pen.setStyle(Qt::DashLine);
-    alertLine->setPen(pen);
-
-    for(int i = 0; i < categories.count(); ++i) {
-        alertLine->append(i, 15); // Ligne horizontale à 15%
-    }
-
-    // 6. CONFIGURATION DU GRAPHIQUE (Chart)
     QChart *chart = new QChart();
     chart->addSeries(series);
-    chart->addSeries(alertLine);
 
-    // Titre dynamique avec QLocale (Corrected)
-    QString nomMoisActuel = QLocale(QLocale::French).monthName(moisEnCours);
-    chart->setTitle(QString("Analyse de l'Absentéisme (Janvier - %1 2026)").arg(nomMoisActuel));
+    // Titre ultra-précis
+    chart->setTitle(QString("<b>ANALYSE RH DÉTAILLÉE</b><br>"
+                            "Période : %1 - %2 %3 | Base : 22j/mois")
+                    .arg(nomMoisDebut).arg(nomMoisFin).arg(annee));
 
-    chart->setAnimationOptions(QChart::SeriesAnimations);
-    chart->legend()->setVisible(true);
-    chart->legend()->setAlignment(Qt::AlignBottom);
+    // Ligne de seuil (Alerte Visuelle)
+    QLineSeries *limitLine = new QLineSeries();
+    limitLine->setName("Seuil Critique RH (15%)");
+    limitLine->setPen(QPen(Qt::red, 3, Qt::DashLine));
+    for(int i=0; i<categories.count(); ++i) limitLine->append(i, 15);
+    chart->addSeries(limitLine);
 
-    // Axe X (Noms des employés)
+    // 5. AXES DÉTAILLÉS
     QBarCategoryAxis *axisX = new QBarCategoryAxis();
     axisX->append(categories);
+    axisX->setTitleText("Liste des Employés");
     chart->addAxis(axisX, Qt::AlignBottom);
     series->attachAxis(axisX);
-    alertLine->attachAxis(axisX);
+    limitLine->attachAxis(axisX);
 
-    // Axe Y (Pourcentage)
     QValueAxis *axisY = new QValueAxis();
     axisY->setRange(0, 100);
-    axisY->setTitleText("Taux d'absence (%)");
+    axisY->setLabelFormat("%i%");
+    axisY->setTitleText("Taux d'Absentéisme (%)");
     chart->addAxis(axisY, Qt::AlignLeft);
     series->attachAxis(axisY);
-    alertLine->attachAxis(axisY);
+    limitLine->attachAxis(axisY);
 
-    // 7. AFFICHAGE DANS UNE VUE
+    // 6. RENDU FINAL
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->setMinimumSize(900, 500);
-    chartView->setWindowTitle("Statistiques RH - Système Vortex");
+    chartView->setMinimumSize(1000, 600);
+    chartView->setWindowTitle("Système Vortex - Rapport Statistiques");
     chartView->show();
 }
 void MainWindow::simulerPointage() {
@@ -775,6 +781,119 @@ void MainWindow::simulerPointage() {
 
     // MISE À JOUR DU TABLEAU VISUEL
     model->setQuery("SELECT CIN, NOM, PRENOM, USERNAME, DATE_POINTAGE, HEURE_ARRIVEE, HEURE_DEPART, STATUT_JOURNALIER FROM EMPLOYES");
+}
+
+// ─── Slot Arduino RFID : traiter les données reçues sur le port série ─────────
+// Protocole Arduino → Qt  :  "UID:<hex_uid>:<id_labo>\n"
+// Protocole Qt → Arduino  :  "1:<prenom>:<HH:MM>\n"   (accès OK)
+//                             "0\n"                    (accès refusé)
+void MainWindow::traiter_rfid()
+{
+    // Accumuler les octets reçus dans le tampon
+    if (!A) return;
+    rfidBuffer += A->read_from_arduino();
+
+    // Traiter toutes les lignes complètes (terminées par \n)
+    while (rfidBuffer.contains('\n')) {
+        int idx = rfidBuffer.indexOf('\n');
+        QByteArray ligne = rfidBuffer.left(idx).trimmed();
+        rfidBuffer = rfidBuffer.mid(idx + 1);
+
+        if (ligne.isEmpty()) continue;
+
+        QString message = QString::fromUtf8(ligne);
+        qDebug() << "[RFID] Reçu :" << message;
+
+        // ── Vérifier que le message commence par "UID:" ─────────────────────
+        if (!message.startsWith("UID:")) continue;
+
+        // ── Parser  "UID:<hex_uid>:<id_labo>" ───────────────────────────────
+        QStringList parts = message.split(':');
+        // parts[0]="UID"  parts[1]=hex_uid  parts[2]=id_labo
+        if (parts.size() < 3) {
+            qDebug() << "[RFID] Format invalide :" << message;
+            A->write_to_arduino("0\n");
+            continue;
+        }
+
+        QString uidCarte = parts[1].trimmed().toUpper();
+        QString idLabo   = parts[2].trimmed();
+
+        // ── Requête : l'employé porteur de cette carte a-t-il accès à ce labo ?
+        QSqlQuery q;
+        // Utilise les tables existantes : EMPLOYES + LABS (via IDEMP)
+        // L'employé doit avoir la carte ET être responsable de ce labo
+        q.prepare(
+            "SELECT e.ID_EMPLOYE, e.PRENOM "
+            "FROM HICHEM.EMPLOYES e "
+            "JOIN HICHEM.LABS l ON l.IDEMP = e.ID_EMPLOYE "
+            "WHERE e.UID_CARTE = :uid AND l.IDLABO = :labo"
+        );
+        q.bindValue(":uid",  uidCarte);
+        q.bindValue(":labo", idLabo);
+
+        if (!q.exec()) {
+            qDebug() << "[RFID] Erreur SQL :" << q.lastError().text();
+            A->write_to_arduino("0\n");
+            continue;
+        }
+
+        if (q.next()) {
+            // ── Accès autorisé ───────────────────────────────────────────────
+            QString idEmploye = q.value("ID_EMPLOYE").toString();
+            QString prenom    = q.value("PRENOM").toString();
+            QString heure     = QTime::currentTime().toString("HH:mm");
+            QString date      = QDate::currentDate().toString("yyyy-MM-dd");
+
+            // Enregistrer le pointage dans la base
+            QSqlQuery upd;
+            upd.prepare(
+                "UPDATE HICHEM.EMPLOYES "
+                "SET DATE_POINTAGE    = TO_DATE(:d, 'YYYY-MM-DD'), "
+                "    HEURE_ARRIVEE    = :h, "
+                "    STATUT_JOURNALIER = 'Présent' "
+                "WHERE ID_EMPLOYE = :id"
+            );
+            upd.bindValue(":d",  date);
+            upd.bindValue(":h",  heure);
+            upd.bindValue(":id", idEmploye);
+
+            if (upd.exec()) {
+                qDebug() << "[RFID] Pointage enregistré pour" << prenom << "à" << heure;
+            } else {
+                qDebug() << "[RFID] Erreur UPDATE pointage :" << upd.lastError().text();
+            }
+
+            // Envoyer la confirmation à l'Arduino : "1:Prenom:HH:MM\n"
+            // L'Arduino affichera sur LCD :
+            //   Ligne 1 : "Bienvenue Prenom"
+            //   Ligne 2 : "Pointe a HH:MM"
+            QString reponse = QString("1:%1:%2\n").arg(prenom, heure);
+            A->write_to_arduino(reponse.toUtf8());
+
+            // Rafraîchir le tableau employés dans l'UI
+            model->setQuery(
+                "SELECT CIN, NOM, PRENOM, USERNAME, DATE_POINTAGE, "
+                "HEURE_ARRIVEE, HEURE_DEPART, STATUT_JOURNALIER FROM EMPLOYES"
+            );
+
+        } else {
+            // ── Accès refusé ─────────────────────────────────────────────────
+            qDebug() << "[RFID] Accès refusé pour UID" << uidCarte << "labo" << idLabo;
+            A->write_to_arduino("0\n");
+        }
+    }
+}
+
+// ─── Slot appelé par RfidHandler quand un pointage RFID réussit ──────────────
+// Rafraîchit le tableau employés dans l'interface
+void MainWindow::onPointageRfid(const QString &prenom, const QString &heure)
+{
+    qDebug() << "[MainWindow] Pointage RFID reçu :" << prenom << "à" << heure;
+    model->setQuery(
+        "SELECT CIN, NOM, PRENOM, USERNAME, DATE_POINTAGE, "
+        "HEURE_ARRIVEE, HEURE_DEPART, STATUT_JOURNALIER FROM EMPLOYES"
+    );
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
@@ -891,7 +1010,6 @@ void MainWindow::on_pointage_clicked()
 
 
 
-
 void MainWindow::configurerPermissions() {
     Session& session = Session::instance();
     QString role = session.getRole();
@@ -972,10 +1090,45 @@ void MainWindow::configurerPermissions() {
 
 
 //fin fct
+void MainWindow::genererScriptPython()
+{
+    // On définit le chemin : là où se trouve l'exécutable
+    QString cheminScript = QCoreApplication::applicationDirPath() + "/face_id_vortex.py";
+    QFile file(cheminScript);
 
+    // On écrit le fichier (On l'écrase à chaque fois pour être sûr qu'il est à jour)
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+
+        // C'est ici que tu mets ton code Python exact
+        out << "import cv2\n";
+        out << "import sys\n";
+        out << "try:\n";
+        out << "    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')\n";
+        out << "    cap = cv2.VideoCapture(0)\n";
+        out << "    while True:\n";
+        out << "        ret, frame = cap.read()\n";
+        out << "        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)\n";
+        out << "        faces = face_cascade.detectMultiScale(gray, 1.1, 4)\n";
+        out << "        for (x, y, w, h) in faces:\n";
+        out << "            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)\n";
+        out << "        cv2.imshow('FaceID - Systeme Vortex', frame)\n";
+        out << "        if cv2.waitKey(1) & 0xFF == ord('q'): break\n";
+        out << "    cap.release()\n";
+        out << "    cv2.destroyAllWindows()\n";
+        out << "except Exception as e:\n";
+        out << "    print(f'Erreur: {e}')\n";
+
+        file.close();
+    }
+}
 
 MainWindow::~MainWindow()
 {
+    if (processIA) {
+            processIA->terminate(); // Tue le processus Python proprement
+            processIA->waitForFinished(2000);
+        }
     delete ui;
 }
 
@@ -2169,11 +2322,62 @@ void MainWindow::goEmployee()
     loadEmployees();
 }
 
-void MainWindow::goInventaire()
-{
+void MainWindow::checkAndShowInventoryAlerts() {
+    QVector<Inventory::Row> alerts;
+    QString err;
+    if (!Inventory::checkThresholdAlerts(alerts, &err)) {
+        qDebug() << "[INVENTORY] Erreur vérification seuils:" << err;
+        return;
+    }
+    if (alerts.isEmpty()) return;
+
+    // ── Notification cloche ───────────────────────────────────────────────
+    for (const auto &row : std::as_const(alerts)) {
+        const QString label = row.name.isEmpty() ? row.sku : row.name;
+        ajouterNotification(
+            "SYSTÈME",
+            QString("⚠ Seuil atteint : %1 (dispo: %2 ≤ seuil: %3)")
+                .arg(label)
+                .arg(row.qtAv)
+                .arg(row.threshold)
+        );
+    }
+
+    // ── QMessageBox récapitulatif ─────────────────────────────────────────
+    QString msg = QString("<b>%1 produit(s) ont atteint leur seuil :</b><br><br>")
+                      .arg(alerts.size());
+
+    for (const auto &row : std::as_const(alerts)) {
+        const QString label = row.name.isEmpty() ? row.sku : row.name;
+        QString color = (row.qtAv <= 0) ? "#DC2626" : "#D97706"; // rouge si épuisé, orange si limité
+        msg += QString(
+            "<span style='color:%4;'>⚠</span> "
+            "<b>%1</b> &nbsp;|&nbsp; SKU: %2 "
+            "&nbsp;|&nbsp; Disponible: <b>%3</b> "
+            "&nbsp;|&nbsp; Seuil: <b>%5</b><br>"
+        )
+        .arg(label)
+        .arg(row.sku)
+        .arg(row.qtAv)
+        .arg(color)
+        .arg(row.threshold);
+    }
+
+    QMessageBox alert(this);
+    alert.setWindowTitle("⚠ Alertes Inventaire — Seuil atteint");
+    alert.setIcon(QMessageBox::Warning);
+    alert.setTextFormat(Qt::RichText);
+    alert.setText(msg);
+    alert.setStandardButtons(QMessageBox::Ok);
+    alert.setDefaultButton(QMessageBox::Ok);
+    alert.exec();
+}
+
+void MainWindow::goInventaire() {
     animatePageChange(1);
     setActiveButton(ui->btnInventaire);
     refreshInventoryTypeFilter();
+    checkAndShowInventoryAlerts();
 }
 
 void MainWindow::goPublication()
@@ -2642,10 +2846,8 @@ void MainWindow::on_btnmapl_3_clicked()
 // ====================== AJOUT ======================
 void MainWindow::handleInventoryAdd()
 {
-    qDebug() << "[INVENTORY] handleInventoryAdd: Navigating to Index 1 (ajouteri)";
-    ui->stacked_I->setCurrentIndex(1);
-    on_BtnPopupResetInventory_clicked(); // Clear fields
-    ui->Sku->setPlaceholderText("ABC-123");
+    qDebug() << "[INVENTORY] handleInventoryAdd: Navigating to Choice Page";
+    ui->stacked_I->setCurrentWidget(m_pageChoixAjoutInv);
 }
 
 
@@ -2704,99 +2906,35 @@ void MainWindow::on_retour_stat_7_clicked()
 void MainWindow::handleInventoryStats()
 {
     QString err;
-    if (!syncInventoryReservationsFromLabs(&err)) {
+    if (!syncInventoryStatsFromProduct(&err)) {
         QMessageBox::critical(this, "Inventaire",
-                              "Impossible de synchroniser les réservations depuis LABS_RESERVATION.\n\n"
+                              "Impossible de synchroniser les statistiques produit.\n\n"
                               "Détail : " + err);
         return;
     }
 
-    // Reload so the inventory table reflects updated PRODUCT.QT_RS / STATUS
     loadInventory();
+    showInventoryLabUsageStats();
     ui->stacked_I->setCurrentIndex(3); // "stati" page (Index 3)
 }
 
-bool MainWindow::syncInventoryReservationsFromLabs(QString *err)
+bool MainWindow::syncInventoryStatsFromProduct(QString *err)
 {
-    // We expect an existing table `LABS_RESERVATION`.
-    // This function syncs its computed reserved quantity into PRODUCT.QT_RS
-    // (and then recomputes PRODUCT.STATUS based on QT_AV - QT_RS vs THRESHOLD).
-    QSqlQuery probe;
-    if (!probe.exec("SELECT * FROM LABS_RESERVATION WHERE 1=0")) {
-        if (err) *err = probe.lastError().text();
-        return false;
-    }
+    // USE_COUNT = cumulative qty allocated to labs (updated only by lab reservation).
+    // Do not overwrite it from QT_RS here.
+    QSqlQuery ensureColumn;
+    ensureColumn.exec(
+        "ALTER TABLE PRODUCT ADD USE_COUNT NUMBER DEFAULT 0"
+    );
 
-    QSqlRecord rec = probe.record();
-    QStringList fieldsUpper;
-    fieldsUpper.reserve(rec.count());
-    for (int i = 0; i < rec.count(); ++i) {
-        fieldsUpper << rec.fieldName(i).toUpper();
-    }
-
-    auto hasField = [&](const QString &name) -> bool {
-        return fieldsUpper.contains(name.toUpper());
-    };
-
-    // Join key between LABS_RESERVATION and PRODUCT
-    QString joinField;
-    if (hasField("SKU")) joinField = "SKU";
-    else if (hasField("ID_PRODUCT")) joinField = "ID_PRODUCT";
-
-    if (joinField.isEmpty()) {
-        if (err) {
-            *err = "Colonnes manquantes dans LABS_RESERVATION : "
-                   "attendu au moins `SKU` ou `ID_PRODUCT`.";
-        }
-        return false;
-    }
-
-    // Reserved quantity column inside LABS_RESERVATION
-    QString qtyField;
-    const QStringList qtyCandidates = {
-        "QT_RS", "QT_RESERVED", "QT_RESERVEE", "QT_RESERVATION",
-        "QTE", "QTE_RESERVED", "QTY", "QUANTITY"
-    };
-    for (const QString &c : qtyCandidates) {
-        if (hasField(c)) {
-            qtyField = c;
-            break;
-        }
-    }
-
-    if (qtyField.isEmpty()) {
-        if (err) {
-            *err = "Impossible de trouver une colonne quantité dans LABS_RESERVATION "
-                   "(candidats : QT_RS / QT_RESERVED / QT_RESERVEE / QTE / QTY / QUANTITY).";
-        }
-        return false;
-    }
-
-    // 1) Copy reserved quantities into PRODUCT.QT_RS
-    //    SUM() ensures we get a single scalar value per product.
-    QSqlQuery q1;
-    const QString sqlQtRs = QStringLiteral(
-        "UPDATE PRODUCT p "
-        "SET p.QT_RS = ("
-        "  SELECT NVL(SUM(r.%1), 0) "
-        "  FROM LABS_RESERVATION r "
-        "  WHERE r.%2 = p.%2"
-        ")"
-    ).arg(qtyField, joinField);
-
-    if (!q1.exec(sqlQtRs)) {
-        if (err) *err = q1.lastError().text();
-        return false;
-    }
-
-    // 2) Recompute PRODUCT.STATUS according to available stock
     QSqlQuery q2;
     const QString sqlStatus = QStringLiteral(
         "UPDATE PRODUCT p "
         "SET p.STATUS = CASE "
-        "  WHEN (NVL(p.QT_AV, 0) - NVL(p.QT_RS, 0)) <= 0 THEN 'stock out' "
-        "  WHEN (NVL(p.QT_AV, 0) - NVL(p.QT_RS, 0)) <= NVL(p.THRESHOLD, 0) THEN 'limited' "
-        "  ELSE 'on hand' "
+        "  WHEN NVL(p.QT_AV, 0) = 0                                    THEN 'stock out' "
+        "  WHEN NVL(p.QT_AV, 0) <= NVL(p.THRESHOLD, 0) * 2            THEN 'limited' "
+        "  WHEN NVL(p.QT_AV, 0) >= NVL(p.THRESHOLD, 0) * 3            THEN 'on hand' "
+        "  ELSE 'limited' "
         "END"
     );
 
@@ -2805,19 +2943,163 @@ bool MainWindow::syncInventoryReservationsFromLabs(QString *err)
         return false;
     }
 
-    // Optional verification (helps confirm the sync “worked”)
-    QSqlQuery verify;
-    const QString sqlVerify = (joinField == "SKU")
-        ? QStringLiteral("SELECT COUNT(*) FROM PRODUCT WHERE QT_RS IS NOT NULL")
-        : QStringLiteral("SELECT COUNT(*) FROM PRODUCT WHERE QT_RS IS NOT NULL");
-    if (verify.exec(sqlVerify) && verify.next()) {
-        qDebug() << "[INVENTORY] Sync LABS_RESERVATION -> PRODUCT done. Products with QT_RS not null:"
-                 << verify.value(0).toInt();
-    } else {
-        qDebug() << "[INVENTORY] Sync LABS_RESERVATION -> PRODUCT done (verification query failed).";
+    return true;
+}
+
+void MainWindow::showInventoryLabUsageStats()
+{
+    // Ensure the combo box exists for chart type selection
+    QComboBox *combo = ui->stati->findChild<QComboBox*>(QStringLiteral("invChartTypeCombo"));
+    if (!combo) {
+        combo = new QComboBox(ui->stati);
+        combo->setObjectName(QStringLiteral("invChartTypeCombo"));
+        combo->addItem("Statistiques : Utilisation par Laboratoires (Colonnes)", 0);
+        combo->addItem("Statistiques : Répartition par Statut (Cercle)", 1);
+        
+        // Match the styling
+        combo->setStyleSheet(
+            "QComboBox { background-color: white; border: 2px solid #e0be9c; border-radius: 8px; padding: 5px 15px; font-weight: bold; font-size: 14px; color: #333; }"
+            "QComboBox::drop-down { border: none; width: 30px; }"
+        );
+        
+        // Position it explicitly roughly above the chart region 
+        // (Assuming ui->stat_pub_6 geometry handles the chart area, we place it near the top left)
+        if (ui->stat_pub_6) {
+            QRect g = ui->stat_pub_6->geometry();
+            combo->setGeometry(g.x(), g.y() - 50, 450, 40);
+        } else {
+            combo->setGeometry(50, 20, 450, 40);
+        }
+        combo->show();
+        combo->raise();
+        
+        connect(combo, &QComboBox::currentIndexChanged, this, [this](int) {
+            this->showInventoryLabUsageStats();
+        });
     }
 
-    return true;
+    int chartType = combo->currentData().toInt();
+
+    QChart *chart = new QChart();
+    
+    // Petite animation demandée : AllAnimations pour transitions douces
+    chart->setAnimationOptions(QChart::AllAnimations);
+    chart->setBackgroundBrush(m_isDarkTheme ? QColor(15, 23, 42) : QColor(252, 252, 250));
+    chart->setTitleFont(QFont(QStringLiteral("Segoe UI"), 14, QFont::Bold));
+    chart->setTitleBrush(m_isDarkTheme ? QColor(241, 245, 249) : QColor(45, 55, 72));
+
+    if (chartType == 0) {
+        // --- 1. GRAPHIQUE EN COLONNES (BAR CHART) ---
+        QSqlQuery qLab;
+        if (!qLab.exec(QStringLiteral(
+                "SELECT * FROM ("
+                "  SELECT NVL(NULLIF(TRIM(NAME), ''), SKU) AS NM, NVL(USE_COUNT, 0) AS UC "
+                "  FROM PRODUCT "
+                "  ORDER BY NVL(USE_COUNT, 0) DESC NULLS LAST"
+                ") WHERE ROWNUM <= 20"))) {
+            qDebug() << "[INVENTORY] stats query failed:" << qLab.lastError().text();
+        }
+
+        QStringList categories;
+        QList<double> values;
+        double maxY = 1.0;
+        bool anyLabUsage = false;
+
+        while (qLab.next()) {
+            const QString nm = qLab.value(0).toString().trimmed();
+            const double uc = qLab.value(1).toDouble();
+            if (uc > 0)
+                anyLabUsage = true;
+            const QString label = nm.length() > 28 ? nm.left(25) + QLatin1String("…") : nm;
+            categories << (label.isEmpty() ? QStringLiteral("(sans nom)") : label);
+            values << uc;
+            if (uc > maxY)
+                maxY = uc;
+        }
+
+        if (categories.isEmpty()) {
+            chart->setTitle(QStringLiteral("Inventaire — aucun produit"));
+        } else if (anyLabUsage) {
+            chart->setTitle(QStringLiteral("Produits les plus alloués aux laboratoires (USE_COUNT)"));
+            QBarSet *set = new QBarSet(QStringLiteral("Quantité allouée (labs)"));
+            set->setColor(QColor(31, 142, 149)); // Primary brand color
+            for (double v : std::as_const(values))
+                *set << v;
+            QBarSeries *series = new QBarSeries();
+            series->append(set);
+            series->setLabelsVisible(true);
+            series->setLabelsFormat(QStringLiteral("@value"));
+            chart->addSeries(series);
+
+            QBarCategoryAxis *axisX = new QBarCategoryAxis();
+            axisX->append(categories);
+            chart->addAxis(axisX, Qt::AlignBottom);
+            series->attachAxis(axisX);
+
+            QValueAxis *axisY = new QValueAxis();
+            axisY->setRange(0, maxY + qMax(1.0, maxY * 0.15));
+            axisY->setTitleText(QStringLiteral("Quantité Utilisée"));
+            chart->addAxis(axisY, Qt::AlignLeft);
+            series->attachAxis(axisY);
+            chart->legend()->setVisible(true);
+            chart->legend()->setAlignment(Qt::AlignBottom);
+        } else {
+            chart->setTitle(QStringLiteral("Aucun produit n'a encore été assigné à un laboratoire."));
+        }
+    } else {
+        // --- 2. GRAPHIQUE EN CERCLE (PIE CHART) ---
+        chart->setTitle(QStringLiteral("Répartition du stock par Statut"));
+        QSqlQuery qSt;
+        qSt.exec(QStringLiteral("SELECT STATUS, COUNT(*) FROM PRODUCT GROUP BY STATUS"));
+        QPieSeries *pie = new QPieSeries();
+        bool has = false;
+        
+        // Custom colors for status pie chart
+        QList<QColor> colors = { QColor(45, 212, 191), QColor(251, 146, 60), QColor(248, 113, 113), QColor(148, 163, 184) };
+        int colorIdx = 0;
+
+        while (qSt.next()) {
+            has = true;
+            QString st = qSt.value(0).toString().trimmed();
+            if (st.isEmpty())
+                st = QStringLiteral("Non défini");
+            const int c = qSt.value(1).toInt();
+            QPieSlice *sl = pie->append(QStringLiteral("%1 (%2)").arg(st).arg(c), c);
+            sl->setLabelVisible(true);
+            sl->setBrush(colors[colorIdx % colors.size()]);
+            // Explosion animation for slices to make it "jolie"
+            sl->setExploded(true);
+            sl->setExplodeDistanceFactor(0.05);
+            colorIdx++;
+        }
+        if (!has) {
+            chart->setTitle(QStringLiteral("Aucune donnée inventaire"));
+        } else {
+            chart->addSeries(pie);
+            chart->legend()->setVisible(true);
+            chart->legend()->setAlignment(Qt::AlignRight);
+        }
+    }
+
+    QChartView *cv = ui->stati->findChild<QChartView*>(QStringLiteral("inventoryLabUsageChart"));
+    if (!cv) {
+        cv = new QChartView(ui->stati);
+        cv->setObjectName(QStringLiteral("inventoryLabUsageChart"));
+        if (ui->stat_pub_6)
+            cv->setGeometry(ui->stat_pub_6->geometry());
+        cv->setRenderHint(QPainter::Antialiasing);
+        cv->raise();
+        if (ui->stat_pub_6)
+            ui->stat_pub_6->hide();
+    } else {
+        QChart *old = cv->chart();
+        if (old)
+            old->deleteLater();
+        if (ui->stat_pub_6)
+            ui->stat_pub_6->hide();
+    }
+    cv->setChart(chart);
+    cv->show();
 }
 
 
@@ -5395,7 +5677,56 @@ void MainWindow::on_btnMailingPub_clicked()
     }
 }
 // ==================== EMPLOYEE CRUD ====================
+void MainWindow::lancerServeurIA() {
+    QString scriptPath = QCoreApplication::applicationDirPath() + "/face_id_vortex.py";
+    QFile file(scriptPath);
 
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << "from flask import Flask, request, jsonify\n"
+            << "import cv2\n"
+            << "import numpy as np\n"
+            << "import os\n\n"
+            << "app = Flask(__name__)\n"
+            << "face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')\n\n"
+
+            << "@app.route('/enroll', methods=['POST'])\n"
+            << "def enroll():\n"
+            << "    if 'face' in request.files:\n"
+            << "        username = request.form.get('username', 'user')\n"
+            << "        img = cv2.imdecode(np.frombuffer(request.files['face'].read(), np.uint8), cv2.IMREAD_COLOR)\n"
+            << "        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)\n"
+            << "        faces = face_cascade.detectMultiScale(gray, 1.1, 4)\n"
+            << "        if len(faces) > 0:\n"
+            << "            x, y, w, h = faces[0]\n"
+            << "            face_crop = img[y:y+h, x:x+w]\n"
+            << "            cv2.imwrite(f'{username}_ref.jpg', face_crop)\n"
+            << "            return jsonify({'success': True})\n"
+            << "    return jsonify({'success': False})\n\n"
+
+            << "@app.route('/verify', methods=['POST'])\n"
+            << "def verify():\n"
+            << "    if 'face' in request.files:\n"
+            << "        username = request.form.get('username', 'user')\n"
+            << "        ref_path = f'{username}_ref.jpg'\n"
+            << "        if not os.path.exists(ref_path): return jsonify({'verified': False})\n"
+            << "        img_ref = cv2.imread(ref_path, 0)\n"
+            << "        img_new = cv2.imdecode(np.frombuffer(request.files['face'].read(), np.uint8), cv2.IMREAD_GRAYSCALE)\n"
+            << "        faces = face_cascade.detectMultiScale(img_new, 1.1, 4)\n"
+            << "        if len(faces) > 0:\n"
+            << "            x, y, w, h = faces[0]\n"
+            << "            curr = cv2.resize(img_new[y:y+h, x:x+w], (img_ref.shape[1], img_ref.shape[0]))\n"
+            << "            score = cv2.matchTemplate(curr, img_ref, cv2.TM_CCOEFF_NORMED).max()\n"
+            << "            return jsonify({'verified': bool(score > 0.7)})\n"
+            << "    return jsonify({'verified': False})\n\n"
+
+            << "if __name__ == '__main__':\n"
+            << "    app.run(host='127.0.0.1', port=5000)\n";
+        file.close();
+    }
+    if (!processIA) processIA = new QProcess(this);
+    processIA->start("python", QStringList() << scriptPath);
+}
 static void updatePasswordStrengthUiAddEmp(const QString &password, QProgressBar *bar, QLabel *label)
 {
     if (!bar || !label)
@@ -5631,6 +5962,24 @@ void MainWindow::on_btnSaveEmployee_clicked()
         ui->lineSalaireAdd->setFocus();
         return;
     }
+    // Vérification spécifique pour les menus déroulants
+    if (ui->comboRoleAdd->currentIndex() <= 0) { // En supposant que l'index 0 est "Choisir..."
+        QMessageBox::warning(this, "Sélection requise", "Veuillez attribuer un rôle à l'employé.");
+        ui->comboRoleAdd->setFocus();
+        return;
+    }
+
+    if (ui->comboDepartementAdd->currentIndex() <= 0) {
+        QMessageBox::warning(this, "Sélection requise", "Veuillez sélectionner un département.");
+        ui->comboDepartementAdd->setFocus();
+        return;
+    }
+
+    if (ui->comboPosteAdd->currentIndex() <= 0) {
+        QMessageBox::warning(this, "Sélection requise", "Veuillez définir le poste de l'employé.");
+        ui->comboPosteAdd->setFocus();
+        return;
+    }
 
     // F. Vérification de la BIOMÉTRIE
     if (this->m_tempFaceEncoding.isEmpty()) {
@@ -5748,55 +6097,44 @@ void MainWindow::on_btnSupprimer_emp_clicked()
 
 void MainWindow::on_btnScanFace_clicked()
 {
-    // 0. Récupération du username pour nommer le fichier côté Python
-    QString username = ui->lineUsernameAdd->text().trimmed(); // Remplace par ton vrai nom d'objet UI
+    QString username = ui->lineUsernameAdd->text().trimmed();
     if (username.isEmpty()) {
-        QMessageBox::warning(this, "Attention", "Veuillez saisir un nom d'utilisateur avant de scanner le visage.");
+        QMessageBox::warning(this, "Attention", "Saisis un username avant de scanner.");
         return;
     }
 
-    // 1. Création des objets pour Qt 6
     QCamera *camera = new QCamera(QMediaDevices::defaultVideoInput(), this);
     QImageCapture *capture = new QImageCapture(this);
     QMediaCaptureSession *session = new QMediaCaptureSession(this);
-
     session->setCamera(camera);
     session->setImageCapture(capture);
-
     camera->start();
 
-    // 2. Attente d'une seconde pour l'initialisation du capteur (Lumière/Focus)
     QEventLoop loop;
     QTimer::singleShot(1000, &loop, &QEventLoop::quit);
     loop.exec();
 
-    // 3. Déclenchement de la capture
     capture->capture();
 
-    // 4. Une fois l'image capturée
     connect(capture, &QImageCapture::imageCaptured, [=](int id, const QImage &img) {
         QByteArray ba;
         QBuffer buf(&ba);
         buf.open(QIODevice::WriteOnly);
         img.save(&buf, "JPG");
 
-        // Préparation de l'envoi Multipart
         QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 
-        // --- AJOUT DU CHAMP USERNAME ---
         QHttpPart namePart;
         namePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"username\""));
         namePart.setBody(username.toUtf8());
         multiPart->append(namePart);
 
-        // Champ Image
         QHttpPart imagePart;
-        imagePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"face\"; filename=\"face.jpg\""));
+        imagePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"face\"; filename=\"ref.jpg\""));
         imagePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("image/jpeg"));
         imagePart.setBody(ba);
         multiPart->append(imagePart);
 
-        // Envoi vers la route /enroll
         QNetworkRequest request(QUrl("http://127.0.0.1:5000/enroll"));
         QNetworkReply *reply = networkManager->post(request, multiPart);
         multiPart->setParent(reply);
@@ -5805,21 +6143,12 @@ void MainWindow::on_btnScanFace_clicked()
             if (reply->error() == QNetworkReply::NoError) {
                 QJsonObject res = QJsonDocument::fromJson(reply->readAll()).object();
                 if (res["success"].toBool()) {
-                    // On stocke le résultat si besoin pour valider l'inscription plus tard
-                    this->m_tempFaceEncoding = "VALIDATED";
-                    QMessageBox::information(this, "Succès", "Visage enregistré pour " + username);
-                } else {
-                    QMessageBox::warning(this, "Erreur", res["error"].toString());
+                    this->m_tempFaceEncoding = "VALIDATED"; // Prêt pour l'insertion SQL
+                    QMessageBox::information(this, "Succès", "Visage de référence enregistré !");
                 }
-            } else {
-                QMessageBox::critical(this, "Erreur Réseau", "Impossible de contacter le serveur Python (app.py)");
             }
-
             camera->stop();
-            // Nettoyage des objets dynamiques
             camera->deleteLater();
-            session->deleteLater();
-            capture->deleteLater();
             reply->deleteLater();
         });
     });
@@ -6791,6 +7120,9 @@ void MainWindow::initLabsUi()
     connect(ui->BtnPopupResetLabs_5, &QPushButton::clicked, this, &MainWindow::on_BtnPopupResetLabs_5_clicked);
     connect(ui->btnSupprimerPub_2,   &QPushButton::clicked, this, &MainWindow::on_btnSupprimerPub_2_clicked);
     connect(ui->BtnExportLabsDirect, &QPushButton::clicked, this, &MainWindow::on_BtnExportLabsDirect_clicked);
+    connect(ui->btnLabReserveProduct, &QPushButton::clicked, this, &MainWindow::on_btnLabReserveProduct_clicked);
+    connect(ui->btnLabReserveValidate, &QPushButton::clicked, this, &MainWindow::on_btnLabReserveValidate_clicked);
+    connect(ui->btnLabReserveBack, &QPushButton::clicked, this, &MainWindow::on_btnLabReserveBack_clicked);
 
     // Numéro labo: exactement 8 chiffres.
     auto *numValidator = new QRegularExpressionValidator(QRegularExpression("^\\d{0,8}$"), this);
@@ -6828,7 +7160,165 @@ void MainWindow::initLabsUi()
         recalcReste(ui->LabMontant_5, ui->LabMontantPaye_5, ui->LabReste_5);
     });
 
+    // Réservation produits inventaire (stacked_L page index 6)
+    ui->TableLabReserveProducts->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->TableLabReserveProducts->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->TableLabReserveProducts->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->TableLabReserveProducts->verticalHeader()->setVisible(false);
+    ui->TableLabReserveProducts->setColumnCount(5);
+    ui->TableLabReserveProducts->setHorizontalHeaderLabels({
+        QStringLiteral("ID"), QStringLiteral("SKU"), QStringLiteral("Nom"),
+        QStringLiteral("Qt stock"), QStringLiteral("Qt réservée (inchangée)")});
+    ui->TableLabReserveProducts->hideColumn(0);
+    ui->TableLabReserveProducts->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->spinLabReserveQty->setRange(1, 999999);
+    connect(ui->TableLabReserveProducts, &QTableWidget::itemSelectionChanged,
+            this, &MainWindow::updateLabReserveSpinMax);
+
 }
+
+// ====================== Réservation produit (labs → inventaire) ======================
+void MainWindow::on_btnLabReserveProduct_clicked()
+{
+    ui->stacked_L->setCurrentIndex(6);
+    loadLabReserveProductTable();
+}
+
+void MainWindow::loadLabReserveProductTable()
+{
+    QVector<Inventory::Row> rows;
+    QString err;
+    if (!Inventory::chargerTout(rows, QStringLiteral("NAME"), &err)) {
+        QMessageBox::critical(this, "Inventaire", err);
+        return;
+    }
+    ui->TableLabReserveProducts->setSortingEnabled(false);
+    ui->TableLabReserveProducts->setRowCount(0);
+    for (int i = 0; i < rows.size(); ++i) {
+        const auto &row = rows[i];
+        ui->TableLabReserveProducts->insertRow(i);
+        auto *idIt = new QTableWidgetItem(row.idProduct);
+        idIt->setData(Qt::UserRole, row.idProduct);
+        ui->TableLabReserveProducts->setItem(i, 0, idIt);
+        ui->TableLabReserveProducts->setItem(i, 1, new QTableWidgetItem(row.sku));
+        ui->TableLabReserveProducts->setItem(i, 2, new QTableWidgetItem(row.name));
+        ui->TableLabReserveProducts->setItem(i, 3, new QTableWidgetItem(QString::number(row.qtAv)));
+        ui->TableLabReserveProducts->setItem(i, 4, new QTableWidgetItem(QString::number(row.qtRs)));
+    }
+    ui->TableLabReserveProducts->setSortingEnabled(false);
+    if (ui->TableLabReserveProducts->rowCount() > 0)
+        ui->TableLabReserveProducts->selectRow(0);
+    updateLabReserveSpinMax();
+}
+
+void MainWindow::updateLabReserveSpinMax()
+{
+    const int r = ui->TableLabReserveProducts->currentRow();
+    if (r < 0) {
+        ui->spinLabReserveQty->setMaximum(999999);
+        return;
+    }
+    QTableWidgetItem *it = ui->TableLabReserveProducts->item(r, 0);
+    if (!it) return;
+    const QString id = it->data(Qt::UserRole).toString();
+    if (id.isEmpty()) return;
+
+    QSqlQuery q;
+    q.prepare(QStringLiteral("SELECT NVL(QT_AV,0) FROM PRODUCT WHERE ID_PRODUCT = :id"));
+    q.bindValue(QStringLiteral(":id"), id);
+    if (!q.exec() || !q.next())
+        return;
+    const int qtAv = q.value(0).toInt();
+    if (qtAv <= 0) {
+        ui->spinLabReserveQty->setMaximum(1);
+        ui->spinLabReserveQty->setValue(1);
+    } else {
+        ui->spinLabReserveQty->setMaximum(qtAv);
+        if (ui->spinLabReserveQty->value() > qtAv)
+            ui->spinLabReserveQty->setValue(qtAv);
+    }
+}
+
+void MainWindow::on_btnLabReserveValidate_clicked()
+{
+    const int r = ui->TableLabReserveProducts->currentRow();
+    if (r < 0) {
+        QMessageBox::warning(this, "Réservation", "Sélectionnez un produit dans la liste.");
+        return;
+    }
+    QTableWidgetItem *idItem = ui->TableLabReserveProducts->item(r, 0);
+    if (!idItem) return;
+    const QString id = idItem->data(Qt::UserRole).toString();
+    if (id.isEmpty()) {
+        QMessageBox::warning(this, "Réservation", "ID produit introuvable.");
+        return;
+    }
+    const int qty = ui->spinLabReserveQty->value();
+    if (qty < 1) {
+        QMessageBox::warning(this, "Réservation", "Indiquez une quantité d’au moins 1.");
+        return;
+    }
+
+    QSqlQuery q0;
+    q0.prepare(QStringLiteral("SELECT NVL(QT_AV,0) FROM PRODUCT WHERE ID_PRODUCT = :id"));
+    q0.bindValue(QStringLiteral(":id"), id);
+    if (!q0.exec() || !q0.next()) {
+        QMessageBox::critical(this, "Réservation", "Produit introuvable en base.");
+        return;
+    }
+    const int qtAv = q0.value(0).toInt();
+    if (qty > qtAv) {
+        QMessageBox::warning(this, "Stock insuffisant",
+                             QStringLiteral("Stock disponible : %1 (la quantité allouée aux labs diminue le stock, QT_RS n’est pas modifié).")
+                                 .arg(qtAv));
+        return;
+    }
+
+    QSqlQuery ensureUse;
+    ensureUse.exec(QStringLiteral("ALTER TABLE PRODUCT ADD USE_COUNT NUMBER DEFAULT 0"));
+
+    QSqlQuery q1;
+    q1.prepare(
+        QStringLiteral(
+            "UPDATE PRODUCT SET "
+            "QT_AV = NVL(QT_AV,0) - :qty, "
+            "USE_COUNT = NVL(USE_COUNT,0) + :qty2 "
+            "WHERE ID_PRODUCT = :id AND NVL(QT_AV,0) >= :need"));
+    q1.bindValue(QStringLiteral(":qty"), qty);
+    q1.bindValue(QStringLiteral(":qty2"), qty);
+    q1.bindValue(QStringLiteral(":id"), id);
+    q1.bindValue(QStringLiteral(":need"), qty);
+    if (!q1.exec()) {
+        QMessageBox::critical(this, "Réservation", q1.lastError().text());
+        return;
+    }
+    const int nAff = q1.numRowsAffected();
+    if (nAff == 0) {
+        QMessageBox::warning(this, "Réservation",
+                             QStringLiteral("Aucune ligne mise à jour (stock insuffisant ou conflit). Réessayez après actualisation."));
+        loadLabReserveProductTable();
+        return;
+    }
+
+    QString syncErr;
+    if (!syncInventoryStatsFromProduct(&syncErr)) {
+        QMessageBox::critical(this, "Réservation",
+                              QStringLiteral("Mise à jour partielle. Statistiques : %1").arg(syncErr));
+        return;
+    }
+
+    QMessageBox::information(this, "Réservation",
+                             QStringLiteral("Allocation enregistrée : %1 unité(s). Stock (QT_AV) diminué, USE_COUNT mis à jour pour les statistiques (QT_RS inchangé).")
+                                 .arg(qty));
+    loadLabReserveProductTable();
+    loadInventory();
+}
+
+void MainWindow::on_btnLabReserveBack_clicked()
+{
+    ui->stacked_L->setCurrentIndex(0);
+}
+
 void MainWindow::onMapLocationSelected(const QString& title)
 {
     if (title.contains(",") && title.contains(QRegularExpression("\\d"))) {
@@ -7268,6 +7758,8 @@ QString MainWindow::selectedInventorySku() const
 
 void MainWindow::initInventoryUi()
 {
+    setupInventoryChoicePage();
+    
     // Populate Status combo (add form)
     ui->Status->clear();
     ui->Status->addItem("on hand",   "on hand");
@@ -7338,8 +7830,6 @@ void MainWindow::initInventoryUi()
     ui->Unit_2->addItem("L",  "L");
     ui->Unit_2->addItem("m",  "m");
 
-    ui->Unit_2->addItem("m",  "m");
-
     // Type combo (Add form)
     ui->Type->clear();
     ui->Type->addItem("Matière première",  "Matière première");
@@ -7401,6 +7891,7 @@ void MainWindow::initInventoryUi()
     connect(ui->BtnInventoryDetailExportPdf, &QPushButton::clicked, this, &MainWindow::handleInventoryDetailExportPdf);
 
     // Form buttons (manual connections for reliability)
+    connect(ui->BtnPopupAutoSaveInventory, &QPushButton::clicked, this, &MainWindow::on_BtnPopupAutoSaveInventory_clicked);
     connect(ui->BtnPopupSaveInventory,   &QPushButton::clicked, this, &MainWindow::on_BtnPopupSaveInventory_clicked);
     connect(ui->BtnPopupResetInventory,  &QPushButton::clicked, this, &MainWindow::on_BtnPopupResetInventory_clicked);
     connect(ui->BtnPopupCancelInventory, &QToolButton::clicked,   this, &MainWindow::on_BtnPopupCancelInventory_clicked);
@@ -7472,6 +7963,9 @@ void MainWindow::fillTableInventoryRow(int r, const Inventory::Row &row)
 
 void MainWindow::loadInventory()
 {
+    // Recalcul automatique des statuts
+    QString syncErr;
+    syncInventoryStatsFromProduct(&syncErr);
     ui->TableInventory->setSortingEnabled(false);
     ui->TableInventory->setRowCount(0);
 
@@ -7495,10 +7989,146 @@ void MainWindow::loadInventory()
         ++r;
     }
     // Keep sorting disabled so SQL ORDER BY is preserved
+
 }
 
 
+// ── UI CHOICE PAGE ────────────────────────────────────────────────────────────
+void MainWindow::setupInventoryChoicePage() {
+    m_pageChoixAjoutInv = new QWidget();
+    m_pageChoixAjoutInv->setObjectName("pageChoixAjoutInv");
+    QVBoxLayout *layout = new QVBoxLayout(m_pageChoixAjoutInv);
+    layout->setAlignment(Qt::AlignCenter);
+
+    QLabel *lblTitle = new QLabel("Choix de la méthode d'ajout", m_pageChoixAjoutInv);
+    QFont fTitle = lblTitle->font();
+    fTitle.setPointSize(24);
+    fTitle.setBold(true);
+    lblTitle->setFont(fTitle);
+    lblTitle->setAlignment(Qt::AlignCenter);
+    layout->addWidget(lblTitle);
+
+    QHBoxLayout *btnLayout = new QHBoxLayout();
+    btnLayout->setSpacing(40);
+
+    QPushButton *btnManual = new QPushButton("Ajout\nManuel", m_pageChoixAjoutInv);
+    btnManual->setFixedSize(280, 180);
+    btnManual->setCursor(Qt::PointingHandCursor);
+    QFont fBtn = btnManual->font();
+    fBtn.setPointSize(18);
+    fBtn.setBold(true);
+    btnManual->setFont(fBtn);
+    connect(btnManual, &QPushButton::clicked, this, &MainWindow::goInventoryAddManual);
+
+    QPushButton *btnAuto = new QPushButton("Ajout\nAutomatique", m_pageChoixAjoutInv);
+    btnAuto->setFixedSize(280, 180);
+    btnAuto->setCursor(Qt::PointingHandCursor);
+    btnAuto->setFont(fBtn);
+    connect(btnAuto, &QPushButton::clicked, this, &MainWindow::goInventoryAddAuto);
+
+    btnLayout->addStretch();
+    btnLayout->addWidget(btnManual);
+    btnLayout->addWidget(btnAuto);
+    btnLayout->addStretch();
+    
+    layout->addLayout(btnLayout);
+    layout->addSpacing(40);
+
+    QPushButton *btnCancel = new QPushButton("Retour", m_pageChoixAjoutInv);
+    btnCancel->setFixedSize(150, 45);
+    btnCancel->setCursor(Qt::PointingHandCursor);
+    QFont fCancel = btnCancel->font();
+    fCancel.setPointSize(14);
+    fCancel.setBold(true);
+    btnCancel->setFont(fCancel);
+    connect(btnCancel, &QPushButton::clicked, this, [this](){ ui->stacked_I->setCurrentIndex(0); });
+    
+    QHBoxLayout *cancelLayout = new QHBoxLayout();
+    cancelLayout->addStretch();
+    cancelLayout->addWidget(btnCancel);
+    cancelLayout->addStretch();
+    
+    layout->addLayout(cancelLayout);
+    
+    ui->stacked_I->addWidget(m_pageChoixAjoutInv);
+}
+
+void MainWindow::goInventoryAddManual() {
+    ui->LblZone->setVisible(true);
+    ui->Zone->setVisible(true);
+    ui->LblShelf->setVisible(true);
+    ui->Shelf->setVisible(true);
+    ui->LblStatus->setVisible(true);
+    ui->Status->setVisible(true);
+    
+    ui->BtnPopupSaveInventory->setVisible(true);
+    ui->BtnPopupAutoSaveInventory->setVisible(false);
+    
+    ui->stacked_I->setCurrentIndex(1); // Page d'ajout
+}
+
+void MainWindow::goInventoryAddAuto() {
+    ui->LblZone->setVisible(false);
+    ui->Zone->setVisible(false);
+    ui->LblShelf->setVisible(false);
+    ui->Shelf->setVisible(false);
+    ui->LblStatus->setVisible(false);
+    ui->Status->setVisible(false);
+    
+    ui->BtnPopupSaveInventory->setVisible(false);
+    ui->BtnPopupAutoSaveInventory->setVisible(true);
+    
+    ui->stacked_I->setCurrentIndex(1); // Page d'ajout
+}
+
 // ── CREATE ────────────────────────────────────────────────────────────────────
+
+void MainWindow::on_BtnPopupAutoSaveInventory_clicked()
+{
+    // Auto-calculate missing fields
+    const int qtAv = ui->QtAv->value();
+    const int threshold = ui->Threshold->value();
+    const QString unit = ui->Unit->currentData().toString();
+    const QString type = ui->Type->currentData().toString();
+    
+    // Calculate Status
+    QString calcStatus;
+    if (qtAv == 0) {
+        calcStatus = "stock out";
+    } else if (qtAv <= threshold * 3) {
+        calcStatus = "limited";
+    } else {
+        calcStatus = "on hand";
+    }
+    
+    // Calculate Shelf
+    QString calcShelf;
+    if (unit == "kg") calcShelf = "1st floor";
+    else if (unit == "m") calcShelf = "2nd floor";
+    else if (unit == "L") calcShelf = "3rd floor";
+    else calcShelf = "RDC";
+    
+    // Calculate Zone
+    QString calcZone;
+    if (type == "Matière première" || type == "Composant") calcZone = "A";
+    else if (type == "Produit fini" || type == "Produit semi-fini") calcZone = "B";
+    else if (type == "Outil" || type == "Équipement") calcZone = "C";
+    else if (type == "Consommable" || type == "Pièce de rechange") calcZone = "D";
+    else calcZone = "A";
+    
+    // Update the UI combos
+    int statusIdx = ui->Status->findData(calcStatus);
+    if(statusIdx >= 0) ui->Status->setCurrentIndex(statusIdx);
+    
+    int shelfIdx = ui->Shelf->findData(calcShelf);
+    if(shelfIdx >= 0) ui->Shelf->setCurrentIndex(shelfIdx);
+    
+    int zoneIdx = ui->Zone->findData(calcZone);
+    if(zoneIdx >= 0) ui->Zone->setCurrentIndex(zoneIdx);
+
+    // Proceed to standard save logic
+    on_BtnPopupSaveInventory_clicked();
+}
 
 void MainWindow::on_BtnPopupSaveInventory_clicked()
 {
@@ -7567,6 +8197,7 @@ void MainWindow::on_BtnPopupSaveInventory_clicked()
 void MainWindow::on_BtnPopupResetInventory_clicked()
 {
     ui->IdProduct->clear();
+    ui->Name->clear();
     ui->Sku->clear();
     ui->QtAv->setValue(0);
     ui->QtRs->setValue(0);
