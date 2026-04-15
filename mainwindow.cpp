@@ -2,20 +2,29 @@
 #include "ui_mainwindow.h"
 #include "ocrscanner.h"
 #include "session.h"  // <--- INDISPENSABLE pour lire le rôle
+#include <QResizeEvent>
+#include <QPropertyAnimation>
+#include <QVariantAnimation>
+#include <QParallelAnimationGroup>
+#include <QSequentialAnimationGroup>
+#include <QGraphicsOpacityEffect>
+#include <QEasingCurve>
 #include "projet.h"
 #include <QGraphicsDropShadowEffect>
-#include <QDir> // Ajoutez ceci en haut du fichier si absent
-#include "ui_mainwindow.h"
+#include <QDir>
 #include "finance.h"
 #include "labs.h"
 #include "employe.h"
 #include "inventory.h"
 #include <QSpinBox>
 #include <QDoubleSpinBox>
+#include <QDateEdit>
+#include <QAbstractSpinBox>
+#include <QVBoxLayout>
+#include <QGroupBox>
 #include <QComboBox>
 #include <QApplication>
 #include <QMessageBox>
-#include <QGraphicsDropShadowEffect>
 #include <QStyle>
 #include <QTableWidgetItem>
 #include <QDate>
@@ -32,7 +41,6 @@
 #include <QUrl>
 #include <QTime>
 #include <QCryptographicHash>
-#include "session.h"
 #include <QtCharts/QBarSeries>
 #include <QtCharts/QBarSet>
 #include <QtCharts/QBarCategoryAxis>
@@ -46,19 +54,6 @@
 
 #include <QMouseEvent>
 #include "publication.h"
-#include <QHeaderView>
-#include <QTableWidgetItem>
-#include <QMessageBox>
-
-#include <QPdfWriter>
-#include <QPainter>
-#include <QFileDialog>
-#include <QDesktopServices>
-#include <QUrl>
-#include <QDate>
-#include <QTime>
-#include <QMessageBox>
-#include <QHeaderView>
 
 #include <QLayout>
 
@@ -68,17 +63,6 @@
 
 
 
-#include <QSqlQuery>
-#include <QSqlError>
-#include <QMessageBox>
-#include <QDebug>
-
-#include <QtCharts/QChartView>
-#include <QtCharts/QChart>
-#include <QtCharts/QBarSeries>
-#include <QtCharts/QBarSet>
-#include <QtCharts/QBarCategoryAxis>
-#include <QtCharts/QValueAxis>
 
 
 
@@ -89,7 +73,6 @@
 #include <QProgressBar>
 #include "currencyconverter.h"
 #include <QInputDialog>
-#include <QRegularExpression>
 #include <QSettings>
 #include <QFile>
 #include <QRandomGenerator>
@@ -102,13 +85,10 @@
 #include <QNetworkReply>
 
 #include <QBuffer>
+#include <QScrollArea>
 #include <QHttpMultiPart>
 #include <QHttpPart>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QMessageBox>
 
 
 #include <QCamera>
@@ -232,7 +212,7 @@ static QString generateTxCode(const QString &type, const QString &mode)
         const QString candidate = QString("%1-%2-%3-%4")
                                       .arg(typePart, modePart, datePart, QString::number(i).rightJustified(4, '0'));
         QSqlQuery q;
-        q.prepare("SELECT COUNT(*) FROM FINANCE WHERE CODETRANSACTION = :code");
+        q.prepare("SELECT COUNT(*) FROM FINANCE WHERE CODETRANSA = :code");
         q.bindValue(":code", candidate);
         if (q.exec() && q.next() && q.value(0).toInt() == 0) {
             return candidate;
@@ -244,6 +224,79 @@ static QString generateTxCode(const QString &type, const QString &mode)
 
 static void drawRect(QPainter& p, const QRect& r) { p.drawRect(r); }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ProportionalScaler : rend responsive une page à positionnement absolu.
+// Installe un event filter sur le conteneur (QGroupBox) et redimensionne
+// ses enfants proportionnellement à chaque resize.
+// ─────────────────────────────────────────────────────────────────────────────
+class ProportionalScaler : public QObject {
+    QWidget *m_box;
+    QSize    m_origSize;
+    QList<QPair<QWidget*, QRect>> m_origGeos;
+    QList<QPair<QWidget*, qreal>> m_origFonts;
+
+public:
+    explicit ProportionalScaler(QWidget *box, QObject *parent = nullptr)
+        : QObject(parent), m_box(box)
+    {
+        m_origSize = box->size();
+        for (auto *child : box->findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly)) {
+            m_origGeos.append({ child, child->geometry() });
+            m_origFonts.append({ child, child->font().pointSizeF() });
+        }
+        box->installEventFilter(this);
+    }
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override {
+        if (obj != m_box || event->type() != QEvent::Resize) return false;
+        if (m_origSize.isEmpty()) return false;
+
+        const QSize newSize = m_box->size();
+        const qreal xR = (qreal)newSize.width()  / m_origSize.width();
+        const qreal yR = (qreal)newSize.height() / m_origSize.height();
+        const qreal fR = qMin(xR, yR);
+
+        for (auto &pair : m_origGeos) {
+            QWidget *w = pair.first;
+            if (!w) continue;
+            const QRect &orig = pair.second;
+            w->setGeometry(
+                qRound(orig.x()      * xR),
+                qRound(orig.y()      * yR),
+                qRound(orig.width()  * xR),
+                qRound(orig.height() * yR)
+            );
+        }
+        for (auto &pair : m_origFonts) {
+            QWidget *w = pair.first;
+            if (!w) continue;
+            QFont f = w->font();
+            f.setPointSizeF(qMax(7.0, pair.second * fR));
+            w->setFont(f);
+        }
+        return false;
+    }
+};
+
+// Rend une page responsive : met le QGroupBox dans un layout + installe le scaler
+static void makePageResponsive(QWidget *page)
+{
+    if (page->layout()) return; // déjà un layout
+
+    QGroupBox *gb = page->findChild<QGroupBox*>(QString(), Qt::FindDirectChildrenOnly);
+    if (!gb) return;
+
+    // Scaler pour les enfants du groupBox (positionnement absolu)
+    new ProportionalScaler(gb, gb);
+
+    // Layout qui étire le groupBox à la taille de la page
+    auto *layout = new QVBoxLayout(page);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+    layout->addWidget(gb);
+}
+
 // ==================== LABS HELPERS ====================
 // (makeQrLabs supprimé : la colonne QRLABS n'existe pas dans la table)
 
@@ -253,6 +306,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     // On installe le filtre sur le champ de localisation
     ui->setupUi(this);
+    // Initialisation du manager réseau
+    networkManager = new QNetworkAccessManager(this);
+
+    // C'est cette ligne qui fait tout le travail invisible !
+    this->lancerServeurIA();
+
     ui->textChatPub->setStyleSheet("background-color: white; color: black;");
     connect(ui->btnEnvoyerQuestionPub, &QPushButton::clicked,
             this, &MainWindow::on_btnEnvoyerQuestionPub_clicked);
@@ -271,6 +330,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     // === STATISTIQUES LABORATOIRES ===
     connect(ui->btnVoirStatistiquesPub_2, &QPushButton::clicked,
             this, &MainWindow::showLabsPaymentStats);
+
 
     //employee
 
@@ -317,14 +377,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
 
 
-    // 1. Créer le menu
-    menuNotif = new QMenu(this);
-
-    // 2. Attacher le menu au bouton
-    ui->btnNotif->setMenu(menuNotif);
-
-    // 3. (Astuce) Enlever la petite flèche de menu par défaut de Qt
-    ui->btnNotif->setStyleSheet("QPushButton::menu-indicator { image: none; }");
+    // ── Système de notifications ──────────────────────────────────────────
+    setupNotifButton();
 
 
 
@@ -454,15 +508,10 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(ui->btnDeconnecter,   &QPushButton::clicked, this, &MainWindow::onDeconnecter);
     connect(ui->btnThemeToggle,   &QPushButton::clicked, this, &MainWindow::toggleTheme);
 
-    // --- Effets Visuels (Ombres) ---
-    auto shadowSidebar = new QGraphicsDropShadowEffect(this);
-    shadowSidebar->setBlurRadius(22);
-    shadowSidebar->setOffset(0, 6);
-    shadowSidebar->setColor(QColor(0, 0, 0, 60));
-    ui->sidebarFrame->setGraphicsEffect(shadowSidebar);
-
-    // NOTE: Ne pas appliquer QGraphicsEffect sur stackedWidget —
-    // cela casse la réception des clics sur tous les boutons enfants.
+    // NOTE: Ne pas appliquer QGraphicsEffect sur sidebarFrame NI sur stackedWidget —
+    // un QGraphicsEffect sur un widget PARENT empêche les effets enfants (opacité,
+    // glow, ripple) de se composer correctement : tout passe par un buffer offscreen
+    // partagé et les rendus entrent en conflit. L'ombre est reproduite en CSS.
 
     // ==========================================
     //    GESTION DES RÔLES (Session)
@@ -503,6 +552,60 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(ui->BtnPopupCancelLabs_10, &QPushButton::clicked,
             this, &MainWindow::on_BtnPopupCancelLabs_10_clicked);
     networkManager = new QNetworkAccessManager(this);
+
+    // ─── Rendre responsive toutes les pages à positionnement absolu ─────────
+    // makePageResponsive est sans danger sur les pages avec layout (retour immédiat)
+    QTimer::singleShot(0, this, [this]() {
+        // Employé (nommées explicitement)
+        makePageResponsive(ui->page_add_Emp);
+        makePageResponsive(ui->page_Edit_Emp);
+        makePageResponsive(ui->page_Stat);
+        makePageResponsive(ui->page_conge);
+        makePageResponsive(ui->page_formation);
+        makePageResponsive(ui->page);
+
+        // Tous les autres stacks : Publication, Projets, Finance, Inventory, Labs
+        auto makeStackResponsive = [](QStackedWidget *sw) {
+            if (!sw) return;
+            for (int i = 0; i < sw->count(); ++i)
+                makePageResponsive(sw->widget(i));
+        };
+        makeStackResponsive(ui->stack_pub);
+        makeStackResponsive(ui->stack_proj);
+        makeStackResponsive(ui->stacked_F);
+        makeStackResponsive(ui->stacked_I);
+        makeStackResponsive(ui->stacked_L);
+    });
+
+    // ─── Bouton hamburger : créé ICI (avant show) pour éviter le glitch d'affichage ───
+    m_btnToggleSidebar = new QPushButton("\u2630", ui->topBar);
+    m_btnToggleSidebar->setObjectName("btnToggleSidebar");
+    m_btnToggleSidebar->setFixedSize(36, 36);
+    m_btnToggleSidebar->setFocusPolicy(Qt::NoFocus);
+    m_btnToggleSidebar->setCursor(Qt::PointingHandCursor);
+    m_btnToggleSidebar->setToolTip("Masquer / Afficher la sidebar");
+    {
+        const int th = ui->topBar->height();
+        m_btnToggleSidebar->move(14, qMax(0, (th - 36) / 2));
+        ui->lblBrand->adjustSize();
+        ui->lblBrand->move(58, qMax(0, (th - ui->lblBrand->height()) / 2));
+    }
+    m_btnToggleSidebar->show();
+    connect(m_btnToggleSidebar, &QPushButton::clicked, this, &MainWindow::toggleSidebar);
+
+    // ─── Forcer le bon positionnement de la topBar + scaling initial ─────────
+    // On attend 1 tick pour que Qt ait calculé la vraie taille de la fenêtre.
+    QTimer::singleShot(0, this, [this]() {
+        if (ui && ui->topBar) {
+            QResizeEvent re(size(), QSize());
+            resizeEvent(&re);
+        }
+        // Premier scaling QSS (fenêtre à sa taille initiale/maximale)
+        updateScaledQss();
+    });
+
+    // ─── Animations ───────────────────────────────────────────────────────────
+    QTimer::singleShot(50, this, [this]() { initAnimations(); });
 }
 
 
@@ -512,106 +615,98 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
 void MainWindow::on_btnStat_emp_clicked()
 {
-    QStringList categories;
-    QList<double> valeurs;
+    // 1. DÉTERMINATION DE LA PÉRIODE (Janvier à Aujourd'hui)
+    QDate dateActuelle = QDate::currentDate();
+    int moisFin = dateActuelle.month(); // ex: 4 pour Avril
+    int annee = dateActuelle.year();
 
-    // 1. CALCUL DU DIVISEUR (Mois actuel pour la généralisation)
-    // On récupère le numéro du mois actuel (ex: 4 pour Avril)
-    int moisEnCours = QDate::currentDate().month();
-    // On s'assure que le diviseur est au moins 1.0 pour éviter la division par zéro
-    double diviseurMois = (moisEnCours > 0) ? static_cast<double>(moisEnCours) : 1.0;
-    double joursOuvresParMois = 22.0;
+    // Noms des mois en français pour le titre
+    QString nomMoisDebut = QLocale(QLocale::French).monthName(1); // Janvier
+    QString nomMoisFin = QLocale(QLocale::French).monthName(moisFin); // Avril
 
-    // 2. REQUÊTE SQL (Récupération du cumul d'absences)
+    // 2. RÉCUPÉRATION DES DONNÉES SQL
     QSqlQuery query;
-    query.prepare("SELECT NOM, NVL(NB_ABSENCES, 0) AS TOTAL_ABS "
-                  "FROM EMPLOYES "
-                  "ORDER BY TOTAL_ABS DESC");
+    query.prepare("SELECT NOM, NVL(NB_ABSENCES, 0) AS TOTAL FROM EMPLOYES ORDER BY TOTAL DESC");
 
     if (!query.exec()) {
         QMessageBox::critical(this, "Erreur SQL", query.lastError().text());
         return;
     }
 
-    // 3. LOGIQUE DE CALCUL DU TAUX MENSUEL MOYEN
+    // 3. PRÉPARATION DES SÉRIES GRAPHIQUES
+    QBarSet *setNormal = new QBarSet("Taux sous le seuil (Ok)");
+    QBarSet *setAlerte = new QBarSet("Taux Critique (>15%)");
+
+    setNormal->setColor(QColor(127, 255, 212)); // Aquamarine
+    setAlerte->setColor(QColor(255, 69, 0));     // Orange-Rouge vif
+
+    QStringList categories;
+    double diviseurMois = (moisFin > 0) ? static_cast<double>(moisFin) : 1.0;
+
     while (query.next()) {
         QString nom = query.value("NOM").toString();
-        int totalAbsences = query.value("TOTAL_ABS").toInt();
+        int totalAbs = query.value("TOTAL").toInt();
 
-        // Calcul : (Total / Nb de mois écoulés) / 22 jours ouvrés
-        double moyenneAbsParMois = totalAbsences / diviseurMois;
-        double taux = (moyenneAbsParMois / joursOuvresParMois) * 100.0;
+        // CALCUL PRÉCIS : (Total / Nb de mois) / 22 jours ouvrés * 100
+        double taux = ((totalAbs / diviseurMois) / 22.0) * 100.0;
+        taux = qRound(taux * 10.0) / 10.0; // Arrondi à 1 chiffre après la virgule
 
-        // Arrondi à 1 décimale pour la clarté (ex: 14.8 au lieu de 14.7727)
-        taux = qRound(taux * 10.0) / 10.0;
-
-        valeurs << (taux > 100.0 ? 100.0 : taux);
         categories << nom;
+
+        // Segmentation visuelle
+        if (taux >= 15.0) {
+            *setAlerte << taux;
+            *setNormal << 0;
+        } else {
+            *setNormal << taux;
+            *setAlerte << 0;
+        }
     }
 
-    if (categories.isEmpty()) {
-        QMessageBox::warning(this, "Stats", "Aucune donnée trouvée dans la base !");
-        return;
-    }
-
-    // 4. CRÉATION DES SÉRIES (Barres)
-    QBarSet *set = new QBarSet("Taux Moyen Mensuel %");
-    for (double v : valeurs) *set << v;
-
-    set->setColor(QColor(127, 255, 212)); // Aquamarine (#7FFFD4)
-    set->setBorderColor(QColor(0, 77, 64)); // Dark Cyan pour le contour
-
+    // 4. CONFIGURATION DU GRAPH (DÉTAILS MAXIMUM)
     QBarSeries *series = new QBarSeries();
-    series->append(set);
+    series->append(setNormal);
+    series->append(setAlerte);
     series->setLabelsVisible(true);
-    series->setLabelsPosition(QAbstractBarSeries::LabelsOutsideEnd);
+    series->setLabelsPosition(QAbstractBarSeries::LabelsOutsideEnd); // Chiffres en haut
     series->setLabelsFormat("@value %");
 
-    // 5. LIGNE DE SEUIL CRITIQUE (Alerte à 15%)
-    QLineSeries *alertLine = new QLineSeries();
-    alertLine->setName("Seuil Critique (15%)");
-    QPen pen(Qt::red);
-    pen.setWidth(2);
-    pen.setStyle(Qt::DashLine);
-    alertLine->setPen(pen);
-
-    for(int i = 0; i < categories.count(); ++i) {
-        alertLine->append(i, 15); // Ligne horizontale à 15%
-    }
-
-    // 6. CONFIGURATION DU GRAPHIQUE (Chart)
     QChart *chart = new QChart();
     chart->addSeries(series);
-    chart->addSeries(alertLine);
 
-    // Titre dynamique avec QLocale (Corrected)
-    QString nomMoisActuel = QLocale(QLocale::French).monthName(moisEnCours);
-    chart->setTitle(QString("Analyse de l'Absentéisme (Janvier - %1 2026)").arg(nomMoisActuel));
+    // Titre ultra-précis
+    chart->setTitle(QString("<b>ANALYSE RH DÉTAILLÉE</b><br>"
+                            "Période : %1 - %2 %3 | Base : 22j/mois")
+                    .arg(nomMoisDebut).arg(nomMoisFin).arg(annee));
 
-    chart->setAnimationOptions(QChart::SeriesAnimations);
-    chart->legend()->setVisible(true);
-    chart->legend()->setAlignment(Qt::AlignBottom);
+    // Ligne de seuil (Alerte Visuelle)
+    QLineSeries *limitLine = new QLineSeries();
+    limitLine->setName("Seuil Critique RH (15%)");
+    limitLine->setPen(QPen(Qt::red, 3, Qt::DashLine));
+    for(int i=0; i<categories.count(); ++i) limitLine->append(i, 15);
+    chart->addSeries(limitLine);
 
-    // Axe X (Noms des employés)
+    // 5. AXES DÉTAILLÉS
     QBarCategoryAxis *axisX = new QBarCategoryAxis();
     axisX->append(categories);
+    axisX->setTitleText("Liste des Employés");
     chart->addAxis(axisX, Qt::AlignBottom);
     series->attachAxis(axisX);
-    alertLine->attachAxis(axisX);
+    limitLine->attachAxis(axisX);
 
-    // Axe Y (Pourcentage)
     QValueAxis *axisY = new QValueAxis();
     axisY->setRange(0, 100);
-    axisY->setTitleText("Taux d'absence (%)");
+    axisY->setLabelFormat("%i%");
+    axisY->setTitleText("Taux d'Absentéisme (%)");
     chart->addAxis(axisY, Qt::AlignLeft);
     series->attachAxis(axisY);
-    alertLine->attachAxis(axisY);
+    limitLine->attachAxis(axisY);
 
-    // 7. AFFICHAGE DANS UNE VUE
+    // 6. RENDU FINAL
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->setMinimumSize(900, 500);
-    chartView->setWindowTitle("Statistiques RH - Système Vortex");
+    chartView->setMinimumSize(1000, 600);
+    chartView->setWindowTitle("Système Vortex - Rapport Statistiques");
     chartView->show();
 }
 void MainWindow::simulerPointage() {
@@ -682,6 +777,18 @@ void MainWindow::simulerPointage() {
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
+    // ── Fermer le panneau de notifications si clic en dehors ─────────────
+    if (m_notifPanel && m_notifPanel->isVisible()
+        && event->type() == QEvent::MouseButtonPress) {
+        QMouseEvent *me = static_cast<QMouseEvent*>(event);
+        QPoint gPos = me->globalPosition().toPoint();
+        QRect panelRect(m_notifPanel->mapToGlobal(QPoint(0,0)), m_notifPanel->size());
+        QRect btnRect(ui->btnNotif->mapToGlobal(QPoint(0,0)), ui->btnNotif->size());
+        if (!panelRect.contains(gPos) && !btnRect.contains(gPos)) {
+            m_notifPanel->hide();
+        }
+    }
+
     if (obj == ui->aff2 && event->type() == QEvent::MouseButtonDblClick) {
         QClipboard *clipboard = QApplication::clipboard();
         QString texte = clipboard->text();
@@ -783,72 +890,79 @@ void MainWindow::on_pointage_clicked()
 
 
 
-
 void MainWindow::configurerPermissions() {
     Session& session = Session::instance();
     QString role = session.getRole();
 
-    // --- ÉTAPE 1 : Nettoyage (On cache tout la sidebar) ---
-    ui->btnEmployee->hide();
-    ui->btnInventaire->hide();
-    ui->btnPublication->hide();
-    ui->btnFinance->hide();
-    ui->btnLaboratoires->hide();
-    ui->btnProjets->hide();
+    // Définition de tous les modules : bouton | emoji | label | page index
+    struct BtnDef {
+        QPushButton *btn;
+        QString icon;
+        QString label;
+        int pageIndex;
+    };
+    const QList<BtnDef> allBtns = {
+        { ui->btnEmployee,     "\U0001F464", "Employés",      0 },
+        { ui->btnInventaire,   "\U0001F4E6", "Inventaire",    1 },
+        { ui->btnPublication,  "\U0001F4C4", "Publications",  2 },
+        { ui->btnFinance,      "\U0001F4B0", "Finance",       3 },
+        { ui->btnLaboratoires, "\U0001F52C", "Laboratoires",  4 },
+        { ui->btnProjets,      "\U0001F4CB", "Projets",       5 },
+    };
 
-    // --- ÉTAPE 2 : Attribution de l'Environnement ---
+    // Droits selon le rôle
+    QList<QPushButton*> authorized;
+    QPushButton *defaultBtn = ui->btnEmployee;
+    int defaultPage = 0;
+
     if (role == "Admin") {
-        // 🔥 ADMIN : accès total
-        ui->btnEmployee->show();
-        ui->btnInventaire->show();
-        ui->btnPublication->show();
-        ui->btnFinance->show();
-        ui->btnLaboratoires->show();
-        ui->btnProjets->show();
-
-        // Page par défaut
-        ui->stackedWidget->setCurrentIndex(0);
-        setActiveButton(ui->btnEmployee);
-    }
-    if (role == "RH") {
-        // Environnement RH : Gestion du personnel et congés
-        ui->btnEmployee->show();
-        ui->stackedWidget->setCurrentIndex(0); // Index de la page Employés
-        setActiveButton(ui->btnEmployee);
-    }
-    else if (role == "Responsable_financier") {
-        // Environnement Finance : Salaires et budgets
-        ui->btnFinance->show();
-        ui->stackedWidget->setCurrentIndex(3); // Index de la page Finance
-        setActiveButton(ui->btnFinance);
-    }
-    else if (role == "Responsable_de_stock") {
-        // Environnement Stock : Inventaire et matériel
-        ui->btnInventaire->show();
-        ui->stackedWidget->setCurrentIndex(1); // Index de la page Inventaire
-        setActiveButton(ui->btnInventaire);
-    }
-    else if (role == "Responsable_Labos") {
-        // Environnement Laboratoire
-        ui->btnLaboratoires->show();
-        ui->stackedWidget->setCurrentIndex(4); // Index de la page Labos
-        setActiveButton(ui->btnLaboratoires);
-    }
-    else if (role == "Chercheur") {
-        // Environnement Recherche : Publications seulement
-        ui->btnPublication->show();
-        ui->stackedWidget->setCurrentIndex(2); // Index Publications
-        setActiveButton(ui->btnPublication);
-    }
-    else if (role == "Directeur_de_projet") {
-        // Environnement Management : Projets et Publications
-        ui->btnProjets->show();
-        ui->btnPublication->show();
-        ui->stackedWidget->setCurrentIndex(5); // Index Projets
-        setActiveButton(ui->btnProjets);
+        for (const auto &b : allBtns) authorized << b.btn;
+        defaultBtn  = ui->btnEmployee;
+        defaultPage = 0;
+    } else if (role == "RH") {
+        authorized  = { ui->btnEmployee };
+        defaultBtn  = ui->btnEmployee;
+        defaultPage = 0;
+    } else if (role == "Responsable_financier") {
+        authorized  = { ui->btnFinance };
+        defaultBtn  = ui->btnFinance;
+        defaultPage = 3;
+    } else if (role == "Responsable_de_stock") {
+        authorized  = { ui->btnInventaire };
+        defaultBtn  = ui->btnInventaire;
+        defaultPage = 1;
+    } else if (role == "Responsable_Labos") {
+        authorized  = { ui->btnLaboratoires };
+        defaultBtn  = ui->btnLaboratoires;
+        defaultPage = 4;
+    } else if (role == "Chercheur") {
+        authorized  = { ui->btnPublication };
+        defaultBtn  = ui->btnPublication;
+        defaultPage = 2;
+    } else if (role == "Directeur_de_projet") {
+        authorized  = { ui->btnProjets, ui->btnPublication };
+        defaultBtn  = ui->btnProjets;
+        defaultPage = 5;
     }
 
-    // Mise à jour du titre en haut de l'écran
+    // Afficher TOUS les boutons — activer les autorisés, verrouiller les autres
+    for (const auto &b : allBtns) {
+        bool auth = authorized.contains(b.btn);
+        b.btn->setVisible(true);
+        b.btn->setEnabled(auth);
+        if (auth) {
+            b.btn->setText(b.icon + "  " + b.label);
+            b.btn->setToolTip(QString());
+        } else {
+            b.btn->setText("\U0001F512  " + b.label);
+            b.btn->setToolTip("Accès réservé — votre rôle ne permet pas d'accéder à ce module.");
+        }
+        b.btn->style()->unpolish(b.btn);
+        b.btn->style()->polish(b.btn);
+    }
+
+    ui->stackedWidget->setCurrentIndex(defaultPage);
+    setActiveButton(defaultBtn);
     updateTopTitle(ui->stackedWidget->currentIndex());
 }
 
@@ -856,11 +970,633 @@ void MainWindow::configurerPermissions() {
 
 
 //fin fct
+void MainWindow::genererScriptPython()
+{
+    // On définit le chemin : là où se trouve l'exécutable
+    QString cheminScript = QCoreApplication::applicationDirPath() + "/face_id_vortex.py";
+    QFile file(cheminScript);
 
+    // On écrit le fichier (On l'écrase à chaque fois pour être sûr qu'il est à jour)
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+
+        // C'est ici que tu mets ton code Python exact
+        out << "import cv2\n";
+        out << "import sys\n";
+        out << "try:\n";
+        out << "    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')\n";
+        out << "    cap = cv2.VideoCapture(0)\n";
+        out << "    while True:\n";
+        out << "        ret, frame = cap.read()\n";
+        out << "        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)\n";
+        out << "        faces = face_cascade.detectMultiScale(gray, 1.1, 4)\n";
+        out << "        for (x, y, w, h) in faces:\n";
+        out << "            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)\n";
+        out << "        cv2.imshow('FaceID - Systeme Vortex', frame)\n";
+        out << "        if cv2.waitKey(1) & 0xFF == ord('q'): break\n";
+        out << "    cap.release()\n";
+        out << "    cv2.destroyAllWindows()\n";
+        out << "except Exception as e:\n";
+        out << "    print(f'Erreur: {e}')\n";
+
+        file.close();
+    }
+}
 
 MainWindow::~MainWindow()
 {
+    if (processIA) {
+            processIA->terminate(); // Tue le processus Python proprement
+            processIA->waitForFinished(2000);
+        }
     delete ui;
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    QMainWindow::resizeEvent(event);
+    if (!ui || !ui->topBar) return;
+
+    const int w = ui->topBar->width();
+    const int h = ui->topBar->height();
+
+    // btnToggleSidebar : tout à gauche de la topBar
+    ui->lblBrand->adjustSize(); // auto-fit width so "Lab" is never clipped
+    if (m_btnToggleSidebar) {
+        m_btnToggleSidebar->move(14, qMax(0, (h - 36) / 2));
+        // lblBrand se décale à droite du bouton toggle
+        ui->lblBrand->move(58, qMax(0, (h - ui->lblBrand->height()) / 2));
+    } else {
+        ui->lblBrand->move(14, (h - ui->lblBrand->height()) / 2);
+    }
+
+    // lblPageTitle : centré horizontalement dans la topBar
+    ui->lblPageTitle->move(
+        (w - ui->lblPageTitle->width()) / 2,
+        (h - ui->lblPageTitle->height()) / 2);
+
+    // btnNotif : aligné à droite avec marge de 10px
+    const int btnNx = w - ui->btnNotif->width() - 10;
+    const int btnNy = (h - ui->btnNotif->height()) / 2;
+    ui->btnNotif->move(btnNx, btnNy);
+
+    // Badge : coin supérieur-droit du bouton
+    if (m_notifBadge) {
+        m_notifBadge->move(btnNx + ui->btnNotif->width() - 10, btnNy - 5);
+        m_notifBadge->raise();
+    }
+
+    // Mettre à jour la position de l'indicateur actif après resize
+    if (m_activeIndicator) {
+        const QList<QPushButton*> nav = {
+            ui->btnEmployee, ui->btnInventaire, ui->btnPublication,
+            ui->btnFinance, ui->btnLaboratoires, ui->btnProjets
+        };
+        for (auto *btn : nav) {
+            if (btn->property("active").toBool()) {
+                QPoint p = btn->mapTo(ui->sidebarFrame, QPoint(0, 0));
+                m_activeIndicator->setGeometry(p.x(), p.y(), 4, btn->height());
+                break;
+            }
+        }
+    }
+
+    // Vignette : toujours la taille de la fenêtre entière, au-dessus de tout
+    if (m_vignetteOverlay) {
+        m_vignetteOverlay->resize(size());
+        m_vignetteOverlay->raise();
+    }
+
+    // ─── Scaling QSS proportionnel (debounce 80 ms) ──────────────────────────
+    // On ne régénère pas le QSS à chaque pixel de resize : on attend la fin du
+    // geste, ce qui évite les ralentissements tout en garantissant le résultat.
+    if (!m_fontScaleTimer) {
+        m_fontScaleTimer = new QTimer(this);
+        m_fontScaleTimer->setSingleShot(true);
+        connect(m_fontScaleTimer, &QTimer::timeout, this, &MainWindow::updateScaledQss);
+    }
+    m_fontScaleTimer->start(80);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VignetteOverlay — vignette néon respirante sur toute la fenêtre
+// ─────────────────────────────────────────────────────────────────────────────
+class VignetteOverlay : public QWidget {
+    float m_phase = 0.0f;
+    bool  m_dark;
+public:
+    explicit VignetteOverlay(QWidget *parent, bool dark) : QWidget(parent), m_dark(dark) {
+        setAttribute(Qt::WA_TransparentForMouseEvents);
+        setAttribute(Qt::WA_NoSystemBackground);
+        setAutoFillBackground(false);
+        setStyleSheet("background: transparent;");
+
+        auto *t = new QTimer(this);
+        connect(t, &QTimer::timeout, this, [this]() {
+            m_phase += 0.007f;
+            if (m_phase > 6.2832f) m_phase = 0.0f;
+            update();
+        });
+        t->start(40); // ~25 fps — léger et suffisant pour un effet breathing
+    }
+
+protected:
+    void paintEvent(QPaintEvent *) override {
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing);
+
+        const float pulse = (qSin(m_phase) + 1.0f) * 0.5f; // 0 → 1
+        const int   a     = static_cast<int>(4 + pulse * 14); // 4 → 18
+
+        // Couleur néon selon le thème
+        const QColor c = m_dark
+            ? QColor(14, 165, 233, a)
+            : QColor(31, 142, 149, a);
+
+        // Dégradé radial depuis chaque coin → effet vignette 4 coins
+        const double r = qMax(width(), height()) * 0.60;
+        const struct { double x, y; } corners[] = {
+            {0.0,           0.0},
+            {(double)width(), 0.0},
+            {0.0,           (double)height()},
+            {(double)width(), (double)height()}
+        };
+        for (const auto &corner : corners) {
+            QRadialGradient g(corner.x, corner.y, r);
+            g.setColorAt(0.00, c);
+            g.setColorAt(0.55, QColor(c.red(), c.green(), c.blue(), a / 4));
+            g.setColorAt(1.00, QColor(0, 0, 0, 0));
+            painter.fillRect(rect(), g);
+        }
+    }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HoverGlowHelper — event filter qui anime le glow d'un bouton sidebar
+// ─────────────────────────────────────────────────────────────────────────────
+class HoverGlowHelper : public QObject {
+    QGraphicsDropShadowEffect *m_eff;
+    QPropertyAnimation        *m_anim;
+public:
+    HoverGlowHelper(QGraphicsDropShadowEffect *eff, QPropertyAnimation *anim, QObject *parent)
+        : QObject(parent), m_eff(eff), m_anim(anim) {}
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override {
+        Q_UNUSED(obj)
+        if (event->type() == QEvent::Enter) {
+            m_anim->stop();
+            m_anim->setStartValue(m_eff->blurRadius());
+            m_anim->setEndValue(32.0);
+            m_anim->start();
+        } else if (event->type() == QEvent::Leave) {
+            m_anim->stop();
+            m_anim->setStartValue(m_eff->blurRadius());
+            m_anim->setEndValue(0.0);
+            m_anim->start();
+        }
+        return false;
+    }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// initAnimations : démarre toutes les animations de l'interface
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::initAnimations()
+{
+    // ── 1. Slide-in sidebar au démarrage ─────────────────────────────────────
+    const int maxW = 260;
+    const int minW = 240;
+    ui->sidebarFrame->setMaximumWidth(0);
+    ui->sidebarFrame->setMinimumWidth(0);
+
+    const QList<QPushButton*> navBtns = {
+        ui->btnEmployee, ui->btnInventaire, ui->btnPublication,
+        ui->btnFinance, ui->btnLaboratoires, ui->btnProjets
+    };
+
+    // Masquer les boutons nav + logo pour la stagger animation d'entrée
+    for (auto *btn : navBtns) {
+        auto *eff = new QGraphicsOpacityEffect(btn);
+        eff->setOpacity(0.0);
+        btn->setGraphicsEffect(eff);
+    }
+    {
+        auto *eff = new QGraphicsOpacityEffect(ui->logoLabel);
+        eff->setOpacity(0.0);
+        ui->logoLabel->setGraphicsEffect(eff);
+    }
+
+    auto *animMax = new QPropertyAnimation(ui->sidebarFrame, "maximumWidth", this);
+    animMax->setDuration(520);
+    animMax->setStartValue(0);
+    animMax->setEndValue(maxW);
+    animMax->setEasingCurve(QEasingCurve::OutCubic);
+
+    auto *animMin = new QPropertyAnimation(ui->sidebarFrame, "minimumWidth", this);
+    animMin->setDuration(520);
+    animMin->setStartValue(0);
+    animMin->setEndValue(minW);
+    animMin->setEasingCurve(QEasingCurve::OutCubic);
+
+    auto *slideGroup = new QParallelAnimationGroup(this);
+    slideGroup->addAnimation(animMax);
+    slideGroup->addAnimation(animMin);
+
+    // Après la slide : logo fade → stagger boutons → glows + indicateur
+    connect(slideGroup, &QParallelAnimationGroup::finished, this, [this, navBtns]() {
+        // Logo fade-in, puis glow pulse
+        auto *logoEff = qobject_cast<QGraphicsOpacityEffect*>(ui->logoLabel->graphicsEffect());
+        if (logoEff) {
+            auto *logoFade = new QPropertyAnimation(logoEff, "opacity", ui->logoLabel);
+            logoFade->setDuration(380);
+            logoFade->setStartValue(0.0);
+            logoFade->setEndValue(1.0);
+            logoFade->setEasingCurve(QEasingCurve::OutCubic);
+            connect(logoFade, &QPropertyAnimation::finished, this, [this]() {
+                // Couleurs : cyan vif → blanc éclatant → retour
+                const QColor c1 = m_isDarkTheme ? QColor(14, 165, 233, 255) : QColor(31, 142, 149, 240);
+                const QColor c2 = m_isDarkTheme ? QColor(180, 235, 255, 255) : QColor(100, 220, 210, 255);
+
+                m_logoGlowEffect = new QGraphicsDropShadowEffect(this);
+                m_logoGlowEffect->setOffset(0, 0);
+                m_logoGlowEffect->setColor(c1);
+                m_logoGlowEffect->setBlurRadius(10.0);
+                ui->logoLabel->setGraphicsEffect(m_logoGlowEffect);
+
+                // Animation blur : 8 → 70 → 8 (bien visible)
+                m_logoGlowAnim = new QPropertyAnimation(m_logoGlowEffect, "blurRadius", this);
+                m_logoGlowAnim->setDuration(1800);
+                m_logoGlowAnim->setStartValue(8.0);
+                m_logoGlowAnim->setEndValue(70.0);
+                m_logoGlowAnim->setEasingCurve(QEasingCurve::SineCurve);
+                m_logoGlowAnim->setLoopCount(-1);
+                m_logoGlowAnim->start();
+
+                // Animation couleur : cyan → blanc → cyan (pulsation chromatique)
+                auto *colorAnim = new QVariantAnimation(this);
+                colorAnim->setStartValue(c1);
+                colorAnim->setKeyValueAt(0.5, c2);
+                colorAnim->setEndValue(c1);
+                colorAnim->setDuration(1800);
+                colorAnim->setEasingCurve(QEasingCurve::SineCurve);
+                colorAnim->setLoopCount(-1);
+                connect(colorAnim, &QVariantAnimation::valueChanged, this, [this](const QVariant &val) {
+                    if (m_logoGlowEffect)
+                        m_logoGlowEffect->setColor(val.value<QColor>());
+                });
+                colorAnim->start();
+            });
+            logoFade->start(QAbstractAnimation::DeleteWhenStopped);
+        }
+
+        // ── Stagger boutons (cascade) ─────────────────────────────────────────
+        for (int i = 0; i < navBtns.size(); ++i) {
+            QPushButton *btn = navBtns[i];
+            QTimer::singleShot(i * 70, this, [btn]() {
+                auto *eff = qobject_cast<QGraphicsOpacityEffect*>(btn->graphicsEffect());
+                if (!eff) return;
+                auto *anim = new QPropertyAnimation(eff, "opacity", btn);
+                anim->setDuration(260);
+                anim->setStartValue(0.0);
+                anim->setEndValue(1.0);
+                anim->setEasingCurve(QEasingCurve::OutCubic);
+                anim->start(QAbstractAnimation::DeleteWhenStopped);
+            });
+        }
+
+        // Après stagger fini → glow effects + active indicator
+        const int totalMs = (navBtns.size() - 1) * 70 + 260 + 80;
+        QTimer::singleShot(totalMs, this, [this]() {
+            applyButtonGlowEffects();
+
+            // ── Active indicator (barre cyan glissante) ───────────────────────
+            m_activeIndicator = new QFrame(ui->sidebarFrame);
+            m_activeIndicator->setAttribute(Qt::WA_TransparentForMouseEvents);
+            m_activeIndicator->setObjectName("activeIndicator");
+            m_activeIndicator->setFixedWidth(4);
+            m_activeIndicator->raise();
+
+            const QList<QPushButton*> nav = {
+                ui->btnEmployee, ui->btnInventaire, ui->btnPublication,
+                ui->btnFinance, ui->btnLaboratoires, ui->btnProjets
+            };
+            for (auto *btn : nav) {
+                if (btn->property("active").toBool()) {
+                    QPoint p = btn->mapTo(ui->sidebarFrame, QPoint(0, 0));
+                    m_activeIndicator->setGeometry(p.x(), p.y(), 4, btn->height());
+                    break;
+                }
+            }
+
+            // Fade-in de l'indicateur
+            auto *indEff = new QGraphicsOpacityEffect(m_activeIndicator);
+            indEff->setOpacity(0.0);
+            m_activeIndicator->setGraphicsEffect(indEff);
+            m_activeIndicator->show();
+
+            auto *indFade = new QPropertyAnimation(indEff, "opacity", m_activeIndicator);
+            indFade->setDuration(400);
+            indFade->setStartValue(0.0);
+            indFade->setEndValue(1.0);
+            indFade->start(QAbstractAnimation::DeleteWhenStopped);
+        });
+    });
+
+    slideGroup->start(QAbstractAnimation::DeleteWhenStopped);
+
+    // ── 2. Title fade effect (réutilisé à chaque changement de page) ─────────
+    m_titleFadeEffect = new QGraphicsOpacityEffect(ui->lblPageTitle);
+    m_titleFadeEffect->setOpacity(1.0);
+    ui->lblPageTitle->setGraphicsEffect(m_titleFadeEffect);
+
+    // ── 2b. Vignette overlay néon (breathing effect sur toute la fenêtre) ────
+    m_vignetteOverlay = new VignetteOverlay(this, m_isDarkTheme);
+    m_vignetteOverlay->resize(size());
+    m_vignetteOverlay->raise();
+
+    // ── 3. Brand — neon glow pulse + shimmer couleur simultanés ─────────────
+    {
+        // 3a. Neon drop shadow qui grossit/rétrécit (effet enseigne lumineuse)
+        const QColor glowCol = m_isDarkTheme
+            ? QColor(14, 165, 233, 210)
+            : QColor(31, 142, 149, 190);
+
+        auto *brandGlow = new QGraphicsDropShadowEffect(this);
+        brandGlow->setOffset(0, 0);
+        brandGlow->setColor(glowCol);
+        brandGlow->setBlurRadius(6.0);
+        ui->lblBrand->setGraphicsEffect(brandGlow);
+
+        auto *glowAnim = new QPropertyAnimation(brandGlow, "blurRadius", this);
+        glowAnim->setDuration(2600);
+        glowAnim->setStartValue(4.0);
+        glowAnim->setEndValue(18.0);
+        glowAnim->setEasingCurve(QEasingCurve::SineCurve);
+        glowAnim->setLoopCount(-1);
+        glowAnim->start();
+
+    }
+
+    // ── 4. Bouton hamburger : déjà créé dans le constructeur avant show() ──────
+    //     (rien à faire ici, connexion déjà faite)
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// applyButtonGlowEffects : installe les effets glow (hover) sur tous les btns
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::applyButtonGlowEffects()
+{
+    const QColor btnGlow = m_isDarkTheme
+        ? QColor(14, 165, 233, 170)
+        : QColor(31, 142, 149, 140);
+
+    const QList<QPushButton*> navBtns = {
+        ui->btnEmployee, ui->btnInventaire, ui->btnPublication,
+        ui->btnFinance, ui->btnLaboratoires, ui->btnProjets
+    };
+    for (auto *btn : navBtns) {
+        auto *glow = new QGraphicsDropShadowEffect(btn);
+        glow->setOffset(0, 0);
+        glow->setColor(btnGlow);
+        glow->setBlurRadius(0.0);
+        btn->setGraphicsEffect(glow);
+
+        auto *anim = new QPropertyAnimation(glow, "blurRadius", btn);
+        anim->setDuration(200);
+        anim->setEasingCurve(QEasingCurve::OutQuad);
+        btn->installEventFilter(new HoverGlowHelper(glow, anim, btn));
+    }
+
+    auto applySmallGlow = [](QPushButton *btn, QColor col) {
+        auto *glow = new QGraphicsDropShadowEffect(btn);
+        glow->setOffset(0, 0);
+        glow->setColor(col);
+        glow->setBlurRadius(0.0);
+        btn->setGraphicsEffect(glow);
+
+        auto *anim = new QPropertyAnimation(glow, "blurRadius", btn);
+        anim->setDuration(180);
+        anim->setEasingCurve(QEasingCurve::OutQuad);
+        btn->installEventFilter(new HoverGlowHelper(glow, anim, btn));
+    };
+    applySmallGlow(ui->btnThemeToggle, QColor(14, 165, 233, 140));
+    applySmallGlow(ui->btnDeconnecter, QColor(239, 68, 68, 140));
+
+    // ── Glow universel : TOUS les boutons nommés de l'application ─────────────
+    // (sidebar + topBar déjà couverts ci-dessus, on skip ceux qui ont déjà un effet)
+    const QColor actionGlow = m_isDarkTheme
+        ? QColor(14, 165, 233, 145)
+        : QColor(31, 142, 149, 130);
+    const QColor dangerGlow  = QColor(239, 68, 68, 130);
+
+    const QStringList skipNames = { "btnToggleSidebar", "btnNotif",
+                                    "btnEmployee", "btnInventaire", "btnPublication",
+                                    "btnFinance", "btnLaboratoires", "btnProjets",
+                                    "btnThemeToggle", "btnDeconnecter" };
+
+    const QList<QPushButton*> allBtns = findChildren<QPushButton*>();
+    for (auto *btn : allBtns) {
+        const QString name = btn->objectName();
+        if (name.isEmpty()) continue;                  // non-nommé → skip
+        if (skipNames.contains(name)) continue;        // déjà traité → skip
+        if (btn->graphicsEffect()) continue;           // effet déjà présent → skip
+
+        // Boutons destructifs → rouge, autres → cyan/teal
+        const bool isDanger = name.contains("Supprimer", Qt::CaseInsensitive)
+                           || name.contains("Delete",    Qt::CaseInsensitive)
+                           || name.contains("Cancel",    Qt::CaseInsensitive)
+                           || name.contains("Annuler",   Qt::CaseInsensitive)
+                           || name.contains("Deconnecter", Qt::CaseInsensitive);
+
+        applySmallGlow(btn, isDanger ? dangerGlow : actionGlow);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// toggleSidebar : collapse / expand animé de la sidebar
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::toggleSidebar()
+{
+    m_sidebarExpanded = !m_sidebarExpanded;
+
+    auto *animMax = new QPropertyAnimation(ui->sidebarFrame, "maximumWidth", this);
+    auto *animMin = new QPropertyAnimation(ui->sidebarFrame, "minimumWidth", this);
+    animMax->setDuration(340);
+    animMin->setDuration(340);
+    animMax->setEasingCurve(QEasingCurve::InOutCubic);
+    animMin->setEasingCurve(QEasingCurve::InOutCubic);
+
+    if (m_sidebarExpanded) {
+        animMax->setStartValue(ui->sidebarFrame->maximumWidth());
+        animMax->setEndValue(260);
+        animMin->setStartValue(ui->sidebarFrame->minimumWidth());
+        animMin->setEndValue(240);
+        if (m_btnToggleSidebar) m_btnToggleSidebar->setText("\u2630");
+    } else {
+        animMax->setStartValue(ui->sidebarFrame->maximumWidth());
+        animMax->setEndValue(0);
+        animMin->setStartValue(ui->sidebarFrame->minimumWidth());
+        animMin->setEndValue(0);
+        if (m_btnToggleSidebar) m_btnToggleSidebar->setText("\u00bb");
+    }
+
+    auto *group = new QParallelAnimationGroup(this);
+    group->addAnimation(animMax);
+    group->addAnimation(animMin);
+    group->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// animateActiveIndicator : glisse la barre cyan vers le bouton actif
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::animateActiveIndicator(QPushButton *btn)
+{
+    if (!m_activeIndicator || !btn) return;
+
+    QPoint p = btn->mapTo(ui->sidebarFrame, QPoint(0, 0));
+    QRect target(p.x(), p.y(), 4, btn->height());
+
+    auto *anim = new QPropertyAnimation(m_activeIndicator, "geometry", this);
+    anim->setDuration(300);
+    anim->setStartValue(m_activeIndicator->geometry());
+    anim->setEndValue(target);
+    anim->setEasingCurve(QEasingCurve::OutCubic);
+    anim->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// animateButtonClick : effet ripple (cercle cyan qui s'élargit et disparaît)
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::animateButtonClick(QPushButton *btn)
+{
+    if (!btn) return;
+
+    const int finalSize = qMax(btn->width(), btn->height()) * 2;
+    const int half      = finalSize / 2;
+    const QPoint center = btn->rect().center();
+
+    auto *ripple = new QWidget(btn);
+    ripple->setAttribute(Qt::WA_TransparentForMouseEvents);
+    ripple->setStyleSheet(QString(
+        "background: rgba(14,165,233,0.45); border-radius: %1px;").arg(half));
+    ripple->setGeometry(center.x() - 4, center.y() - 4, 8, 8);
+    ripple->show();
+    ripple->raise();
+
+    auto *eff = new QGraphicsOpacityEffect(ripple);
+    eff->setOpacity(0.7);
+    ripple->setGraphicsEffect(eff);
+
+    auto *geoAnim = new QPropertyAnimation(ripple, "geometry", ripple);
+    geoAnim->setDuration(440);
+    geoAnim->setStartValue(QRect(center.x() - 4, center.y() - 4, 8, 8));
+    geoAnim->setEndValue(QRect(center.x() - half, center.y() - half, finalSize, finalSize));
+    geoAnim->setEasingCurve(QEasingCurve::OutCubic);
+
+    auto *fadeAnim = new QPropertyAnimation(eff, "opacity", ripple);
+    fadeAnim->setDuration(440);
+    fadeAnim->setStartValue(0.7);
+    fadeAnim->setEndValue(0.0);
+    fadeAnim->setEasingCurve(QEasingCurve::OutCubic);
+
+    auto *group = new QParallelAnimationGroup(ripple);
+    group->addAnimation(geoAnim);
+    group->addAnimation(fadeAnim);
+    connect(group, &QParallelAnimationGroup::finished, ripple, &QWidget::deleteLater);
+    group->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// animatePageChange : fade-in du contenu + wipe overlay depuis le bas
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::animatePageChange(int newIndex)
+{
+    if (ui->stackedWidget->currentIndex() == newIndex) return;
+
+    ui->stackedWidget->setCurrentIndex(newIndex);
+    QWidget *newPage = ui->stackedWidget->currentWidget();
+
+    // — Fade-in de la nouvelle page (0 → 1, 280 ms OutCubic) ──────────────
+    if (newPage) {
+        auto *pageEff = new QGraphicsOpacityEffect(newPage);
+        pageEff->setOpacity(0.0);
+        newPage->setGraphicsEffect(pageEff);
+
+        auto *pageFade = new QPropertyAnimation(pageEff, "opacity", newPage);
+        pageFade->setDuration(280);
+        pageFade->setStartValue(0.0);
+        pageFade->setEndValue(1.0);
+        pageFade->setEasingCurve(QEasingCurve::OutCubic);
+        connect(pageFade, &QPropertyAnimation::finished, newPage, [newPage]() {
+            newPage->setGraphicsEffect(nullptr);
+        });
+        pageFade->start(QAbstractAnimation::DeleteWhenStopped);
+    }
+
+    // — Overlay lumineux glissant depuis le bas (wipe reveal) ────────────
+    const QString overlayStyle = m_isDarkTheme
+        ? "background: rgba(14,165,233,0.09);"
+        : "background: rgba(31,142,149,0.07);";
+
+    auto *overlay = new QWidget(ui->stackedWidget);
+    overlay->setAttribute(Qt::WA_TransparentForMouseEvents);
+    overlay->setStyleSheet(overlayStyle);
+    overlay->resize(ui->stackedWidget->size());
+    overlay->show();
+    overlay->raise();
+
+    auto *overlayEff = new QGraphicsOpacityEffect(overlay);
+    overlayEff->setOpacity(0.85);
+    overlay->setGraphicsEffect(overlayEff);
+
+    const int startY = ui->stackedWidget->height() / 5;
+
+    auto *slideAnim = new QPropertyAnimation(overlay, "pos", overlay);
+    slideAnim->setDuration(380);
+    slideAnim->setStartValue(QPoint(0, startY));
+    slideAnim->setEndValue(QPoint(0, 0));
+    slideAnim->setEasingCurve(QEasingCurve::OutQuart);
+
+    auto *fadeOut = new QPropertyAnimation(overlayEff, "opacity", overlay);
+    fadeOut->setDuration(380);
+    fadeOut->setStartValue(0.85);
+    fadeOut->setEndValue(0.0);
+    fadeOut->setEasingCurve(QEasingCurve::OutCubic);
+
+    auto *group = new QParallelAnimationGroup(overlay);
+    group->addAnimation(slideAnim);
+    group->addAnimation(fadeOut);
+    connect(group, &QParallelAnimationGroup::finished, overlay, &QWidget::deleteLater);
+    group->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// updateAnimationColors : met à jour les couleurs des animations au changement de thème
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::updateAnimationColors()
+{
+    if (!m_logoGlowEffect) return;
+    const QColor glowCol = m_isDarkTheme
+        ? QColor(14, 165, 233, 190)
+        : QColor(31, 142, 149, 160);
+    m_logoGlowEffect->setColor(glowCol);
+
+    // Met à jour la couleur des glows sur les boutons sidebar
+    const QColor btnGlow = m_isDarkTheme
+        ? QColor(14, 165, 233, 170)
+        : QColor(31, 142, 149, 140);
+
+    const QList<QPushButton*> navBtns = {
+        ui->btnEmployee, ui->btnInventaire, ui->btnPublication,
+        ui->btnFinance, ui->btnLaboratoires, ui->btnProjets,
+        ui->btnThemeToggle, ui->btnDeconnecter
+    };
+    for (auto *btn : navBtns) {
+        if (auto *eff = qobject_cast<QGraphicsDropShadowEffect*>(btn->graphicsEffect())) {
+            eff->setColor(btnGlow);
+        }
+    }
 }
 
 void MainWindow::applyModernStyle()
@@ -906,11 +1642,8 @@ QLabel#lblPageTitle {
 }
 
 QLabel#logoLabel {
-    min-height: 210px;
-    background-image: url(":/img/images/logoLabel.png");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
+    min-height: 180px;
+    /* pixmap chargé via setPixmap() dans updateThemeButton — pas de background-image */
 }
 
 QLabel#stat_pub {
@@ -1289,37 +2022,72 @@ QPushButton#retour_stat_6:hover {
     qApp->setStyleSheet(qss);
 }
 
+void MainWindow::updateScaledQss()
+{
+    // Supprimé : qApp->setStyleSheet() sur chaque resize est trop coûteux
+    // (re-parse + re-render de TOUS les widgets → lag systématique).
+    // Le scaling des formulaires est géré par ProportionalScaler.
+}
+
 void MainWindow::toggleTheme()
 {
     m_isDarkTheme = !m_isDarkTheme;
 
     // Charger et appliquer le fichier QSS correspondant
-    QString themeFile = m_isDarkTheme ? ":/theme/style.qss" : ":/theme/style_light.qss";
+    QString themeFile = m_isDarkTheme
+        ? QStringLiteral(":/theme/style_dark.qss")
+        : QStringLiteral(":/theme/style_light.qss");
     QFile f(themeFile);
     if (f.open(QFile::ReadOnly)) {
         qApp->setStyleSheet(QLatin1String(f.readAll()));
         f.close();
     }
 
-    // Persister la préférence
     QSettings settings("SmartResearchLab", "Theme");
     settings.setValue("darkMode", m_isDarkTheme);
 
     updateThemeButton();
+    updateAnimationColors();
 }
 
 void MainWindow::updateThemeButton()
 {
+    // Logo sidebar commun (logo_off.png) — centré, séparé par une ligne
+    {
+        QPixmap pix(":/img/images/logo_off.png");
+        if (!pix.isNull()) {
+            // Taille fixe : 160×160 px max dans la sidebar (240-260px wide)
+            ui->logoLabel->setPixmap(
+                pix.scaled(160, 160, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        }
+        ui->logoLabel->setAlignment(Qt::AlignCenter);
+        ui->logoLabel->setScaledContents(false);
+        ui->logoLabel->setText(QString()); // pas de texte sur le pixmap
+    }
+
     if (m_isDarkTheme) {
         ui->btnThemeToggle->setText(QString::fromUtf8("\xe2\x98\x80\xef\xb8\x8f  Mode Jour"));
         ui->btnThemeToggle->setToolTip("Passer en th\u00E8me clair");
-        // En mode nuit (fond bleu tr\u00e8s fonc\u00e9) : l'id\u00e9al est un texte blanc/clair pour le mot "Smart"
         ui->lblBrand->setText(R"(<span style="color:#e2e8f0; font-weight:900;">Smart</span><span style="color:#38bdf8; font-weight:900;">ResearchLab</span>)");
+        ui->logoLabel->setStyleSheet(
+            "QLabel {"
+            "  border-bottom: 2px solid rgba(14,165,233,0.35);"
+            "  padding-bottom: 8px;"
+            "  margin-bottom: 4px;"
+            "  background: qlineargradient(x1:0,y1:0,x2:0,y2:1,"
+            "    stop:0 rgba(14,165,233,0.06), stop:1 transparent);"
+            "}");
     } else {
         ui->btnThemeToggle->setText(QString::fromUtf8("\xf0\x9f\x8c\x99  Mode Nuit"));
         ui->btnThemeToggle->setToolTip("Passer en th\u00E8me sombre");
-        // En mode jour (fond blanc) : le mot "Smart" doit \u00eatre noir/fonc\u00e9
         ui->lblBrand->setText(R"(<span style="color:#1e293b; font-weight:900;">Smart</span><span style="color:#1F8E95; font-weight:900;">ResearchLab</span>)");
+        ui->logoLabel->setStyleSheet(
+            "QLabel {"
+            "  border-bottom: 2px solid rgba(31,142,149,0.35);"
+            "  padding-bottom: 8px;"
+            "  margin-bottom: 4px;"
+            "  background: transparent;"
+            "}");
     }
 }
 
@@ -1341,6 +2109,10 @@ void MainWindow::setActiveButton(QPushButton *btn)
         b->update();
         b->setChecked(b == btn);
     }
+
+    // Barre indicatrice glissante + ripple sur le bouton cliqué
+    animateActiveIndicator(btn);
+    animateButtonClick(btn);
 }
 
 /* ===================== NAVIGATION ===================== */
@@ -1425,39 +2197,90 @@ void MainWindow::initEmployeUserGuidance()
 
 void MainWindow::goEmployee()
 {
-    ui->stackedWidget->setCurrentIndex(0);
+    animatePageChange(0);
     setActiveButton(ui->btnEmployee);
     loadEmployees();
 }
 
-void MainWindow::goInventaire()
-{
-    ui->stackedWidget->setCurrentIndex(1);
+void MainWindow::checkAndShowInventoryAlerts() {
+    QVector<Inventory::Row> alerts;
+    QString err;
+    if (!Inventory::checkThresholdAlerts(alerts, &err)) {
+        qDebug() << "[INVENTORY] Erreur vérification seuils:" << err;
+        return;
+    }
+    if (alerts.isEmpty()) return;
+
+    // ── Notification cloche ───────────────────────────────────────────────
+    for (const auto &row : std::as_const(alerts)) {
+        const QString label = row.name.isEmpty() ? row.sku : row.name;
+        ajouterNotification(
+            "SYSTÈME",
+            QString("⚠ Seuil atteint : %1 (dispo: %2 ≤ seuil: %3)")
+                .arg(label)
+                .arg(row.qtAv)
+                .arg(row.threshold)
+        );
+    }
+
+    // ── QMessageBox récapitulatif ─────────────────────────────────────────
+    QString msg = QString("<b>%1 produit(s) ont atteint leur seuil :</b><br><br>")
+                      .arg(alerts.size());
+
+    for (const auto &row : std::as_const(alerts)) {
+        const QString label = row.name.isEmpty() ? row.sku : row.name;
+        QString color = (row.qtAv <= 0) ? "#DC2626" : "#D97706"; // rouge si épuisé, orange si limité
+        msg += QString(
+            "<span style='color:%4;'>⚠</span> "
+            "<b>%1</b> &nbsp;|&nbsp; SKU: %2 "
+            "&nbsp;|&nbsp; Disponible: <b>%3</b> "
+            "&nbsp;|&nbsp; Seuil: <b>%5</b><br>"
+        )
+        .arg(label)
+        .arg(row.sku)
+        .arg(row.qtAv)
+        .arg(color)
+        .arg(row.threshold);
+    }
+
+    QMessageBox alert(this);
+    alert.setWindowTitle("⚠ Alertes Inventaire — Seuil atteint");
+    alert.setIcon(QMessageBox::Warning);
+    alert.setTextFormat(Qt::RichText);
+    alert.setText(msg);
+    alert.setStandardButtons(QMessageBox::Ok);
+    alert.setDefaultButton(QMessageBox::Ok);
+    alert.exec();
+}
+
+void MainWindow::goInventaire() {
+    animatePageChange(1);
     setActiveButton(ui->btnInventaire);
     refreshInventoryTypeFilter();
+    checkAndShowInventoryAlerts();
 }
 
 void MainWindow::goPublication()
 {
-    ui->stackedWidget->setCurrentIndex(2);
+    animatePageChange(2);
     setActiveButton(ui->btnPublication);
 }
 
 void MainWindow::goFinance()
 {
-    ui->stackedWidget->setCurrentIndex(3);
+    animatePageChange(3);
     setActiveButton(ui->btnFinance);
 }
 
 void MainWindow::goLaboratoires()
 {
-    ui->stackedWidget->setCurrentIndex(4);
+    animatePageChange(4);
     setActiveButton(ui->btnLaboratoires);
 }
 
 void MainWindow::goProjets()
 {
-    ui->stackedWidget->setCurrentIndex(5);
+    animatePageChange(5);
     setActiveButton(ui->btnProjets);
 }
 
@@ -1497,11 +2320,19 @@ void MainWindow::updateTopTitle(int index)
 
     // Augmenter dynamiquement la largeur du label pour ne pas couper le texte
     ui->lblPageTitle->setMinimumWidth(400);
-    // On déplace le label pour qu'il ait assez d'espace même s'il est aligné à droite
-    ui->lblPageTitle->setGeometry(QRect(180, 10, 400, 31));
-
     ui->lblPageTitle->setText(pageName + QString::fromUtf8("  |  %1 %2")
                               .arg(greeting, userName));
+
+    // Animation fade-in du titre à chaque changement de page
+    if (m_titleFadeEffect) {
+        m_titleFadeEffect->setOpacity(0.0);
+        auto *fadeIn = new QPropertyAnimation(m_titleFadeEffect, "opacity", this);
+        fadeIn->setDuration(380);
+        fadeIn->setStartValue(0.0);
+        fadeIn->setEndValue(1.0);
+        fadeIn->setEasingCurve(QEasingCurve::OutCubic);
+        fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
+    }
 }
 
 /* ===================== SLOTS DE NAVIGATION SIMPLES ===================== */
@@ -1895,10 +2726,8 @@ void MainWindow::on_btnmapl_3_clicked()
 // ====================== AJOUT ======================
 void MainWindow::handleInventoryAdd()
 {
-    qDebug() << "[INVENTORY] handleInventoryAdd: Navigating to Index 1 (ajouteri)";
-    ui->stacked_I->setCurrentIndex(1);
-    on_BtnPopupResetInventory_clicked(); // Clear fields
-    ui->Sku->setPlaceholderText("ABC-123");
+    qDebug() << "[INVENTORY] handleInventoryAdd: Navigating to Choice Page";
+    ui->stacked_I->setCurrentWidget(m_pageChoixAjoutInv);
 }
 
 
@@ -1957,99 +2786,35 @@ void MainWindow::on_retour_stat_7_clicked()
 void MainWindow::handleInventoryStats()
 {
     QString err;
-    if (!syncInventoryReservationsFromLabs(&err)) {
+    if (!syncInventoryStatsFromProduct(&err)) {
         QMessageBox::critical(this, "Inventaire",
-                              "Impossible de synchroniser les réservations depuis LABS_RESERVATION.\n\n"
+                              "Impossible de synchroniser les statistiques produit.\n\n"
                               "Détail : " + err);
         return;
     }
 
-    // Reload so the inventory table reflects updated PRODUCT.QT_RS / STATUS
     loadInventory();
+    showInventoryLabUsageStats();
     ui->stacked_I->setCurrentIndex(3); // "stati" page (Index 3)
 }
 
-bool MainWindow::syncInventoryReservationsFromLabs(QString *err)
+bool MainWindow::syncInventoryStatsFromProduct(QString *err)
 {
-    // We expect an existing table `LABS_RESERVATION`.
-    // This function syncs its computed reserved quantity into PRODUCT.QT_RS
-    // (and then recomputes PRODUCT.STATUS based on QT_AV - QT_RS vs THRESHOLD).
-    QSqlQuery probe;
-    if (!probe.exec("SELECT * FROM LABS_RESERVATION WHERE 1=0")) {
-        if (err) *err = probe.lastError().text();
-        return false;
-    }
+    // USE_COUNT = cumulative qty allocated to labs (updated only by lab reservation).
+    // Do not overwrite it from QT_RS here.
+    QSqlQuery ensureColumn;
+    ensureColumn.exec(
+        "ALTER TABLE PRODUCT ADD USE_COUNT NUMBER DEFAULT 0"
+    );
 
-    QSqlRecord rec = probe.record();
-    QStringList fieldsUpper;
-    fieldsUpper.reserve(rec.count());
-    for (int i = 0; i < rec.count(); ++i) {
-        fieldsUpper << rec.fieldName(i).toUpper();
-    }
-
-    auto hasField = [&](const QString &name) -> bool {
-        return fieldsUpper.contains(name.toUpper());
-    };
-
-    // Join key between LABS_RESERVATION and PRODUCT
-    QString joinField;
-    if (hasField("SKU")) joinField = "SKU";
-    else if (hasField("ID_PRODUCT")) joinField = "ID_PRODUCT";
-
-    if (joinField.isEmpty()) {
-        if (err) {
-            *err = "Colonnes manquantes dans LABS_RESERVATION : "
-                   "attendu au moins `SKU` ou `ID_PRODUCT`.";
-        }
-        return false;
-    }
-
-    // Reserved quantity column inside LABS_RESERVATION
-    QString qtyField;
-    const QStringList qtyCandidates = {
-        "QT_RS", "QT_RESERVED", "QT_RESERVEE", "QT_RESERVATION",
-        "QTE", "QTE_RESERVED", "QTY", "QUANTITY"
-    };
-    for (const QString &c : qtyCandidates) {
-        if (hasField(c)) {
-            qtyField = c;
-            break;
-        }
-    }
-
-    if (qtyField.isEmpty()) {
-        if (err) {
-            *err = "Impossible de trouver une colonne quantité dans LABS_RESERVATION "
-                   "(candidats : QT_RS / QT_RESERVED / QT_RESERVEE / QTE / QTY / QUANTITY).";
-        }
-        return false;
-    }
-
-    // 1) Copy reserved quantities into PRODUCT.QT_RS
-    //    SUM() ensures we get a single scalar value per product.
-    QSqlQuery q1;
-    const QString sqlQtRs = QStringLiteral(
-        "UPDATE PRODUCT p "
-        "SET p.QT_RS = ("
-        "  SELECT NVL(SUM(r.%1), 0) "
-        "  FROM LABS_RESERVATION r "
-        "  WHERE r.%2 = p.%2"
-        ")"
-    ).arg(qtyField, joinField);
-
-    if (!q1.exec(sqlQtRs)) {
-        if (err) *err = q1.lastError().text();
-        return false;
-    }
-
-    // 2) Recompute PRODUCT.STATUS according to available stock
     QSqlQuery q2;
     const QString sqlStatus = QStringLiteral(
         "UPDATE PRODUCT p "
         "SET p.STATUS = CASE "
-        "  WHEN (NVL(p.QT_AV, 0) - NVL(p.QT_RS, 0)) <= 0 THEN 'stock out' "
-        "  WHEN (NVL(p.QT_AV, 0) - NVL(p.QT_RS, 0)) <= NVL(p.THRESHOLD, 0) THEN 'limited' "
-        "  ELSE 'on hand' "
+        "  WHEN NVL(p.QT_AV, 0) = 0                                    THEN 'stock out' "
+        "  WHEN NVL(p.QT_AV, 0) <= NVL(p.THRESHOLD, 0) * 2            THEN 'limited' "
+        "  WHEN NVL(p.QT_AV, 0) >= NVL(p.THRESHOLD, 0) * 3            THEN 'on hand' "
+        "  ELSE 'limited' "
         "END"
     );
 
@@ -2058,19 +2823,163 @@ bool MainWindow::syncInventoryReservationsFromLabs(QString *err)
         return false;
     }
 
-    // Optional verification (helps confirm the sync “worked”)
-    QSqlQuery verify;
-    const QString sqlVerify = (joinField == "SKU")
-        ? QStringLiteral("SELECT COUNT(*) FROM PRODUCT WHERE QT_RS IS NOT NULL")
-        : QStringLiteral("SELECT COUNT(*) FROM PRODUCT WHERE QT_RS IS NOT NULL");
-    if (verify.exec(sqlVerify) && verify.next()) {
-        qDebug() << "[INVENTORY] Sync LABS_RESERVATION -> PRODUCT done. Products with QT_RS not null:"
-                 << verify.value(0).toInt();
-    } else {
-        qDebug() << "[INVENTORY] Sync LABS_RESERVATION -> PRODUCT done (verification query failed).";
+    return true;
+}
+
+void MainWindow::showInventoryLabUsageStats()
+{
+    // Ensure the combo box exists for chart type selection
+    QComboBox *combo = ui->stati->findChild<QComboBox*>(QStringLiteral("invChartTypeCombo"));
+    if (!combo) {
+        combo = new QComboBox(ui->stati);
+        combo->setObjectName(QStringLiteral("invChartTypeCombo"));
+        combo->addItem("Statistiques : Utilisation par Laboratoires (Colonnes)", 0);
+        combo->addItem("Statistiques : Répartition par Statut (Cercle)", 1);
+        
+        // Match the styling
+        combo->setStyleSheet(
+            "QComboBox { background-color: white; border: 2px solid #e0be9c; border-radius: 8px; padding: 5px 15px; font-weight: bold; font-size: 14px; color: #333; }"
+            "QComboBox::drop-down { border: none; width: 30px; }"
+        );
+        
+        // Position it explicitly roughly above the chart region 
+        // (Assuming ui->stat_pub_6 geometry handles the chart area, we place it near the top left)
+        if (ui->stat_pub_6) {
+            QRect g = ui->stat_pub_6->geometry();
+            combo->setGeometry(g.x(), g.y() - 50, 450, 40);
+        } else {
+            combo->setGeometry(50, 20, 450, 40);
+        }
+        combo->show();
+        combo->raise();
+        
+        connect(combo, &QComboBox::currentIndexChanged, this, [this](int) {
+            this->showInventoryLabUsageStats();
+        });
     }
 
-    return true;
+    int chartType = combo->currentData().toInt();
+
+    QChart *chart = new QChart();
+    
+    // Petite animation demandée : AllAnimations pour transitions douces
+    chart->setAnimationOptions(QChart::AllAnimations);
+    chart->setBackgroundBrush(m_isDarkTheme ? QColor(15, 23, 42) : QColor(252, 252, 250));
+    chart->setTitleFont(QFont(QStringLiteral("Segoe UI"), 14, QFont::Bold));
+    chart->setTitleBrush(m_isDarkTheme ? QColor(241, 245, 249) : QColor(45, 55, 72));
+
+    if (chartType == 0) {
+        // --- 1. GRAPHIQUE EN COLONNES (BAR CHART) ---
+        QSqlQuery qLab;
+        if (!qLab.exec(QStringLiteral(
+                "SELECT * FROM ("
+                "  SELECT NVL(NULLIF(TRIM(NAME), ''), SKU) AS NM, NVL(USE_COUNT, 0) AS UC "
+                "  FROM PRODUCT "
+                "  ORDER BY NVL(USE_COUNT, 0) DESC NULLS LAST"
+                ") WHERE ROWNUM <= 20"))) {
+            qDebug() << "[INVENTORY] stats query failed:" << qLab.lastError().text();
+        }
+
+        QStringList categories;
+        QList<double> values;
+        double maxY = 1.0;
+        bool anyLabUsage = false;
+
+        while (qLab.next()) {
+            const QString nm = qLab.value(0).toString().trimmed();
+            const double uc = qLab.value(1).toDouble();
+            if (uc > 0)
+                anyLabUsage = true;
+            const QString label = nm.length() > 28 ? nm.left(25) + QLatin1String("…") : nm;
+            categories << (label.isEmpty() ? QStringLiteral("(sans nom)") : label);
+            values << uc;
+            if (uc > maxY)
+                maxY = uc;
+        }
+
+        if (categories.isEmpty()) {
+            chart->setTitle(QStringLiteral("Inventaire — aucun produit"));
+        } else if (anyLabUsage) {
+            chart->setTitle(QStringLiteral("Produits les plus alloués aux laboratoires (USE_COUNT)"));
+            QBarSet *set = new QBarSet(QStringLiteral("Quantité allouée (labs)"));
+            set->setColor(QColor(31, 142, 149)); // Primary brand color
+            for (double v : std::as_const(values))
+                *set << v;
+            QBarSeries *series = new QBarSeries();
+            series->append(set);
+            series->setLabelsVisible(true);
+            series->setLabelsFormat(QStringLiteral("@value"));
+            chart->addSeries(series);
+
+            QBarCategoryAxis *axisX = new QBarCategoryAxis();
+            axisX->append(categories);
+            chart->addAxis(axisX, Qt::AlignBottom);
+            series->attachAxis(axisX);
+
+            QValueAxis *axisY = new QValueAxis();
+            axisY->setRange(0, maxY + qMax(1.0, maxY * 0.15));
+            axisY->setTitleText(QStringLiteral("Quantité Utilisée"));
+            chart->addAxis(axisY, Qt::AlignLeft);
+            series->attachAxis(axisY);
+            chart->legend()->setVisible(true);
+            chart->legend()->setAlignment(Qt::AlignBottom);
+        } else {
+            chart->setTitle(QStringLiteral("Aucun produit n'a encore été assigné à un laboratoire."));
+        }
+    } else {
+        // --- 2. GRAPHIQUE EN CERCLE (PIE CHART) ---
+        chart->setTitle(QStringLiteral("Répartition du stock par Statut"));
+        QSqlQuery qSt;
+        qSt.exec(QStringLiteral("SELECT STATUS, COUNT(*) FROM PRODUCT GROUP BY STATUS"));
+        QPieSeries *pie = new QPieSeries();
+        bool has = false;
+        
+        // Custom colors for status pie chart
+        QList<QColor> colors = { QColor(45, 212, 191), QColor(251, 146, 60), QColor(248, 113, 113), QColor(148, 163, 184) };
+        int colorIdx = 0;
+
+        while (qSt.next()) {
+            has = true;
+            QString st = qSt.value(0).toString().trimmed();
+            if (st.isEmpty())
+                st = QStringLiteral("Non défini");
+            const int c = qSt.value(1).toInt();
+            QPieSlice *sl = pie->append(QStringLiteral("%1 (%2)").arg(st).arg(c), c);
+            sl->setLabelVisible(true);
+            sl->setBrush(colors[colorIdx % colors.size()]);
+            // Explosion animation for slices to make it "jolie"
+            sl->setExploded(true);
+            sl->setExplodeDistanceFactor(0.05);
+            colorIdx++;
+        }
+        if (!has) {
+            chart->setTitle(QStringLiteral("Aucune donnée inventaire"));
+        } else {
+            chart->addSeries(pie);
+            chart->legend()->setVisible(true);
+            chart->legend()->setAlignment(Qt::AlignRight);
+        }
+    }
+
+    QChartView *cv = ui->stati->findChild<QChartView*>(QStringLiteral("inventoryLabUsageChart"));
+    if (!cv) {
+        cv = new QChartView(ui->stati);
+        cv->setObjectName(QStringLiteral("inventoryLabUsageChart"));
+        if (ui->stat_pub_6)
+            cv->setGeometry(ui->stat_pub_6->geometry());
+        cv->setRenderHint(QPainter::Antialiasing);
+        cv->raise();
+        if (ui->stat_pub_6)
+            ui->stat_pub_6->hide();
+    } else {
+        QChart *old = cv->chart();
+        if (old)
+            old->deleteLater();
+        if (ui->stat_pub_6)
+            ui->stat_pub_6->hide();
+    }
+    cv->setChart(chart);
+    cv->show();
 }
 
 
@@ -2113,6 +3022,7 @@ void MainWindow::on_btnModifierProj_clicked()
         return;
     }
     int r = ui->tableProjets->currentRow();
+    if (!ui->tableProjets->item(r, 0)) return;
     ui->lineTitreEditProj->setText(ui->tableProjets->item(r,0)->text());
     ui->lineDomaineEditProj->setText(ui->tableProjets->item(r,1)->text());
     ui->lineEdit_2->setText(ui->tableProjets->item(r,2)->text());
@@ -2496,6 +3406,9 @@ void MainWindow::initFinanceUi()
 {
     ui->FormCode->setReadOnly(true);
     ui->FormCode_2->setReadOnly(true);
+    // Date de transaction verrouillée dans modifier (non modifiable après création)
+    ui->FormDate_2->setReadOnly(true);
+    ui->FormDate_2->setButtonSymbols(QAbstractSpinBox::NoButtons);
     ui->FormCategory->setVisible(false);
     ui->LblCat2->setVisible(false);
     ui->FormCategory_2->setVisible(false);
@@ -2550,7 +3463,9 @@ void MainWindow::initFinanceUi()
         "  padding: 4px 10px;"
         "}");
 
-    auto *amountValidator = new QRegularExpressionValidator(QRegularExpression("^\\d*(?:[\\.,]\\d{0,3})?$"), this);
+    // Max 9 chiffres avant la décimale, 2 après — bloque ORA-01438
+    auto *amountValidator = new QRegularExpressionValidator(
+        QRegularExpression("^\\d{0,9}([,.]\\d{0,2})?$"), this);
     ui->FormAmount->setValidator(amountValidator);
     ui->FormAmount_2->setValidator(amountValidator);
 
@@ -2640,7 +3555,10 @@ void MainWindow::loadFinance()
         ui->TableFinance->setItem(row, 1, itType);
 
         auto *itMontant = new QTableWidgetItem();
-        itMontant->setData(Qt::DisplayRole, r.montant.toDouble()); // tri numérique correct
+        const double montantNum = r.montant.toDouble();
+        itMontant->setData(Qt::DisplayRole, QString::number(montantNum, 'f', 2)); // jamais notation scientifique
+        itMontant->setData(Qt::UserRole, montantNum); // valeur numérique pour lecture modifier
+        itMontant->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
         ui->TableFinance->setItem(row, 2, itMontant);
 
         ui->TableFinance->setItem(row, 3, new QTableWidgetItem(r.description));
@@ -2880,7 +3798,7 @@ void MainWindow::on_BtnPopupSaveFinance_clicked()
 
     // --- Validation Montant ---
     bool okAmount = false;
-    const double montant = ui->FormAmount->text().trimmed().toDouble(&okAmount);
+    const double montant = ui->FormAmount->text().trimmed().replace(',', '.').toDouble(&okAmount);
     if (!okAmount) {
         QMessageBox::warning(this, "Ajout", "Montant invalide (nombre attendu).");
         ui->FormAmount->setFocus();
@@ -2930,6 +3848,7 @@ void MainWindow::on_BtnEdit_clicked()
         QMessageBox::warning(this, "Modifier", "ID introuvable.");
         return;
     }
+    if (!ui->TableFinance->item(r, 0)) return;
 
     ui->FormCode_2->setText(ui->TableFinance->item(r,0)->text());
 
@@ -2938,8 +3857,8 @@ void MainWindow::on_BtnEdit_clicked()
     int idxType = ui->FormType_2->findData(typeDb);
     ui->FormType_2->setCurrentIndex(qMax(0, idxType));
 
-    // Montant : stocké en DisplayRole (double), on récupère la chaîne formatée
-    const double montantVal = ui->TableFinance->item(r,2)->data(Qt::DisplayRole).toDouble();
+    // Montant : valeur numérique stockée en UserRole
+    const double montantVal = ui->TableFinance->item(r,2)->data(Qt::UserRole).toDouble();
     ui->FormAmount_2->setText(QString::number(montantVal, 'f', 2));
     ui->FormDesc_2->setText(ui->TableFinance->item(r,3)->text());
 
@@ -2991,7 +3910,7 @@ void MainWindow::on_BtnPopupSaveFinance_2_clicked()
     }
 
     bool okAmount = false;
-    const double montant = ui->FormAmount_2->text().trimmed().toDouble(&okAmount);
+    const double montant = ui->FormAmount_2->text().trimmed().replace(',', '.').toDouble(&okAmount);
     if (!okAmount) {
         QMessageBox::warning(this, "Modifier", "Montant invalide (nombre attendu).");
         ui->FormAmount_2->setFocus();
@@ -3341,7 +4260,10 @@ void MainWindow::on_BtnApply_clicked()
         ui->TableFinance->setItem(row, 1, itType);
 
         auto *itMontant = new QTableWidgetItem();
-        itMontant->setData(Qt::DisplayRole, r.montant.toDouble());
+        const double montantNum2 = r.montant.toDouble();
+        itMontant->setData(Qt::DisplayRole, QString::number(montantNum2, 'f', 2));
+        itMontant->setData(Qt::UserRole, montantNum2);
+        itMontant->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
         ui->TableFinance->setItem(row, 2, itMontant);
 
         ui->TableFinance->setItem(row, 3, new QTableWidgetItem(r.description));
@@ -3543,6 +4465,35 @@ void MainWindow::loadPublications()
 void MainWindow::on_btnAjouterPub_clicked()
 {
     ui->stack_pub->setCurrentIndex(1);
+}
+
+void MainWindow::on_btnModifierPub_clicked()
+{
+    // Colonnes : 0=titre(+id UserRole), 1=inventeurs, 2=domaine, 3=type,
+    //            4=numeroBrevet, 5=dateDepot, 6=statut, 7=resume
+    const int row = ui->tablePublication->currentRow();
+    if (row < 0) {
+        QMessageBox::warning(this, "Modification", "Veuillez sélectionner une publication à modifier.");
+        return;
+    }
+    idPublicationToEdit = selectedPublicationId();
+    if (idPublicationToEdit.isEmpty()) {
+        QMessageBox::warning(this, "Modification", "ID publication introuvable.");
+        return;
+    }
+    if (!ui->tablePublication->item(row, 0)) return;
+
+    ui->lineTitreEdit->setText(ui->tablePublication->item(row, 0)->text());
+    ui->lineInventeursEdit->setCurrentText(ui->tablePublication->item(row, 1)->text());
+    ui->lineDomaineEdit->setText(ui->tablePublication->item(row, 2)->text());
+    ui->comboTypeBrevetEdit->setCurrentText(ui->tablePublication->item(row, 3)->text());
+    ui->lineNumeroBrevetEdit->setText(ui->tablePublication->item(row, 4)->text());
+    QDate d = QDate::fromString(ui->tablePublication->item(row, 5)->text(), "yyyy-MM-dd");
+    ui->dateDepotEdit->setDate(d.isValid() ? d : QDate::currentDate());
+    ui->comboStatusBrevetEdit->setCurrentText(ui->tablePublication->item(row, 6)->text());
+    ui->lineResumeEdit->setText(ui->tablePublication->item(row, 7)->text());
+
+    ui->stack_pub->setCurrentIndex(2);
 }
 
 void MainWindow::on_btnRetourAddPub_clicked()
@@ -3834,6 +4785,7 @@ void MainWindow::on_btnSupprimerPub_clicked()
         QMessageBox::warning(this, "Suppression", "ID publication introuvable.");
         return;
     }
+    if (!ui->tablePublication->item(row, 0)) return;
 
     QString titre = ui->tablePublication->item(row, 0)->text();
 
@@ -4036,8 +4988,11 @@ void MainWindow::on_lineSearchPub_textChanged(const QString &text)
     }
 
     for (int i = 0; i < ui->tablePublication->rowCount(); i++) {
-        QString titre = ui->tablePublication->item(i, 0)->text().toLower();
-        QString numero = ui->tablePublication->item(i, 4)->text().toLower();
+        auto *it0 = ui->tablePublication->item(i, 0);
+        auto *it4 = ui->tablePublication->item(i, 4);
+        if (!it0 || !it4) continue;
+        QString titre  = it0->text().toLower();
+        QString numero = it4->text().toLower();
 
         bool match = titre.contains(search) || numero.contains(search);
 
@@ -4602,7 +5557,84 @@ void MainWindow::on_btnMailingPub_clicked()
     }
 }
 // ==================== EMPLOYEE CRUD ====================
+void MainWindow::lancerServeurIA() {
+    // 1. Définition du chemin (Portabilité respectée)
+    QString scriptPath = QCoreApplication::applicationDirPath() + "/face_id_vortex.py";
+    QFile file(scriptPath);
 
+    // 2. Écriture du script avec TRUNCATE (pour forcer la mise à jour)
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        QTextStream out(&file);
+        out << "from flask import Flask, request, jsonify\n"
+            << "import cv2\n"
+            << "import numpy as np\n"
+            << "import os\n\n"
+            << "app = Flask(__name__)\n"
+            // Utilisation de la détection de visage OpenCV standard
+            << "face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')\n\n"
+
+            << "@app.route('/enroll', methods=['POST'])\n"
+            << "def enroll():\n"
+            << "    if 'face' in request.files:\n"
+            << "        username = request.form.get('username', 'user')\n"
+            << "        img = cv2.imdecode(np.frombuffer(request.files['face'].read(), np.uint8), cv2.IMREAD_COLOR)\n"
+            << "        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)\n"
+            << "        faces = face_cascade.detectMultiScale(gray, 1.1, 4)\n"
+            << "        if len(faces) > 0:\n"
+            << "            x, y, w, h = faces[0]\n"
+            << "            face_crop = img[y:y+h, x:x+w]\n"
+            << "            cv2.imwrite(f'{username}_ref.jpg', face_crop)\n"
+            << "            return jsonify({'success': True})\n"
+            << "    return jsonify({'success': False})\n\n"
+
+            << "@app.route('/verify', methods=['POST'])\n"
+            << "def verify():\n"
+            << "    if 'face' in request.files:\n"
+            << "        username = request.form.get('username', 'user')\n"
+            << "        ref_path = f'{username}_ref.jpg'\n"
+            << "        if not os.path.exists(ref_path): return jsonify({'verified': False})\n"
+            << "        img_ref = cv2.imread(ref_path, 0)\n"
+            << "        img_new = cv2.imdecode(np.frombuffer(request.files['face'].read(), np.uint8), cv2.IMREAD_GRAYSCALE)\n"
+            << "        faces = face_cascade.detectMultiScale(img_new, 1.1, 4)\n"
+            << "        if len(faces) > 0:\n"
+            << "            x, y, w, h = faces[0]\n"
+            << "            curr = cv2.resize(img_new[y:y+h, x:x+w], (img_ref.shape[1], img_ref.shape[0]))\n"
+            << "            score = cv2.matchTemplate(curr, img_ref, cv2.TM_CCOEFF_NORMED).max()\n"
+            << "            return jsonify({'verified': bool(score > 0.7)})\n"
+            << "    return jsonify({'verified': False})\n\n"
+
+            << "if __name__ == '__main__':\n"
+            << "    app.run(host='127.0.0.1', port=5000)\n";
+        file.close();
+    }
+
+    // 3. Gestion du processus QProcess
+    if (!processIA) {
+        processIA = new QProcess(this);
+    }
+
+    // Si le processus tourne déjà, on ne fait rien
+    if (processIA->state() == QProcess::NotRunning) {
+
+        // Capture des erreurs Python pour le débuggage dans Qt Creator
+        connect(processIA, &QProcess::readyReadStandardError, [this]() {
+            qDebug() << "PYTHON ERROR LOG:" << processIA->readAllStandardError();
+        });
+
+        connect(processIA, &QProcess::readyReadStandardOutput, [this]() {
+            qDebug() << "PYTHON OUTPUT:" << processIA->readAllStandardOutput();
+        });
+
+        // Lancement (vérifie que 'python' est dans ton PATH Windows)
+        processIA->start("python", QStringList() << scriptPath);
+
+        if (!processIA->waitForStarted(3000)) {
+            qDebug() << "ERREUR : Impossible de démarrer le processus Python.";
+        } else {
+            qDebug() << "Serveur IA Vortex lancé avec succès sur le port 5000.";
+        }
+    }
+}
 static void updatePasswordStrengthUiAddEmp(const QString &password, QProgressBar *bar, QLabel *label)
 {
     if (!bar || !label)
@@ -4838,6 +5870,24 @@ void MainWindow::on_btnSaveEmployee_clicked()
         ui->lineSalaireAdd->setFocus();
         return;
     }
+    // Vérification spécifique pour les menus déroulants
+    if (ui->comboRoleAdd->currentIndex() <= 0) { // En supposant que l'index 0 est "Choisir..."
+        QMessageBox::warning(this, "Sélection requise", "Veuillez attribuer un rôle à l'employé.");
+        ui->comboRoleAdd->setFocus();
+        return;
+    }
+
+    if (ui->comboDepartementAdd->currentIndex() <= 0) {
+        QMessageBox::warning(this, "Sélection requise", "Veuillez sélectionner un département.");
+        ui->comboDepartementAdd->setFocus();
+        return;
+    }
+
+    if (ui->comboPosteAdd->currentIndex() <= 0) {
+        QMessageBox::warning(this, "Sélection requise", "Veuillez définir le poste de l'employé.");
+        ui->comboPosteAdd->setFocus();
+        return;
+    }
 
     // F. Vérification de la BIOMÉTRIE
     if (this->m_tempFaceEncoding.isEmpty()) {
@@ -4917,6 +5967,7 @@ void MainWindow::on_btnSupprimer_emp_clicked()
     }
 
     QTableWidgetItem *item = ui->TableEmp->item(row, 0);
+    if (!item) return;
 
     QString idEmploye = item->data(Qt::UserRole).toString(); // ✅ ID caché
 
@@ -4954,55 +6005,44 @@ void MainWindow::on_btnSupprimer_emp_clicked()
 
 void MainWindow::on_btnScanFace_clicked()
 {
-    // 0. Récupération du username pour nommer le fichier côté Python
-    QString username = ui->lineUsernameAdd->text().trimmed(); // Remplace par ton vrai nom d'objet UI
+    QString username = ui->lineUsernameAdd->text().trimmed();
     if (username.isEmpty()) {
-        QMessageBox::warning(this, "Attention", "Veuillez saisir un nom d'utilisateur avant de scanner le visage.");
+        QMessageBox::warning(this, "Attention", "Saisis un username avant de scanner.");
         return;
     }
 
-    // 1. Création des objets pour Qt 6
     QCamera *camera = new QCamera(QMediaDevices::defaultVideoInput(), this);
     QImageCapture *capture = new QImageCapture(this);
     QMediaCaptureSession *session = new QMediaCaptureSession(this);
-
     session->setCamera(camera);
     session->setImageCapture(capture);
-
     camera->start();
 
-    // 2. Attente d'une seconde pour l'initialisation du capteur (Lumière/Focus)
     QEventLoop loop;
     QTimer::singleShot(1000, &loop, &QEventLoop::quit);
     loop.exec();
 
-    // 3. Déclenchement de la capture
     capture->capture();
 
-    // 4. Une fois l'image capturée
     connect(capture, &QImageCapture::imageCaptured, [=](int id, const QImage &img) {
         QByteArray ba;
         QBuffer buf(&ba);
         buf.open(QIODevice::WriteOnly);
         img.save(&buf, "JPG");
 
-        // Préparation de l'envoi Multipart
         QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 
-        // --- AJOUT DU CHAMP USERNAME ---
         QHttpPart namePart;
         namePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"username\""));
         namePart.setBody(username.toUtf8());
         multiPart->append(namePart);
 
-        // Champ Image
         QHttpPart imagePart;
-        imagePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"face\"; filename=\"face.jpg\""));
+        imagePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"face\"; filename=\"ref.jpg\""));
         imagePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("image/jpeg"));
         imagePart.setBody(ba);
         multiPart->append(imagePart);
 
-        // Envoi vers la route /enroll
         QNetworkRequest request(QUrl("http://127.0.0.1:5000/enroll"));
         QNetworkReply *reply = networkManager->post(request, multiPart);
         multiPart->setParent(reply);
@@ -5011,21 +6051,12 @@ void MainWindow::on_btnScanFace_clicked()
             if (reply->error() == QNetworkReply::NoError) {
                 QJsonObject res = QJsonDocument::fromJson(reply->readAll()).object();
                 if (res["success"].toBool()) {
-                    // On stocke le résultat si besoin pour valider l'inscription plus tard
-                    this->m_tempFaceEncoding = "VALIDATED";
-                    QMessageBox::information(this, "Succès", "Visage enregistré pour " + username);
-                } else {
-                    QMessageBox::warning(this, "Erreur", res["error"].toString());
+                    this->m_tempFaceEncoding = "VALIDATED"; // Prêt pour l'insertion SQL
+                    QMessageBox::information(this, "Succès", "Visage de référence enregistré !");
                 }
-            } else {
-                QMessageBox::critical(this, "Erreur Réseau", "Impossible de contacter le serveur Python (app.py)");
             }
-
             camera->stop();
-            // Nettoyage des objets dynamiques
             camera->deleteLater();
-            session->deleteLater();
-            capture->deleteLater();
             reply->deleteLater();
         });
     });
@@ -5037,6 +6068,7 @@ void MainWindow::on_btnModifier_emp_clicked()
         QMessageBox::warning(this, "Sélection", "Veuillez sélectionner un employé.");
         return;
     }
+    if (!ui->TableEmp->item(row, 0)) return;
 
     // Remplissage des champs de l'interface de modification
     ui->lineCIN_emp->setText(ui->TableEmp->item(row, 0)->text());
@@ -5056,6 +6088,7 @@ void MainWindow::on_btnSaveEditEmployee_clicked()
 {
     int row = ui->TableEmp->currentRow();
     if (row < 0) return;
+    if (!ui->TableEmp->item(row, 0)) return;
 
     QString idEmploye = ui->TableEmp->item(row, 0)->data(Qt::UserRole).toString();
 
@@ -5264,46 +6297,320 @@ void MainWindow::on_btnForm_emp_clicked()
 }
 void MainWindow::ajouterNotification(const QString &actionType, const QString &cible)
 {
-    nbNotifs++;
-    QString nom = Session::instance().getNom();
-    QString role = Session::instance().getRole();
-    QString temps = QTime::currentTime().toString("HH:mm");
+    NotifEntry entry;
+    entry.actionType = actionType;
+    entry.cible      = cible;
+    entry.time       = QTime::currentTime().toString("HH:mm");
+    entry.user       = Session::instance().getNom();
+    entry.role       = Session::instance().getRole();
+    entry.read       = false;
+    m_notifications.append(entry);
+    m_unreadCount++;
 
-    QString texteLog = QString("[%1] %2 (%3) : %4 sur %5")
-                           .arg(temps, nom, role, actionType, cible);
+    updateNotifBadge();
 
-    QAction *action = new QAction(texteLog, this);
-
-    // CORRECTION ICI : On stocke la liste dans une variable pour éviter le warning
-    QList<QAction*> actionsActuelles = menuNotif->actions();
-
-    if (actionsActuelles.isEmpty()) {
-        menuNotif->addAction(action);
-    } else {
-        // On utilise la variable "actionsActuelles" au lieu de menuNotif->actions().first()
-        menuNotif->insertAction(actionsActuelles.first(), action);
-    }
-
-    ui->btnNotif->setText(QString("(%1)").arg(nbNotifs));
-    ui->btnNotif->setStyleSheet("color: #e67e22; font-weight: bold;");
-    // Style de base (quand il n'y a pas de nouvelles notifications)
-    ui->btnNotif->setStyleSheet(R"(
-    QPushButton {
-        background-color: #ffffff;
-        border: 1.5px solid rgba(240, 206, 170, 150); /* Couleur sable comme ton login */
-        border-radius: 12px;
-        color: #2c1e16;
-        font-weight: 800;
-        padding: 5px 10px;
-    }
-    QPushButton:hover {
-        background-color: #faf9f6;
-        border: 1.5px solid #f0ceaa;
-    }
-    QPushButton::menu-indicator { image: none; } /* Enlever la flèche */
-)");
+    // Si le panneau est ouvert, le reconstruire en direct
+    if (m_notifPanel && m_notifPanel->isVisible())
+        rebuildNotifPanel();
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// setupNotifButton : transforme btnNotif en cloche + crée badge + panneau
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::setupNotifButton()
+{
+    // Bell button
+    ui->btnNotif->setText("\U0001F514");
+    ui->btnNotif->setFixedSize(40, 40);
+    ui->btnNotif->setObjectName("btnNotif");
+    ui->btnNotif->setCursor(Qt::PointingHandCursor);
+    ui->btnNotif->setFocusPolicy(Qt::NoFocus);
+    ui->btnNotif->setToolTip("Notifications");
+    connect(ui->btnNotif, &QPushButton::clicked, this, &MainWindow::toggleNotifPanel);
+
+    // Badge rouge (child de topBar, superposé sur btnNotif)
+    m_notifBadge = new QLabel(ui->topBar);
+    m_notifBadge->setObjectName("notifBadge");
+    m_notifBadge->setFixedSize(18, 18);
+    m_notifBadge->setAlignment(Qt::AlignCenter);
+    m_notifBadge->setAttribute(Qt::WA_TransparentForMouseEvents);
+    m_notifBadge->raise();
+    m_notifBadge->hide();
+
+    // Panneau de notifications (child du MainWindow, flottant)
+    m_notifPanel = new QFrame(this);
+    m_notifPanel->setObjectName("notifPanel");
+    m_notifPanel->setFixedWidth(360);
+    m_notifPanel->hide();
+    m_notifPanel->raise();
+
+    // Filtre global pour fermer le panneau au clic extérieur
+    qApp->installEventFilter(this);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// toggleNotifPanel : ouvre / ferme le panneau avec animation
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::toggleNotifPanel()
+{
+    if (!m_notifPanel) return;
+
+    if (m_notifPanel->isVisible()) {
+        // Fermer avec fade-out
+        auto *eff = qobject_cast<QGraphicsOpacityEffect*>(m_notifPanel->graphicsEffect());
+        if (!eff) {
+            eff = new QGraphicsOpacityEffect(m_notifPanel);
+            m_notifPanel->setGraphicsEffect(eff);
+        }
+        auto *fadeOut = new QPropertyAnimation(eff, "opacity", this);
+        fadeOut->setDuration(160);
+        fadeOut->setStartValue(1.0);
+        fadeOut->setEndValue(0.0);
+        fadeOut->setEasingCurve(QEasingCurve::OutQuad);
+        connect(fadeOut, &QPropertyAnimation::finished, m_notifPanel, &QFrame::hide);
+        fadeOut->start(QAbstractAnimation::DeleteWhenStopped);
+    } else {
+        // Reconstruire le contenu
+        rebuildNotifPanel();
+
+        // Positionner sous btnNotif, aligné à droite
+        QPoint gp = ui->btnNotif->mapToGlobal(QPoint(0, ui->btnNotif->height() + 6));
+        QPoint lp = this->mapFromGlobal(gp);
+        int x = lp.x() + ui->btnNotif->width() - m_notifPanel->width();
+        m_notifPanel->move(qMax(x, 8), lp.y());
+        m_notifPanel->raise();
+
+        // Ouvrir avec fade-in
+        auto *eff = new QGraphicsOpacityEffect(m_notifPanel);
+        eff->setOpacity(0.0);
+        m_notifPanel->setGraphicsEffect(eff);
+        m_notifPanel->show();
+
+        auto *fadeIn = new QPropertyAnimation(eff, "opacity", this);
+        fadeIn->setDuration(200);
+        fadeIn->setStartValue(0.0);
+        fadeIn->setEndValue(1.0);
+        fadeIn->setEasingCurve(QEasingCurve::OutQuad);
+        fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// rebuildNotifPanel : reconstruit le contenu du panneau
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::rebuildNotifPanel()
+{
+    // Supprimer l'ancien layout
+    if (m_notifPanel->layout()) {
+        QLayout *old = m_notifPanel->layout();
+        QLayoutItem *item;
+        while ((item = old->takeAt(0)) != nullptr) {
+            if (item->widget()) item->widget()->deleteLater();
+            delete item;
+        }
+        delete old;
+    }
+
+    QVBoxLayout *root = new QVBoxLayout(m_notifPanel);
+    root->setContentsMargins(0, 0, 0, 0);
+    root->setSpacing(0);
+
+    // ── En-tête ────────────────────────────────────────────────────────────
+    QWidget *header = new QWidget;
+    header->setObjectName("notifHeader");
+    header->setFixedHeight(52);
+    QHBoxLayout *hdrL = new QHBoxLayout(header);
+    hdrL->setContentsMargins(16, 0, 10, 0);
+    hdrL->setSpacing(6);
+
+    QLabel *title = new QLabel(
+        m_unreadCount > 0
+            ? QString("Notifications <b>(%1)</b>").arg(m_unreadCount)
+            : "Notifications");
+    title->setObjectName("notifTitle");
+
+    QPushButton *btnMarkAll = new QPushButton("✓ Tout lire");
+    btnMarkAll->setObjectName("notifBtnAction");
+    btnMarkAll->setFixedHeight(26);
+    btnMarkAll->setCursor(Qt::PointingHandCursor);
+    btnMarkAll->setFocusPolicy(Qt::NoFocus);
+    connect(btnMarkAll, &QPushButton::clicked, this, &MainWindow::markAllNotifRead);
+
+    QPushButton *btnClear = new QPushButton("🗑 Effacer");
+    btnClear->setObjectName("notifBtnClear");
+    btnClear->setFixedHeight(26);
+    btnClear->setCursor(Qt::PointingHandCursor);
+    btnClear->setFocusPolicy(Qt::NoFocus);
+    connect(btnClear, &QPushButton::clicked, this, &MainWindow::clearAllNotif);
+
+    hdrL->addWidget(title, 1);
+    hdrL->addWidget(btnMarkAll);
+    hdrL->addWidget(btnClear);
+
+    // ── Séparateur ─────────────────────────────────────────────────────────
+    QFrame *sep = new QFrame;
+    sep->setObjectName("notifSep");
+    sep->setFixedHeight(1);
+
+    // ── Zone scrollable ────────────────────────────────────────────────────
+    QScrollArea *scroll = new QScrollArea;
+    scroll->setObjectName("notifScroll");
+    scroll->setWidgetResizable(true);
+    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scroll->setFrameShape(QFrame::NoFrame);
+
+    QWidget *content = new QWidget;
+    content->setObjectName("notifContent");
+    QVBoxLayout *contentL = new QVBoxLayout(content);
+    contentL->setContentsMargins(0, 4, 0, 4);
+    contentL->setSpacing(0);
+
+    if (m_notifications.isEmpty()) {
+        QLabel *empty = new QLabel("Aucune notification");
+        empty->setObjectName("notifEmpty");
+        empty->setAlignment(Qt::AlignCenter);
+        empty->setFixedHeight(80);
+        contentL->addWidget(empty);
+    } else {
+        // Afficher du plus récent au plus ancien
+        for (int i = m_notifications.size() - 1; i >= 0; --i) {
+            const NotifEntry &n = m_notifications[i];
+
+            // Couleur et icône selon le type
+            QString barColor, typeIcon;
+            if      (n.actionType == "CONNEXION")   { barColor = "#0ea5e9"; typeIcon = "🔑"; }
+            else if (n.actionType == "SUPPRESSION")  { barColor = "#ef4444"; typeIcon = "🗑"; }
+            else if (n.actionType == "MODIFICATION") { barColor = "#f59e0b"; typeIcon = "✏"; }
+            else if (n.actionType == "SYSTÈME")      { barColor = "#10b981"; typeIcon = "⚙"; }
+            else                                     { barColor = "#8b5cf6"; typeIcon = "📌"; }
+
+            // Conteneur de l'item
+            QWidget *item = new QWidget;
+            item->setObjectName(n.read ? "notifItem" : "notifItemUnread");
+            item->setFixedHeight(62);
+
+            QHBoxLayout *itemL = new QHBoxLayout(item);
+            itemL->setContentsMargins(0, 0, 12, 0);
+            itemL->setSpacing(0);
+
+            // Barre colorée gauche
+            QFrame *bar = new QFrame;
+            bar->setFixedWidth(4);
+            bar->setStyleSheet(
+                QString("background: %1; border-radius: 2px;").arg(barColor));
+
+            // Zone texte
+            QWidget *textZone = new QWidget;
+            QVBoxLayout *textL = new QVBoxLayout(textZone);
+            textL->setContentsMargins(12, 6, 0, 6);
+            textL->setSpacing(2);
+
+            QLabel *msg = new QLabel(typeIcon + " " + n.cible);
+            msg->setObjectName("notifMsg");
+
+            QLabel *meta = new QLabel(
+                QString("%1 — %2 (%3)").arg(n.time, n.user, n.role));
+            meta->setObjectName("notifMeta");
+
+            textL->addWidget(msg);
+            textL->addWidget(meta);
+
+            itemL->addWidget(bar);
+            itemL->addWidget(textZone, 1);
+
+            // Pastille non-lu
+            if (!n.read) {
+                QLabel *dot = new QLabel;
+                dot->setFixedSize(8, 8);
+                dot->setObjectName("notifDot");
+                dot->setStyleSheet(
+                    QString("background:%1; border-radius:4px;").arg(barColor));
+                itemL->addWidget(dot);
+                itemL->setAlignment(dot, Qt::AlignVCenter);
+            }
+
+            contentL->addWidget(item);
+
+            // Séparateur fin entre items
+            if (i > 0) {
+                QFrame *isep = new QFrame;
+                isep->setObjectName("notifItemSep");
+                isep->setFixedHeight(1);
+                contentL->addWidget(isep);
+            }
+        }
+    }
+    contentL->addStretch();
+    scroll->setWidget(content);
+
+    root->addWidget(header);
+    root->addWidget(sep);
+    root->addWidget(scroll, 1);
+
+    // Ajuster la hauteur du panneau
+    int visItems = qMin(m_notifications.size(), 5);
+    int panelH = 52 + 1 + qMax(visItems * 63 + 8, 88);
+    m_notifPanel->setFixedHeight(panelH);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// updateNotifBadge : met à jour le badge rouge
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::updateNotifBadge()
+{
+    if (!m_notifBadge) return;
+
+    if (m_unreadCount > 0) {
+        m_notifBadge->setText(m_unreadCount > 9 ? "9+" : QString::number(m_unreadCount));
+        m_notifBadge->show();
+        m_notifBadge->raise();
+
+        // Petite animation pulse à l'apparition
+        auto *eff = qobject_cast<QGraphicsOpacityEffect*>(m_notifBadge->graphicsEffect());
+        if (!eff) {
+            eff = new QGraphicsOpacityEffect(m_notifBadge);
+            m_notifBadge->setGraphicsEffect(eff);
+        }
+        auto *pulse = new QPropertyAnimation(eff, "opacity", m_notifBadge);
+        pulse->setDuration(500);
+        pulse->setStartValue(0.3);
+        pulse->setEndValue(1.0);
+        pulse->setEasingCurve(QEasingCurve::OutCubic);
+        pulse->setLoopCount(2);
+        pulse->start(QAbstractAnimation::DeleteWhenStopped);
+    } else {
+        m_notifBadge->hide();
+    }
+
+    // Repositionner le badge
+    const int tw = ui->topBar->width();
+    const int th = ui->topBar->height();
+    const int bx = tw - ui->btnNotif->width() - 10;
+    const int by = (th - ui->btnNotif->height()) / 2;
+    m_notifBadge->move(bx + ui->btnNotif->width() - 10, by - 5);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// markAllNotifRead / clearAllNotif
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::markAllNotifRead()
+{
+    for (auto &n : m_notifications) n.read = true;
+    m_unreadCount = 0;
+    updateNotifBadge();
+    rebuildNotifPanel();
+}
+
+void MainWindow::clearAllNotif()
+{
+    m_notifications.clear();
+    m_unreadCount = 0;
+    updateNotifBadge();
+    rebuildNotifPanel();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 void MainWindow::notifierConnexion()
 {
     // On récupère le nom et le rôle depuis ta classe Session
@@ -5721,6 +7028,9 @@ void MainWindow::initLabsUi()
     connect(ui->BtnPopupResetLabs_5, &QPushButton::clicked, this, &MainWindow::on_BtnPopupResetLabs_5_clicked);
     connect(ui->btnSupprimerPub_2,   &QPushButton::clicked, this, &MainWindow::on_btnSupprimerPub_2_clicked);
     connect(ui->BtnExportLabsDirect, &QPushButton::clicked, this, &MainWindow::on_BtnExportLabsDirect_clicked);
+    connect(ui->btnLabReserveProduct, &QPushButton::clicked, this, &MainWindow::on_btnLabReserveProduct_clicked);
+    connect(ui->btnLabReserveValidate, &QPushButton::clicked, this, &MainWindow::on_btnLabReserveValidate_clicked);
+    connect(ui->btnLabReserveBack, &QPushButton::clicked, this, &MainWindow::on_btnLabReserveBack_clicked);
 
     // Numéro labo: exactement 8 chiffres.
     auto *numValidator = new QRegularExpressionValidator(QRegularExpression("^\\d{0,8}$"), this);
@@ -5758,7 +7068,165 @@ void MainWindow::initLabsUi()
         recalcReste(ui->LabMontant_5, ui->LabMontantPaye_5, ui->LabReste_5);
     });
 
+    // Réservation produits inventaire (stacked_L page index 6)
+    ui->TableLabReserveProducts->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->TableLabReserveProducts->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->TableLabReserveProducts->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->TableLabReserveProducts->verticalHeader()->setVisible(false);
+    ui->TableLabReserveProducts->setColumnCount(5);
+    ui->TableLabReserveProducts->setHorizontalHeaderLabels({
+        QStringLiteral("ID"), QStringLiteral("SKU"), QStringLiteral("Nom"),
+        QStringLiteral("Qt stock"), QStringLiteral("Qt réservée (inchangée)")});
+    ui->TableLabReserveProducts->hideColumn(0);
+    ui->TableLabReserveProducts->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->spinLabReserveQty->setRange(1, 999999);
+    connect(ui->TableLabReserveProducts, &QTableWidget::itemSelectionChanged,
+            this, &MainWindow::updateLabReserveSpinMax);
+
 }
+
+// ====================== Réservation produit (labs → inventaire) ======================
+void MainWindow::on_btnLabReserveProduct_clicked()
+{
+    ui->stacked_L->setCurrentIndex(6);
+    loadLabReserveProductTable();
+}
+
+void MainWindow::loadLabReserveProductTable()
+{
+    QVector<Inventory::Row> rows;
+    QString err;
+    if (!Inventory::chargerTout(rows, QStringLiteral("NAME"), &err)) {
+        QMessageBox::critical(this, "Inventaire", err);
+        return;
+    }
+    ui->TableLabReserveProducts->setSortingEnabled(false);
+    ui->TableLabReserveProducts->setRowCount(0);
+    for (int i = 0; i < rows.size(); ++i) {
+        const auto &row = rows[i];
+        ui->TableLabReserveProducts->insertRow(i);
+        auto *idIt = new QTableWidgetItem(row.idProduct);
+        idIt->setData(Qt::UserRole, row.idProduct);
+        ui->TableLabReserveProducts->setItem(i, 0, idIt);
+        ui->TableLabReserveProducts->setItem(i, 1, new QTableWidgetItem(row.sku));
+        ui->TableLabReserveProducts->setItem(i, 2, new QTableWidgetItem(row.name));
+        ui->TableLabReserveProducts->setItem(i, 3, new QTableWidgetItem(QString::number(row.qtAv)));
+        ui->TableLabReserveProducts->setItem(i, 4, new QTableWidgetItem(QString::number(row.qtRs)));
+    }
+    ui->TableLabReserveProducts->setSortingEnabled(false);
+    if (ui->TableLabReserveProducts->rowCount() > 0)
+        ui->TableLabReserveProducts->selectRow(0);
+    updateLabReserveSpinMax();
+}
+
+void MainWindow::updateLabReserveSpinMax()
+{
+    const int r = ui->TableLabReserveProducts->currentRow();
+    if (r < 0) {
+        ui->spinLabReserveQty->setMaximum(999999);
+        return;
+    }
+    QTableWidgetItem *it = ui->TableLabReserveProducts->item(r, 0);
+    if (!it) return;
+    const QString id = it->data(Qt::UserRole).toString();
+    if (id.isEmpty()) return;
+
+    QSqlQuery q;
+    q.prepare(QStringLiteral("SELECT NVL(QT_AV,0) FROM PRODUCT WHERE ID_PRODUCT = :id"));
+    q.bindValue(QStringLiteral(":id"), id);
+    if (!q.exec() || !q.next())
+        return;
+    const int qtAv = q.value(0).toInt();
+    if (qtAv <= 0) {
+        ui->spinLabReserveQty->setMaximum(1);
+        ui->spinLabReserveQty->setValue(1);
+    } else {
+        ui->spinLabReserveQty->setMaximum(qtAv);
+        if (ui->spinLabReserveQty->value() > qtAv)
+            ui->spinLabReserveQty->setValue(qtAv);
+    }
+}
+
+void MainWindow::on_btnLabReserveValidate_clicked()
+{
+    const int r = ui->TableLabReserveProducts->currentRow();
+    if (r < 0) {
+        QMessageBox::warning(this, "Réservation", "Sélectionnez un produit dans la liste.");
+        return;
+    }
+    QTableWidgetItem *idItem = ui->TableLabReserveProducts->item(r, 0);
+    if (!idItem) return;
+    const QString id = idItem->data(Qt::UserRole).toString();
+    if (id.isEmpty()) {
+        QMessageBox::warning(this, "Réservation", "ID produit introuvable.");
+        return;
+    }
+    const int qty = ui->spinLabReserveQty->value();
+    if (qty < 1) {
+        QMessageBox::warning(this, "Réservation", "Indiquez une quantité d’au moins 1.");
+        return;
+    }
+
+    QSqlQuery q0;
+    q0.prepare(QStringLiteral("SELECT NVL(QT_AV,0) FROM PRODUCT WHERE ID_PRODUCT = :id"));
+    q0.bindValue(QStringLiteral(":id"), id);
+    if (!q0.exec() || !q0.next()) {
+        QMessageBox::critical(this, "Réservation", "Produit introuvable en base.");
+        return;
+    }
+    const int qtAv = q0.value(0).toInt();
+    if (qty > qtAv) {
+        QMessageBox::warning(this, "Stock insuffisant",
+                             QStringLiteral("Stock disponible : %1 (la quantité allouée aux labs diminue le stock, QT_RS n’est pas modifié).")
+                                 .arg(qtAv));
+        return;
+    }
+
+    QSqlQuery ensureUse;
+    ensureUse.exec(QStringLiteral("ALTER TABLE PRODUCT ADD USE_COUNT NUMBER DEFAULT 0"));
+
+    QSqlQuery q1;
+    q1.prepare(
+        QStringLiteral(
+            "UPDATE PRODUCT SET "
+            "QT_AV = NVL(QT_AV,0) - :qty, "
+            "USE_COUNT = NVL(USE_COUNT,0) + :qty2 "
+            "WHERE ID_PRODUCT = :id AND NVL(QT_AV,0) >= :need"));
+    q1.bindValue(QStringLiteral(":qty"), qty);
+    q1.bindValue(QStringLiteral(":qty2"), qty);
+    q1.bindValue(QStringLiteral(":id"), id);
+    q1.bindValue(QStringLiteral(":need"), qty);
+    if (!q1.exec()) {
+        QMessageBox::critical(this, "Réservation", q1.lastError().text());
+        return;
+    }
+    const int nAff = q1.numRowsAffected();
+    if (nAff == 0) {
+        QMessageBox::warning(this, "Réservation",
+                             QStringLiteral("Aucune ligne mise à jour (stock insuffisant ou conflit). Réessayez après actualisation."));
+        loadLabReserveProductTable();
+        return;
+    }
+
+    QString syncErr;
+    if (!syncInventoryStatsFromProduct(&syncErr)) {
+        QMessageBox::critical(this, "Réservation",
+                              QStringLiteral("Mise à jour partielle. Statistiques : %1").arg(syncErr));
+        return;
+    }
+
+    QMessageBox::information(this, "Réservation",
+                             QStringLiteral("Allocation enregistrée : %1 unité(s). Stock (QT_AV) diminué, USE_COUNT mis à jour pour les statistiques (QT_RS inchangé).")
+                                 .arg(qty));
+    loadLabReserveProductTable();
+    loadInventory();
+}
+
+void MainWindow::on_btnLabReserveBack_clicked()
+{
+    ui->stacked_L->setCurrentIndex(0);
+}
+
 void MainWindow::onMapLocationSelected(const QString& title)
 {
     if (title.contains(",") && title.contains(QRegularExpression("\\d"))) {
@@ -5981,6 +7449,7 @@ void MainWindow::on_btnSupprimerPub_2_clicked()
         QMessageBox::warning(this, "Supprimer", "Veuillez sélectionner un laboratoire.");
         return;
     }
+    if (!ui->TableLabs_2->item(row, 0)) return;
 
     const QString id  = ui->TableLabs_2->item(row, 0)->text();
     const QString nom = ui->TableLabs_2->item(row, 1)->text();
@@ -6110,6 +7579,7 @@ void MainWindow::on_btnModifierPub_2_clicked()
         QMessageBox::warning(this, "Modifier", "ID introuvable.");
         return;
     }
+    if (!ui->TableLabs_2->item(r, 0)) return;
 
     ui->LabName_5->setText(ui->TableLabs_2->item(r, 1)->text());
     setComboValue(ui->LabResponsible_5, ui->TableLabs_2->item(r, 2)->text());
@@ -6143,6 +7613,7 @@ void MainWindow::on_btnAjouterPub_3_clicked()
         QMessageBox::warning(this, "Afficher", "Sélectionne un laboratoire à afficher.");
         return;
     }
+    if (!ui->TableLabs_2->item(r, 0)) return;
 
     ui->aff1->setText(ui->TableLabs_2->item(r, 1)->text()); // Nom
         ui->aff5->setText(ui->TableLabs_2->item(r, 2)->text()); // Responsable
@@ -6195,6 +7666,8 @@ QString MainWindow::selectedInventorySku() const
 
 void MainWindow::initInventoryUi()
 {
+    setupInventoryChoicePage();
+    
     // Populate Status combo (add form)
     ui->Status->clear();
     ui->Status->addItem("on hand",   "on hand");
@@ -6265,8 +7738,6 @@ void MainWindow::initInventoryUi()
     ui->Unit_2->addItem("L",  "L");
     ui->Unit_2->addItem("m",  "m");
 
-    ui->Unit_2->addItem("m",  "m");
-
     // Type combo (Add form)
     ui->Type->clear();
     ui->Type->addItem("Matière première",  "Matière première");
@@ -6328,6 +7799,7 @@ void MainWindow::initInventoryUi()
     connect(ui->BtnInventoryDetailExportPdf, &QPushButton::clicked, this, &MainWindow::handleInventoryDetailExportPdf);
 
     // Form buttons (manual connections for reliability)
+    connect(ui->BtnPopupAutoSaveInventory, &QPushButton::clicked, this, &MainWindow::on_BtnPopupAutoSaveInventory_clicked);
     connect(ui->BtnPopupSaveInventory,   &QPushButton::clicked, this, &MainWindow::on_BtnPopupSaveInventory_clicked);
     connect(ui->BtnPopupResetInventory,  &QPushButton::clicked, this, &MainWindow::on_BtnPopupResetInventory_clicked);
     connect(ui->BtnPopupCancelInventory, &QToolButton::clicked,   this, &MainWindow::on_BtnPopupCancelInventory_clicked);
@@ -6399,6 +7871,9 @@ void MainWindow::fillTableInventoryRow(int r, const Inventory::Row &row)
 
 void MainWindow::loadInventory()
 {
+    // Recalcul automatique des statuts
+    QString syncErr;
+    syncInventoryStatsFromProduct(&syncErr);
     ui->TableInventory->setSortingEnabled(false);
     ui->TableInventory->setRowCount(0);
 
@@ -6422,10 +7897,146 @@ void MainWindow::loadInventory()
         ++r;
     }
     // Keep sorting disabled so SQL ORDER BY is preserved
+
 }
 
 
+// ── UI CHOICE PAGE ────────────────────────────────────────────────────────────
+void MainWindow::setupInventoryChoicePage() {
+    m_pageChoixAjoutInv = new QWidget();
+    m_pageChoixAjoutInv->setObjectName("pageChoixAjoutInv");
+    QVBoxLayout *layout = new QVBoxLayout(m_pageChoixAjoutInv);
+    layout->setAlignment(Qt::AlignCenter);
+
+    QLabel *lblTitle = new QLabel("Choix de la méthode d'ajout", m_pageChoixAjoutInv);
+    QFont fTitle = lblTitle->font();
+    fTitle.setPointSize(24);
+    fTitle.setBold(true);
+    lblTitle->setFont(fTitle);
+    lblTitle->setAlignment(Qt::AlignCenter);
+    layout->addWidget(lblTitle);
+
+    QHBoxLayout *btnLayout = new QHBoxLayout();
+    btnLayout->setSpacing(40);
+
+    QPushButton *btnManual = new QPushButton("Ajout\nManuel", m_pageChoixAjoutInv);
+    btnManual->setFixedSize(280, 180);
+    btnManual->setCursor(Qt::PointingHandCursor);
+    QFont fBtn = btnManual->font();
+    fBtn.setPointSize(18);
+    fBtn.setBold(true);
+    btnManual->setFont(fBtn);
+    connect(btnManual, &QPushButton::clicked, this, &MainWindow::goInventoryAddManual);
+
+    QPushButton *btnAuto = new QPushButton("Ajout\nAutomatique", m_pageChoixAjoutInv);
+    btnAuto->setFixedSize(280, 180);
+    btnAuto->setCursor(Qt::PointingHandCursor);
+    btnAuto->setFont(fBtn);
+    connect(btnAuto, &QPushButton::clicked, this, &MainWindow::goInventoryAddAuto);
+
+    btnLayout->addStretch();
+    btnLayout->addWidget(btnManual);
+    btnLayout->addWidget(btnAuto);
+    btnLayout->addStretch();
+    
+    layout->addLayout(btnLayout);
+    layout->addSpacing(40);
+
+    QPushButton *btnCancel = new QPushButton("Retour", m_pageChoixAjoutInv);
+    btnCancel->setFixedSize(150, 45);
+    btnCancel->setCursor(Qt::PointingHandCursor);
+    QFont fCancel = btnCancel->font();
+    fCancel.setPointSize(14);
+    fCancel.setBold(true);
+    btnCancel->setFont(fCancel);
+    connect(btnCancel, &QPushButton::clicked, this, [this](){ ui->stacked_I->setCurrentIndex(0); });
+    
+    QHBoxLayout *cancelLayout = new QHBoxLayout();
+    cancelLayout->addStretch();
+    cancelLayout->addWidget(btnCancel);
+    cancelLayout->addStretch();
+    
+    layout->addLayout(cancelLayout);
+    
+    ui->stacked_I->addWidget(m_pageChoixAjoutInv);
+}
+
+void MainWindow::goInventoryAddManual() {
+    ui->LblZone->setVisible(true);
+    ui->Zone->setVisible(true);
+    ui->LblShelf->setVisible(true);
+    ui->Shelf->setVisible(true);
+    ui->LblStatus->setVisible(true);
+    ui->Status->setVisible(true);
+    
+    ui->BtnPopupSaveInventory->setVisible(true);
+    ui->BtnPopupAutoSaveInventory->setVisible(false);
+    
+    ui->stacked_I->setCurrentIndex(1); // Page d'ajout
+}
+
+void MainWindow::goInventoryAddAuto() {
+    ui->LblZone->setVisible(false);
+    ui->Zone->setVisible(false);
+    ui->LblShelf->setVisible(false);
+    ui->Shelf->setVisible(false);
+    ui->LblStatus->setVisible(false);
+    ui->Status->setVisible(false);
+    
+    ui->BtnPopupSaveInventory->setVisible(false);
+    ui->BtnPopupAutoSaveInventory->setVisible(true);
+    
+    ui->stacked_I->setCurrentIndex(1); // Page d'ajout
+}
+
 // ── CREATE ────────────────────────────────────────────────────────────────────
+
+void MainWindow::on_BtnPopupAutoSaveInventory_clicked()
+{
+    // Auto-calculate missing fields
+    const int qtAv = ui->QtAv->value();
+    const int threshold = ui->Threshold->value();
+    const QString unit = ui->Unit->currentData().toString();
+    const QString type = ui->Type->currentData().toString();
+    
+    // Calculate Status
+    QString calcStatus;
+    if (qtAv == 0) {
+        calcStatus = "stock out";
+    } else if (qtAv <= threshold * 3) {
+        calcStatus = "limited";
+    } else {
+        calcStatus = "on hand";
+    }
+    
+    // Calculate Shelf
+    QString calcShelf;
+    if (unit == "kg") calcShelf = "1st floor";
+    else if (unit == "m") calcShelf = "2nd floor";
+    else if (unit == "L") calcShelf = "3rd floor";
+    else calcShelf = "RDC";
+    
+    // Calculate Zone
+    QString calcZone;
+    if (type == "Matière première" || type == "Composant") calcZone = "A";
+    else if (type == "Produit fini" || type == "Produit semi-fini") calcZone = "B";
+    else if (type == "Outil" || type == "Équipement") calcZone = "C";
+    else if (type == "Consommable" || type == "Pièce de rechange") calcZone = "D";
+    else calcZone = "A";
+    
+    // Update the UI combos
+    int statusIdx = ui->Status->findData(calcStatus);
+    if(statusIdx >= 0) ui->Status->setCurrentIndex(statusIdx);
+    
+    int shelfIdx = ui->Shelf->findData(calcShelf);
+    if(shelfIdx >= 0) ui->Shelf->setCurrentIndex(shelfIdx);
+    
+    int zoneIdx = ui->Zone->findData(calcZone);
+    if(zoneIdx >= 0) ui->Zone->setCurrentIndex(zoneIdx);
+
+    // Proceed to standard save logic
+    on_BtnPopupSaveInventory_clicked();
+}
 
 void MainWindow::on_BtnPopupSaveInventory_clicked()
 {
@@ -6494,6 +8105,7 @@ void MainWindow::on_BtnPopupSaveInventory_clicked()
 void MainWindow::on_BtnPopupResetInventory_clicked()
 {
     ui->IdProduct->clear();
+    ui->Name->clear();
     ui->Sku->clear();
     ui->QtAv->setValue(0);
     ui->QtRs->setValue(0);
@@ -7188,6 +8800,7 @@ void MainWindow::on_BtnPopupResetInventory_2_clicked()
 {
     const int r = ui->TableInventory->currentRow();
     if (r < 0) return;
+    if (!ui->TableInventory->item(r, 0)) return;
 
     ui->IdProduct_2->setText(ui->TableInventory->item(r, 0)->text());
     ui->Sku_2->setText(ui->TableInventory->item(r, 1)->text());

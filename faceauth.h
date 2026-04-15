@@ -1,16 +1,23 @@
 #ifndef FACEAUTH_H
 #define FACEAUTH_H
 
-#include <opencv2/opencv.hpp>
 #include <QString>
+#include <QProcess>
+#include <QNetworkAccessManager>
 
 class FaceAuth {
 public:
+    FaceAuth(); // Constructeur
 
-    FaceAuth(); // <-- Vérifie que cette ligne est bien là !
-    bool identifierUtilisateur(const QString& employeeID);
+    // La fonction principale que tu appelles dans ton Login
+    bool identifierUtilisateur(const QString& username);
+
 private:
-    cv::CascadeClassifier faceCascade;
+    // Vérifie si le serveur Python tourne, sinon le lance
+    void assurerServeurActif();
+
+    // "static" permet au serveur de rester ouvert même si l'objet FaceAuth est détruit
+    static QProcess* processIA;
 };
 
-#endif
+#endif // FACEAUTH_H

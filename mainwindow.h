@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QPushButton>
+#include <QResizeEvent>
+#include <QPropertyAnimation>
+#include <QGraphicsDropShadowEffect>
 #include <QAction>
 #include <QString>
 #include "finance.h"
@@ -15,6 +18,7 @@
 #include <QSqlTableModel>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QProcess>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -32,9 +36,10 @@ public:
 private:
     Ui::MainWindow *ui;
     QSqlQueryModel *model; // <--- C'est ce type qu'il faut utiliser
-    QString currentUser;
-    QNetworkAccessManager *networkManager;
-    QString m_tempFaceEncoding; // Pour stocker la signature
+    QProcess *processIA = nullptr; // Pour lancer Python
+    QNetworkAccessManager *networkManager; // Pour envoyer les requêtes    QString m_tempFaceEncoding; // Pour stocker la signature
+    void lancerServeurIA(); // La fonction qui crée et lance Python
+    QString m_tempFaceEncoding;
 
     // ===== FINANCE =====
     Finance::Row selectedFinanceRowFromTable(bool *ok=nullptr) const;
@@ -87,10 +92,30 @@ private:
     bool embaucheAscending = true;
     void configurerPermissions();
     void on_btn_reset_clicked();
-    QMenu *menuNotif;     // Le menu qui va descendre du bouton
-    int nbNotifs = 0;     // Le compteur (ex: 1, 2, 3...)
+    void genererScriptPython();
 
-    void ajouterNotification(const QString &titre, const QString &message);
+
+    // ── Système de notifications ───────────────────────────────────────────
+    struct NotifEntry {
+        QString actionType;
+        QString cible;
+        QString time;
+        QString user;
+        QString role;
+        bool    read = false;
+    };
+    QList<NotifEntry> m_notifications;
+    QLabel  *m_notifBadge  = nullptr;
+    QFrame  *m_notifPanel  = nullptr;
+    int      m_unreadCount = 0;
+
+    void ajouterNotification(const QString &actionType, const QString &cible);
+    void setupNotifButton();
+    void toggleNotifPanel();
+    void rebuildNotifPanel();
+    void updateNotifBadge();
+    void markAllNotifRead();
+    void clearAllNotif();
     // ====================
 
     // ===== PROJECTS =====
@@ -101,6 +126,11 @@ private:
     QString idProjetToEdit;
 
     // ===== INVENTORY =====
+    QWidget *m_pageChoixAjoutInv = nullptr;
+    void setupInventoryChoicePage();
+    void goInventoryAddManual();
+    void goInventoryAddAuto();
+    
     void initInventoryUi();
     void setupTableInventory();
     void loadInventory();
@@ -108,16 +138,38 @@ private:
     QString selectedInventorySku() const;
     QString idProductToEdit;
     QString skuToEdit;
-    bool syncInventoryReservationsFromLabs(QString *err = nullptr);
+    bool syncInventoryStatsFromProduct(QString *err = nullptr);
+    void showInventoryLabUsageStats();
+    void checkAndShowInventoryAlerts();
     // =====================
 
     void updateTopTitle(int index);
+    void updateScaledQss();
     void applyModernStyle();
     void setActiveButton(QPushButton *btn);
     void toggleTheme();
     void updateThemeButton();
+    void initAnimations();
+    void animatePageChange(int newIndex);
+    void updateAnimationColors();
+
+    // === NOUVELLES ANIMATIONS & SIDEBAR TOGGLE ===
+    void applyButtonGlowEffects();
+    void toggleSidebar();
+    void animateActiveIndicator(QPushButton *btn);
+    void animateButtonClick(QPushButton *btn);
 
     bool m_isDarkTheme = false;
+
+    // Animation members
+    QGraphicsDropShadowEffect *m_logoGlowEffect    = nullptr;
+    QPropertyAnimation        *m_logoGlowAnim      = nullptr;
+    bool                       m_sidebarExpanded   = true;
+    QFrame                    *m_activeIndicator   = nullptr;
+    QPushButton               *m_btnToggleSidebar  = nullptr;
+    QGraphicsOpacityEffect    *m_titleFadeEffect   = nullptr;
+    QWidget                   *m_vignetteOverlay   = nullptr;
+    QTimer                    *m_fontScaleTimer    = nullptr;
 
 private slots:
     // Navigation
@@ -198,6 +250,7 @@ private slots:
 protected:
     // Le filtre pour capturer le double-clic sur aff2
     bool eventFilter(QObject *obj, QEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
     void on_btnPasteLocation_clicked();
     void onMapLocationSelected(const QString& title);
     void on_BtnExportLabs_clicked(); // Remplacez par le vrai nom de votre bouton PDF
@@ -209,6 +262,8 @@ protected:
     void on_BtnPopupCancelLabs_9_clicked();
     void on_BtnPopupCancelLabs_10_clicked();
     void on_TableLabs_2_headerClicked(int logicalIndex);
+    void loadLabReserveProductTable();
+    void updateLabReserveSpinMax();
     void on_BtnPopupSaveLabs_3_clicked();   // ajouter
     void on_BtnPopupResetLabs_3_clicked();
     void on_BtnPopupSaveLabs_5_clicked();   // modifier
@@ -217,6 +272,9 @@ protected:
     void on_btnAppliquerPub_3_clicked();    // filtre
     void on_btnReinitialiserPub_3_clicked();// reset filtre
     void on_BtnExportLabsDirect_clicked();
+    void on_btnLabReserveProduct_clicked();
+    void on_btnLabReserveValidate_clicked();
+    void on_btnLabReserveBack_clicked();
     // Inventory slots
     void handleInventoryAdd();
     void handleInventoryView();
@@ -229,6 +287,7 @@ protected:
     void on_BtnPopupCancelInventory_2_triggered(QAction *arg1);
     void on_BtnPopupCancelInventory_2_clicked();
     void on_BtnPopupCancelInventory_clicked();
+    void on_BtnPopupAutoSaveInventory_clicked(); // ADD auto save
     void on_BtnPopupSaveInventory_clicked();    // ADD save
     void on_BtnPopupResetInventory_clicked();   // ADD reset
     void on_BtnPopupSaveInventory_2_clicked();  // EDIT save

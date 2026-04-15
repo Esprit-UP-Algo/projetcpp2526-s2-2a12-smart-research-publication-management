@@ -243,28 +243,27 @@ bool Employe::authentifier(const QString &username, const QString &passwordHash,
 }
 
 // Authentification FaceID
-bool Employe::authentifierFaceID(const QString &username, QString *err)
-{
+// --- CORRECTION FINALE : Authentification FaceID ---
+bool Employe::authentifierFaceID(const QString &username, QString *error) {
     QSqlQuery query;
-    query.prepare("SELECT ID_EMPLOYE, NOM, PRENOM, ROLE FROM EMPLOYES WHERE USERNAME = :user");
-    query.bindValue(":user", username);
+    // On remplace ID_EMP par ID_EMPLOYE ici aussi !
+    query.prepare("SELECT ID_EMPLOYE, NOM, PRENOM, ROLE FROM EMPLOYES WHERE UPPER(USERNAME) = UPPER(:u)");
+    query.bindValue(":u", username);
 
-    if (!query.exec()) {
-        if (err) *err = "Erreur SQL : " + query.lastError().text();
+    if (query.exec() && query.next()) {
+        // On récupère les vraies valeurs de la base
+        QString idStr = query.value("ID_EMPLOYE").toString();
+        QString nomComplet = query.value("NOM").toString() + " " + query.value("PRENOM").toString();
+        QString role = query.value("ROLE").toString();
+
+        // On remplit la Session
+        Session::instance().login(idStr, nomComplet, role);
+        return true;
+    } else {
+        if (error) *error = "Utilisateur introuvable dans la base SQL.";
         return false;
     }
-
-    if (query.next()) {
-        Session::instance().login(query.value("ID_EMPLOYE").toString(),
-                                  query.value("NOM").toString() + " " + query.value("PRENOM").toString(),
-                                  query.value("ROLE").toString());
-        return true;
-    }
-
-    if (err) *err = "Utilisateur introuvable.";
-    return false;
 }
-
 // Setter pour la signature faciale
 void Employe::setFaceEncoding(QString faceEncoding) {
     m_faceEncoding = std::move(faceEncoding);
