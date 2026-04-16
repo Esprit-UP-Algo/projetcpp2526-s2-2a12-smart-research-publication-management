@@ -39,6 +39,7 @@
 #include <QDateTime>
 #include <QDesktopServices>
 #include <QUrl>
+#include "mapdialog.h"
 #include <QTime>
 #include <QCryptographicHash>
 #include <QtCharts/QBarSeries>
@@ -539,6 +540,7 @@ MainWindow::MainWindow(Arduino *arduino, QWidget *parent): QMainWindow(parent), 
             ui->FormAmount_2->setText(QString::number(dlg.convertedAmountDT(), 'f', 3));
     });
     connect(ui->BtnOcrReceipt,           &QPushButton::clicked, this, &MainWindow::on_BtnOcrReceipt_clicked);
+    connect(ui->BtnOcrReceipt_2,         &QPushButton::clicked, this, &MainWindow::on_BtnOcrReceipt_2_clicked);
 
     connect(ui->BtnExportLabsDirect, &QPushButton::clicked, this, &MainWindow::on_BtnExportLabsDirect_clicked);
     connect(ui->btn_reset, &QPushButton::clicked,
@@ -824,7 +826,9 @@ void MainWindow::traiter_rfid()
         // Utilise les tables existantes : EMPLOYES + LABS (via IDEMP)
         // L'employé doit avoir la carte ET être responsable de ce labo
         q.prepare(
-            "SELECT e.ID_EMPLOYE, e.PRENOM "
+            "SELECT e.ID_EMPLOYE, e.PRENOM, "
+            "       e.HEURE_ARRIVEE, e.HEURE_DEPART, "
+            "       TO_CHAR(e.DATE_POINTAGE, 'YYYY-MM-DD') AS DATE_POINTAGE "
             "FROM HICHEM.EMPLOYES e "
             "JOIN HICHEM.LABS l ON l.IDEMP = e.ID_EMPLOYE "
             "WHERE e.UID_CARTE = :uid AND l.IDLABO = :labo"
@@ -839,37 +843,62 @@ void MainWindow::traiter_rfid()
         }
 
         if (q.next()) {
-            // ── Accès autorisé ───────────────────────────────────────────────
-            QString idEmploye = q.value("ID_EMPLOYE").toString();
-            QString prenom    = q.value("PRENOM").toString();
-            QString heure     = QTime::currentTime().toString("HH:mm");
-            QString date      = QDate::currentDate().toString("yyyy-MM-dd");
+            // ── Accès autorisé : déterminer arrivée / départ / déjà pointé ──
+            QString idEmploye   = q.value("ID_EMPLOYE").toString();
+            QString prenom      = q.value("PRENOM").toString();
+            QString hArrivee    = q.value("HEURE_ARRIVEE").toString().trimmed();
+            QString hDepart     = q.value("HEURE_DEPART").toString().trimmed();
+            QString datePointage= q.value("DATE_POINTAGE").toString().trimmed();
+            QString heure       = QTime::currentTime().toString("HH:mm");
+            QString dateAuj     = QDate::currentDate().toString("yyyy-MM-dd");
 
-            // Enregistrer le pointage dans la base
-            QSqlQuery upd;
-            upd.prepare(
-                "UPDATE HICHEM.EMPLOYES "
-                "SET DATE_POINTAGE    = TO_DATE(:d, 'YYYY-MM-DD'), "
-                "    HEURE_ARRIVEE    = :h, "
-                "    STATUT_JOURNALIER = 'Présent' "
-                "WHERE ID_EMPLOYE = :id"
-            );
-            upd.bindValue(":d",  date);
-            upd.bindValue(":h",  heure);
-            upd.bindValue(":id", idEmploye);
+            // Déjà pointé ET parti aujourd'hui → LCD "Déjà pointé"
+            if (datePointage == dateAuj && !hArrivee.isEmpty() && !hDepart.isEmpty()) {
+                qDebug() << "[RFID] Déjà pointé (arrivée+départ) :" << prenom;
+                A->write_to_arduino(QString("3:%1\n").arg(prenom).toUtf8());
 
-            if (upd.exec()) {
-                qDebug() << "[RFID] Pointage enregistré pour" << prenom << "à" << heure;
+            // Arrivée enregistrée mais pas encore parti → enregistrer le DÉPART
+            } else if (datePointage == dateAuj && !hArrivee.isEmpty() && hDepart.isEmpty()) {
+                QSqlQuery upd;
+                upd.prepare(
+                    "UPDATE HICHEM.EMPLOYES "
+                    "SET HEURE_DEPART = :h "
+                    "WHERE ID_EMPLOYE = :id"
+                );
+                upd.bindValue(":h",  heure);
+                upd.bindValue(":id", idEmploye);
+
+                if (upd.exec()) {
+                    qDebug() << "[RFID] Départ enregistré pour" << prenom << "à" << heure;
+                } else {
+                    qDebug() << "[RFID] Erreur UPDATE départ :" << upd.lastError().text();
+                }
+                // Code "2:" → LCD affiche "Départ"
+                A->write_to_arduino(QString("2:%1:%2\n").arg(prenom, heure).toUtf8());
+
+            // Premier passage de la journée → enregistrer l'ARRIVÉE
             } else {
-                qDebug() << "[RFID] Erreur UPDATE pointage :" << upd.lastError().text();
-            }
+                QSqlQuery upd;
+                upd.prepare(
+                    "UPDATE HICHEM.EMPLOYES "
+                    "SET DATE_POINTAGE     = TO_DATE(:d, 'YYYY-MM-DD'), "
+                    "    HEURE_ARRIVEE     = :h, "
+                    "    HEURE_DEPART      = NULL, "
+                    "    STATUT_JOURNALIER = 'Présent' "
+                    "WHERE ID_EMPLOYE = :id"
+                );
+                upd.bindValue(":d",  dateAuj);
+                upd.bindValue(":h",  heure);
+                upd.bindValue(":id", idEmploye);
 
-            // Envoyer la confirmation à l'Arduino : "1:Prenom:HH:MM\n"
-            // L'Arduino affichera sur LCD :
-            //   Ligne 1 : "Bienvenue Prenom"
-            //   Ligne 2 : "Pointe a HH:MM"
-            QString reponse = QString("1:%1:%2\n").arg(prenom, heure);
-            A->write_to_arduino(reponse.toUtf8());
+                if (upd.exec()) {
+                    qDebug() << "[RFID] Arrivée enregistrée pour" << prenom << "à" << heure;
+                } else {
+                    qDebug() << "[RFID] Erreur UPDATE arrivée :" << upd.lastError().text();
+                }
+                // Code "1:" → LCD affiche "Arrivée"
+                A->write_to_arduino(QString("1:%1:%2\n").arg(prenom, heure).toUtf8());
+            }
 
             // Rafraîchir le tableau employés dans l'UI
             model->setQuery(
@@ -2644,7 +2673,6 @@ void MainWindow::on_BtnExportLabsDirect_clicked()
 
 void MainWindow::on_btnOpenGoogleMaps_clicked()
 {
-    // Récupérer la localisation depuis le champ aff2
     QString location = ui->aff2->text().trimmed();
 
     if (location.isEmpty()) {
@@ -2654,16 +2682,8 @@ void MainWindow::on_btnOpenGoogleMaps_clicked()
         return;
     }
 
-    // Construire l'URL Google Maps
-    QString encodedLocation = QUrl::toPercentEncoding(location);
-    QString googleMapsUrl = QString("https://www.google.com/maps/search/%1").arg(encodedLocation);
-
-    // Ouvrir l'URL
-    bool opened = QDesktopServices::openUrl(QUrl(googleMapsUrl));
-
-    if (!opened) {
-        QMessageBox::warning(this, "Erreur", "Impossible d'ouvrir Google Maps.");
-    }
+    MapDialog dlg(MapDialog::ViewMode, location, this);
+    dlg.exec();
 }
 
 void MainWindow::on_btnVoirStatistiquesPub_2_clicked()
@@ -2817,30 +2837,24 @@ void MainWindow::on_btnPasteLocation_clicked()
 }
 void MainWindow::on_btnAjouterPub_4_clicked()
 {
-    QDesktopServices::openUrl(QUrl("https://www.google.com/maps/@36.8065,10.1815,12z"));
-    QMessageBox::information(this, "Instructions Localisation",
-                             "1. Cherchez le lieu sur Google Maps.\n"
-                             "2. Faites un clic-droit sur le point exact.\n"
-                             "3. Cliquez sur les coordonnées pour les copier.\n"
-                             "4. Revenez ici et collez (Ctrl+V) dans le champ Localisation.");
+    MapDialog *dlg = new MapDialog(MapDialog::PickMode, QString(), this);
+    connect(dlg, &MapDialog::coordinatesSelected, this, &MainWindow::onMapLocationSelected);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->exec();
 }
 void MainWindow::on_btnAjouterPub_5_clicked()
 {
-    QDesktopServices::openUrl(QUrl("https://www.google.com/maps/@36.8065,10.1815,12z"));
-    QMessageBox::information(this, "Instructions Localisation",
-                             "1. Cherchez le lieu sur Google Maps.\n"
-                             "2. Faites un clic-droit sur le point exact.\n"
-                             "3. Cliquez sur les coordonnées pour les copier.\n"
-                             "4. Revenez ici et collez (Ctrl+V) dans le champ Localisation.");
+    MapDialog *dlg = new MapDialog(MapDialog::PickMode, QString(), this);
+    connect(dlg, &MapDialog::coordinatesSelected, this, &MainWindow::onMapLocationSelected);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->exec();
 }
 void MainWindow::on_btnmapl_3_clicked()
 {
-    QDesktopServices::openUrl(QUrl("https://www.google.com/maps/@36.8065,10.1815,12z"));
-    QMessageBox::information(this, "Instructions Localisation",
-                             "1. Cherchez le lieu sur Google Maps.\n"
-                             "2. Faites un clic-droit sur le point exact.\n"
-                             "3. Cliquez sur les coordonnées pour les copier.\n"
-                             "4. Revenez ici et collez (Ctrl+V) dans le champ Localisation.");
+    MapDialog *dlg = new MapDialog(MapDialog::PickMode, QString(), this);
+    connect(dlg, &MapDialog::coordinatesSelected, this, &MainWindow::onMapLocationSelected);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->exec();
 }
 // Inventory - Navigation
 // ====================== AJOUT ======================
@@ -3570,9 +3584,10 @@ void MainWindow::initFinanceUi()
     ui->BtnConvertCurrency_2->setStyleSheet("");
 
     ui->BtnOcrReceipt->setStyleSheet("");
+    ui->BtnOcrReceipt_2->setStyleSheet("");
 
     // ── LblOcrHint : badge hint stylé ────────────────────────────────────────
-    ui->LblOcrHint->setStyleSheet(
+    const QString ocrHintStyle =
         "QLabel {"
         "  color: #4a9fa5;"
         "  font-size: 9.5px;"
@@ -3581,7 +3596,9 @@ void MainWindow::initFinanceUi()
         "  background: rgba(31,142,149,0.07);"
         "  border-radius: 6px;"
         "  padding: 4px 10px;"
-        "}");
+        "}";
+    ui->LblOcrHint->setStyleSheet(ocrHintStyle);
+    ui->LblOcrHint_2->setStyleSheet(ocrHintStyle);
 
     // Max 9 chiffres avant la décimale, 2 après — bloque ORA-01438
     auto *amountValidator = new QRegularExpressionValidator(
@@ -3865,6 +3882,32 @@ void MainWindow::on_BtnOcrReceipt_clicked()
 
     if (!r.description.isEmpty() && ui->FormDesc->text().isEmpty())
         ui->FormDesc->setText(r.description);
+}
+
+void MainWindow::on_BtnOcrReceipt_2_clicked()
+{
+    OcrScannerDialog dlg(this);
+    if (dlg.exec() != QDialog::Accepted) return;
+
+    const OcrResult &r = dlg.result();
+
+    if (r.hasAmount && r.amount > 0.0)
+        ui->FormAmount_2->setText(QString::number(r.amount, 'f', 2));
+
+    if (r.hasDate && r.date.isValid())
+        ui->FormDate_2->setDate(r.date);
+
+    if (!r.type.isEmpty()) {
+        for (int i = 0; i < ui->FormType_2->count(); ++i) {
+            if (ui->FormType_2->itemData(i).toString() == r.type) {
+                ui->FormType_2->setCurrentIndex(i);
+                break;
+            }
+        }
+    }
+
+    if (!r.description.isEmpty() && ui->FormDesc_2->text().isEmpty())
+        ui->FormDesc_2->setText(r.description);
 }
 
 void MainWindow::showFinanceList()

@@ -56,6 +56,10 @@ set(PROJECT_SOURCES
     arduino.cpp
     rfidhandler.h
     rfidhandler.cpp
+    mapdialog.h
+    mapdialog.cpp
+    tilemapwidget.h
+    tilemapwidget.cpp
 )
 
 # --- 4. CRÉATION DE L'EXÉCUTABLE ---

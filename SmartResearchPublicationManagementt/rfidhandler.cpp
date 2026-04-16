@@ -1,5 +1,6 @@
 #include "rfidhandler.h"
 #include <QSqlQuery>
+#include <QSqlDatabase>
 #include <QSqlError>
 #include <QDate>
 #include <QTime>
@@ -46,10 +47,12 @@ void RfidHandler::traiter_rfid()
 
         qDebug() << "[RFID] Carte :" << uidCarte << "| Labo :" << idLabo;
 
-        // Vérifier si l'employé a accès à ce labo
+        // ── Requête : accès + état de pointage actuel ─────────────────────────
         QSqlQuery q;
         q.prepare(
-            "SELECT e.ID_EMPLOYE, e.PRENOM "
+            "SELECT e.ID_EMPLOYE, e.PRENOM, "
+            "       e.HEURE_ARRIVEE, e.HEURE_DEPART, "
+            "       TO_CHAR(e.DATE_POINTAGE, 'YYYY-MM-DD') AS DATE_POINTAGE "
             "FROM HICHEM.EMPLOYES e "
             "JOIN HICHEM.LABS l ON l.IDEMP = e.ID_EMPLOYE "
             "WHERE e.UID_CARTE = :uid AND l.IDLABO = :labo"
@@ -58,39 +61,79 @@ void RfidHandler::traiter_rfid()
         q.bindValue(":labo", idLabo);
 
         if (!q.exec()) {
-            qDebug() << "[RFID] Erreur SQL :" << q.lastError().text();
+            qDebug() << "[RFID] Erreur SQL SELECT :" << q.lastError().text();
             A->write_to_arduino("0\n");
             continue;
         }
 
         if (q.next()) {
             // ── Accès autorisé ───────────────────────────────────────────────
-            QString idEmploye = q.value("ID_EMPLOYE").toString();
-            QString prenom    = q.value("PRENOM").toString();
-            QString heure     = QTime::currentTime().toString("HH:mm");
-            QString date      = QDate::currentDate().toString("yyyy-MM-dd");
+            QString idEmploye    = q.value("ID_EMPLOYE").toString();
+            QString prenom       = q.value("PRENOM").toString();
+            bool    arriveeNull  = q.value("HEURE_ARRIVEE").isNull();
+            bool    departNull   = q.value("HEURE_DEPART").isNull();
+            QString hArrivee     = arriveeNull ? "" : q.value("HEURE_ARRIVEE").toString().trimmed();
+            QString hDepart      = departNull  ? "" : q.value("HEURE_DEPART").toString().trimmed();
+            QString datePointage = q.value("DATE_POINTAGE").toString().trimmed();
+            QString heure        = QTime::currentTime().toString("HH:mm");
+            QString dateAuj      = QDate::currentDate().toString("yyyy-MM-dd");
 
-            QSqlQuery upd;
-            upd.prepare(
-                "UPDATE HICHEM.EMPLOYES "
-                "SET DATE_POINTAGE     = TO_DATE(:d, 'YYYY-MM-DD'), "
-                "    HEURE_ARRIVEE     = :h, "
-                "    STATUT_JOURNALIER = 'Présent' "
-                "WHERE ID_EMPLOYE = :id"
-            );
-            upd.bindValue(":d",  date);
-            upd.bindValue(":h",  heure);
-            upd.bindValue(":id", idEmploye);
+            qDebug() << "[RFID] DB —"
+                     << "date:" << datePointage
+                     << "hArrivee:" << hArrivee << "(null:" << arriveeNull << ")"
+                     << "hDepart:"  << hDepart  << "(null:" << departNull  << ")"
+                     << "dateAuj:"  << dateAuj;
 
-            if (upd.exec()) {
-                qDebug() << "[RFID] Pointage OK :" << prenom << "à" << heure;
-                emit pointageEffectue(prenom, heure);
-            } else {
-                qDebug() << "[RFID] Erreur UPDATE :" << upd.lastError().text();
+            // ── Déjà pointé (arrivée ET départ enregistrés aujourd'hui) ──────
+            // TEST DÉPART : commenté temporairement pour tester directement la branche départ
+            /*if (datePointage == dateAuj && !hArrivee.isEmpty() && !hDepart.isEmpty()) {
+                qDebug() << "[RFID] Déjà pointé (arrivée+départ) :" << prenom;
+                A->write_to_arduino(QString("3:%1\n").arg(prenom).toUtf8());
+
+            } else*/ if (true) { // TEST : force toujours la branche DÉPART
+                QSqlQuery upd;
+                upd.prepare(
+                    "UPDATE HICHEM.EMPLOYES "
+                    "SET HEURE_DEPART = :h "
+                    "WHERE ID_EMPLOYE = :id"
+                );
+                upd.bindValue(":h",  heure);
+                upd.bindValue(":id", idEmploye);
+
+                if (upd.exec()) {
+                    QSqlDatabase::database().commit();
+                    qDebug() << "[RFID] Départ enregistré pour" << prenom << "à" << heure;
+                    emit pointageEffectue(prenom, heure);
+                } else {
+                    qDebug() << "[RFID] Erreur UPDATE départ :" << upd.lastError().text();
+                }
+                A->write_to_arduino(QString("2:%1:%2\n").arg(prenom, heure).toUtf8());
+
+            // ── Enregistrer l'ARRIVÉE (premier passage du jour) ───────────────
+            // TEST DÉPART : commenté temporairement
+            } else if (false) { // désactivé pendant le test
+                QSqlQuery upd;
+                upd.prepare(
+                    "UPDATE HICHEM.EMPLOYES "
+                    "SET DATE_POINTAGE     = TO_DATE(:d, 'YYYY-MM-DD'), "
+                    "    HEURE_ARRIVEE     = :h, "
+                    "    HEURE_DEPART      = NULL, "
+                    "    STATUT_JOURNALIER = 'Présent' "
+                    "WHERE ID_EMPLOYE = :id"
+                );
+                upd.bindValue(":d",  dateAuj);
+                upd.bindValue(":h",  heure);
+                upd.bindValue(":id", idEmploye);
+
+                if (upd.exec()) {
+                    QSqlDatabase::database().commit();
+                    qDebug() << "[RFID] Arrivée enregistrée pour" << prenom << "à" << heure;
+                    emit pointageEffectue(prenom, heure);
+                } else {
+                    qDebug() << "[RFID] Erreur UPDATE arrivée :" << upd.lastError().text();
+                }
+                A->write_to_arduino(QString("1:%1:%2\n").arg(prenom, heure).toUtf8());
             }
-
-            QString reponse = QString("1:%1:%2\n").arg(prenom, heure);
-            A->write_to_arduino(reponse.toUtf8());
 
         } else {
             // ── Accès refusé ─────────────────────────────────────────────────

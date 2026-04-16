@@ -421,10 +421,8 @@ public:
     QGridLayout *gridLayout_2;
     QFrame *OverlayFinance;
     QVBoxLayout *overlayFinanceLayout;
-    QSpacerItem *ovTop;
     QFrame *PopupFinanceCard;
     QVBoxLayout *popupFinanceCardLayout;
-    QLabel *PopupTitleFinance;
     QGridLayout *popupFinanceGrid;
     QLabel *LblAmount;
     QComboBox *FormPayMode;
@@ -453,14 +451,12 @@ public:
     QVBoxLayout *layoutOcrSection;
     QPushButton *BtnOcrReceipt;
     QLabel *LblOcrHint;
-    QSpacerItem *ovBottom;
     QWidget *modifierF;
+    QGridLayout *gridLayout_modifierF;
     QFrame *OverlayFinance_2;
     QVBoxLayout *overlayFinanceLayout_2;
-    QSpacerItem *ovTop_2;
     QFrame *PopupFinanceCard_2;
     QVBoxLayout *popupFinanceCardLayout_2;
-    QLabel *PopupTitleFinance_2;
     QGridLayout *popupFinanceGrid_2;
     QDateEdit *FormDate_2;
     QComboBox *FormPayMode_2;
@@ -486,7 +482,9 @@ public:
     QLineEdit *FormAmount_2;
     QPushButton *BtnAmountIncr_2;
     QPushButton *BtnConvertCurrency_2;
-    QSpacerItem *ovBottom_2;
+    QVBoxLayout *layoutOcrSection_2;
+    QPushButton *BtnOcrReceipt_2;
+    QLabel *LblOcrHint_2;
     QWidget *statsF;
     QComboBox *comboBox_3;
     QLabel *stat_pub_3;
@@ -498,78 +496,79 @@ public:
     QVBoxLayout *verticalLayoutPage4;
     QStackedWidget *stacked_L;
     QWidget *Lab;
+    QVBoxLayout *verticalLayout_Lab;
+    QHBoxLayout *labsFilterLayout;
+    QLineEdit *LabsSearch_2;
+    QComboBox *LabsSpec_2;
+    QComboBox *LabsCap_2;
+    QPushButton *btnReinitialiserPub_3;
     QTableWidget *TableLabs_2;
-    QPushButton *btnVoirStatistiquesPub_2;
+    QHBoxLayout *labsButtonsLayout;
     QPushButton *btnAjouterPub_3;
     QPushButton *btnAjouterPub_2;
     QPushButton *btnModifierPub_2;
     QPushButton *btnSupprimerPub_2;
     QPushButton *btnLabReserveProduct;
-    QFrame *LabsCardFilter_2;
-    QLineEdit *LabsSearch_2;
-    QComboBox *LabsSpec_2;
-    QComboBox *LabsCap_2;
-    QPushButton *btnReinitialiserPub_3;
+    QPushButton *btnVoirStatistiquesPub_2;
     QWidget *modifierL;
-    QFrame *PopupLabsCard_4;
-    QFrame *PopupLabsForm_5;
-    QLineEdit *LabLocation_5;
+    QGridLayout *gridLayout_modifierL;
+    QLabel *lblPageTitle_4;
+    QLabel *LblLabName_5;
+    QLineEdit *LabName_5;
+    QLabel *LblLabResp_5;
     QComboBox *LabResponsible_5;
+    QLabel *LblLabLoc_5;
+    QLineEdit *LabLocation_5;
+    QLabel *LblLabNum_5;
+    QLineEdit *LabNumber_5;
+    QLabel *LblLabSpec_5;
     QComboBox *LabSpec_5;
     QLabel *LblLabCap_5;
-    QLabel *LblLabLoc_5;
-    QLabel *LblLabName_5;
-    QLabel *LblLabNum_5;
-    QLineEdit *LabName_5;
-    QLineEdit *LabNumber_5;
-    QLabel *LblLabResp_5;
-    QLabel *LblLabSpec_5;
     QComboBox *LabCap_5;
     QLabel *LblLabSpec_14;
+    QComboBox *LabSpec_6;
     QLabel *LblLabSpec_15;
     QComboBox *LabCap_6;
-    QComboBox *LabSpec_6;
-    QPushButton *BtnPopupResetLabs_5;
     QLabel *label_22;
-    QLabel *label_23;
-    QLabel *label_24;
     QDoubleSpinBox *LabMontant_5;
-    QLineEdit *LabReste_5;
+    QLabel *label_24;
     QDoubleSpinBox *LabMontantPaye_5;
+    QLabel *label_23;
+    QLineEdit *LabReste_5;
+    QHBoxLayout *hboxLayout;
     QPushButton *BtnPopupSaveLabs_5;
     QPushButton *btnAjouterPub_4;
+    QPushButton *BtnPopupResetLabs_5;
     QPushButton *retour_stat_9;
-    QLabel *lblPageTitle_4;
     QWidget *ajouterL;
-    QFrame *PopupLabsCard_3;
-    QFrame *PopupLabsForm_3;
+    QGridLayout *gridLayout_ajouterL;
+    QComboBox *LabCap_3;
+    QLabel *LblLabCap_3;
+    QHBoxLayout *hboxLayout1;
+    QPushButton *BtnPopupSaveLabs_3;
+    QPushButton *btnAjouterPub_5;
+    QPushButton *BtnPopupResetLabs_3;
+    QPushButton *retour_stat_8;
+    QLabel *label_21;
+    QDoubleSpinBox *LabMontantPaye_3;
+    QLineEdit *LabName_3;
+    QLabel *LblLabName_3;
     QLineEdit *LabLocation_3;
     QComboBox *LabResponsible_3;
-    QComboBox *LabSpec_3;
-    QLabel *LblLabCap_3;
-    QLabel *LblLabLoc_3;
-    QLabel *LblLabName_3;
-    QLabel *LblLabNum_3;
-    QLineEdit *LabName_3;
-    QLineEdit *LabNumber_3;
-    QLabel *LblLabResp_3;
-    QLabel *LblLabSpec_3;
-    QComboBox *LabCap_3;
-    QLabel *LblLabSpec_12;
-    QLabel *LblLabSpec_13;
     QComboBox *LabCap_4;
-    QComboBox *LabSpec_4;
-    QLabel *label_19;
-    QLabel *label_20;
-    QLabel *label_21;
     QDoubleSpinBox *LabMontant_3;
     QLineEdit *LabReste_3;
-    QDoubleSpinBox *LabMontantPaye_3;
-    QPushButton *BtnPopupSaveLabs_3;
-    QPushButton *BtnPopupResetLabs_3;
-    QPushButton *btnAjouterPub_5;
-    QPushButton *retour_stat_8;
-    QLabel *lblPageTitle_3;
+    QLabel *LblLabSpec_13;
+    QLabel *LblLabSpec_3;
+    QLabel *LblLabNum_3;
+    QLabel *LblLabResp_3;
+    QLabel *LblLabLoc_3;
+    QLabel *label_20;
+    QLabel *LblLabSpec_12;
+    QComboBox *LabSpec_3;
+    QLineEdit *LabNumber_3;
+    QLabel *label_19;
+    QComboBox *LabSpec_4;
     QWidget *statL;
     QPushButton *retour_stat_2;
     QComboBox *comboBox_2;
@@ -2739,24 +2738,13 @@ public:
         overlayFinanceLayout = new QVBoxLayout(OverlayFinance);
         overlayFinanceLayout->setObjectName("overlayFinanceLayout");
         overlayFinanceLayout->setContentsMargins(0, 0, 0, 0);
-        ovTop = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-
-        overlayFinanceLayout->addItem(ovTop);
-
         PopupFinanceCard = new QFrame(OverlayFinance);
         PopupFinanceCard->setObjectName("PopupFinanceCard");
-        PopupFinanceCard->setMinimumSize(QSize(760, 260));
-        PopupFinanceCard->setMaximumSize(QSize(900, 400));
         PopupFinanceCard->setFrameShape(QFrame::Shape::NoFrame);
         popupFinanceCardLayout = new QVBoxLayout(PopupFinanceCard);
         popupFinanceCardLayout->setSpacing(12);
         popupFinanceCardLayout->setObjectName("popupFinanceCardLayout");
         popupFinanceCardLayout->setContentsMargins(16, 16, 16, 16);
-        PopupTitleFinance = new QLabel(PopupFinanceCard);
-        PopupTitleFinance->setObjectName("PopupTitleFinance");
-
-        popupFinanceCardLayout->addWidget(PopupTitleFinance);
-
         popupFinanceGrid = new QGridLayout();
         popupFinanceGrid->setObjectName("popupFinanceGrid");
         popupFinanceGrid->setHorizontalSpacing(4);
@@ -2927,44 +2915,31 @@ public:
 
         overlayFinanceLayout->addWidget(PopupFinanceCard);
 
-        ovBottom = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-
-        overlayFinanceLayout->addItem(ovBottom);
-
 
         gridLayout_2->addWidget(OverlayFinance, 0, 0, 1, 1);
 
         stacked_F->addWidget(ajouterF);
         modifierF = new QWidget();
         modifierF->setObjectName("modifierF");
+        gridLayout_modifierF = new QGridLayout(modifierF);
+        gridLayout_modifierF->setContentsMargins(0, 0, 0, 0);
+        gridLayout_modifierF->setObjectName("gridLayout_modifierF");
         OverlayFinance_2 = new QFrame(modifierF);
         OverlayFinance_2->setObjectName("OverlayFinance_2");
-        OverlayFinance_2->setGeometry(QRect(40, 10, 1041, 581));
         OverlayFinance_2->setFrameShape(QFrame::Shape::NoFrame);
         overlayFinanceLayout_2 = new QVBoxLayout(OverlayFinance_2);
         overlayFinanceLayout_2->setObjectName("overlayFinanceLayout_2");
         overlayFinanceLayout_2->setContentsMargins(0, 0, 0, 0);
-        ovTop_2 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-
-        overlayFinanceLayout_2->addItem(ovTop_2);
-
         PopupFinanceCard_2 = new QFrame(OverlayFinance_2);
         PopupFinanceCard_2->setObjectName("PopupFinanceCard_2");
-        PopupFinanceCard_2->setMinimumSize(QSize(760, 260));
-        PopupFinanceCard_2->setMaximumSize(QSize(900, 400));
         PopupFinanceCard_2->setFrameShape(QFrame::Shape::NoFrame);
         popupFinanceCardLayout_2 = new QVBoxLayout(PopupFinanceCard_2);
         popupFinanceCardLayout_2->setSpacing(12);
         popupFinanceCardLayout_2->setObjectName("popupFinanceCardLayout_2");
         popupFinanceCardLayout_2->setContentsMargins(16, 16, 16, 16);
-        PopupTitleFinance_2 = new QLabel(PopupFinanceCard_2);
-        PopupTitleFinance_2->setObjectName("PopupTitleFinance_2");
-
-        popupFinanceCardLayout_2->addWidget(PopupTitleFinance_2);
-
         popupFinanceGrid_2 = new QGridLayout();
         popupFinanceGrid_2->setObjectName("popupFinanceGrid_2");
-        popupFinanceGrid_2->setHorizontalSpacing(12);
+        popupFinanceGrid_2->setHorizontalSpacing(4);
         popupFinanceGrid_2->setVerticalSpacing(10);
         FormDate_2 = new QDateEdit(PopupFinanceCard_2);
         FormDate_2->setObjectName("FormDate_2");
@@ -3103,15 +3078,34 @@ public:
 
         popupFinanceGrid_2->addLayout(layoutAmountRow_2, 1, 1, 1, 1);
 
+        layoutOcrSection_2 = new QVBoxLayout();
+        layoutOcrSection_2->setSpacing(5);
+        layoutOcrSection_2->setObjectName("layoutOcrSection_2");
+        BtnOcrReceipt_2 = new QPushButton(PopupFinanceCard_2);
+        BtnOcrReceipt_2->setObjectName("BtnOcrReceipt_2");
+        BtnOcrReceipt_2->setCursor(QCursor(Qt::CursorShape::PointingHandCursor));
+
+        layoutOcrSection_2->addWidget(BtnOcrReceipt_2);
+
+        LblOcrHint_2 = new QLabel(PopupFinanceCard_2);
+        LblOcrHint_2->setObjectName("LblOcrHint_2");
+        LblOcrHint_2->setFont(font5);
+        LblOcrHint_2->setAlignment(Qt::AlignmentFlag::AlignCenter);
+        LblOcrHint_2->setWordWrap(true);
+
+        layoutOcrSection_2->addWidget(LblOcrHint_2);
+
+
+        popupFinanceGrid_2->addLayout(layoutOcrSection_2, 5, 0, 1, 4);
+
 
         popupFinanceCardLayout_2->addLayout(popupFinanceGrid_2);
 
 
         overlayFinanceLayout_2->addWidget(PopupFinanceCard_2);
 
-        ovBottom_2 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
-        overlayFinanceLayout_2->addItem(ovBottom_2);
+        gridLayout_modifierF->addWidget(OverlayFinance_2, 0, 0, 1, 1);
 
         stacked_F->addWidget(modifierF);
         statsF = new QWidget();
@@ -3150,318 +3144,410 @@ public:
         stacked_L->setObjectName("stacked_L");
         Lab = new QWidget();
         Lab->setObjectName("Lab");
+        verticalLayout_Lab = new QVBoxLayout(Lab);
+        verticalLayout_Lab->setSpacing(10);
+        verticalLayout_Lab->setObjectName("verticalLayout_Lab");
+        verticalLayout_Lab->setContentsMargins(10, 10, 10, 10);
+        labsFilterLayout = new QHBoxLayout();
+        labsFilterLayout->setSpacing(10);
+        labsFilterLayout->setObjectName("labsFilterLayout");
+        LabsSearch_2 = new QLineEdit(Lab);
+        LabsSearch_2->setObjectName("LabsSearch_2");
+
+        labsFilterLayout->addWidget(LabsSearch_2);
+
+        LabsSpec_2 = new QComboBox(Lab);
+        LabsSpec_2->addItem(QString());
+        LabsSpec_2->addItem(QString());
+        LabsSpec_2->addItem(QString());
+        LabsSpec_2->setObjectName("LabsSpec_2");
+
+        labsFilterLayout->addWidget(LabsSpec_2);
+
+        LabsCap_2 = new QComboBox(Lab);
+        LabsCap_2->addItem(QString());
+        LabsCap_2->addItem(QString());
+        LabsCap_2->addItem(QString());
+        LabsCap_2->setObjectName("LabsCap_2");
+
+        labsFilterLayout->addWidget(LabsCap_2);
+
+        btnReinitialiserPub_3 = new QPushButton(Lab);
+        btnReinitialiserPub_3->setObjectName("btnReinitialiserPub_3");
+
+        labsFilterLayout->addWidget(btnReinitialiserPub_3);
+
+
+        verticalLayout_Lab->addLayout(labsFilterLayout);
+
         TableLabs_2 = new QTableWidget(Lab);
-        if (TableLabs_2->columnCount() < 11)
-            TableLabs_2->setColumnCount(11);
-        QTableWidgetItem *__qtablewidgetitem100 = new QTableWidgetItem();
-        TableLabs_2->setHorizontalHeaderItem(0, __qtablewidgetitem100);
-        QTableWidgetItem *__qtablewidgetitem101 = new QTableWidgetItem();
-        TableLabs_2->setHorizontalHeaderItem(1, __qtablewidgetitem101);
-        QTableWidgetItem *__qtablewidgetitem102 = new QTableWidgetItem();
-        TableLabs_2->setHorizontalHeaderItem(2, __qtablewidgetitem102);
-        QTableWidgetItem *__qtablewidgetitem103 = new QTableWidgetItem();
-        TableLabs_2->setHorizontalHeaderItem(3, __qtablewidgetitem103);
-        QTableWidgetItem *__qtablewidgetitem104 = new QTableWidgetItem();
-        TableLabs_2->setHorizontalHeaderItem(4, __qtablewidgetitem104);
-        QTableWidgetItem *__qtablewidgetitem105 = new QTableWidgetItem();
-        TableLabs_2->setHorizontalHeaderItem(5, __qtablewidgetitem105);
-        QTableWidgetItem *__qtablewidgetitem106 = new QTableWidgetItem();
-        TableLabs_2->setHorizontalHeaderItem(6, __qtablewidgetitem106);
-        QTableWidgetItem *__qtablewidgetitem107 = new QTableWidgetItem();
-        TableLabs_2->setHorizontalHeaderItem(7, __qtablewidgetitem107);
-        QTableWidgetItem *__qtablewidgetitem108 = new QTableWidgetItem();
-        TableLabs_2->setHorizontalHeaderItem(8, __qtablewidgetitem108);
-        QTableWidgetItem *__qtablewidgetitem109 = new QTableWidgetItem();
-        TableLabs_2->setHorizontalHeaderItem(9, __qtablewidgetitem109);
-        QTableWidgetItem *__qtablewidgetitem110 = new QTableWidgetItem();
-        TableLabs_2->setHorizontalHeaderItem(10, __qtablewidgetitem110);
-        if (TableLabs_2->rowCount() < 4)
-            TableLabs_2->setRowCount(4);
-        QTableWidgetItem *__qtablewidgetitem111 = new QTableWidgetItem();
-        TableLabs_2->setItem(0, 0, __qtablewidgetitem111);
-        QTableWidgetItem *__qtablewidgetitem112 = new QTableWidgetItem();
-        TableLabs_2->setItem(0, 1, __qtablewidgetitem112);
-        QTableWidgetItem *__qtablewidgetitem113 = new QTableWidgetItem();
-        TableLabs_2->setItem(0, 2, __qtablewidgetitem113);
-        QTableWidgetItem *__qtablewidgetitem114 = new QTableWidgetItem();
-        TableLabs_2->setItem(0, 3, __qtablewidgetitem114);
-        QTableWidgetItem *__qtablewidgetitem115 = new QTableWidgetItem();
-        TableLabs_2->setItem(0, 4, __qtablewidgetitem115);
-        QTableWidgetItem *__qtablewidgetitem116 = new QTableWidgetItem();
-        TableLabs_2->setItem(0, 5, __qtablewidgetitem116);
-        QTableWidgetItem *__qtablewidgetitem117 = new QTableWidgetItem();
-        TableLabs_2->setItem(0, 6, __qtablewidgetitem117);
-        QTableWidgetItem *__qtablewidgetitem118 = new QTableWidgetItem();
-        TableLabs_2->setItem(0, 10, __qtablewidgetitem118);
-        QTableWidgetItem *__qtablewidgetitem119 = new QTableWidgetItem();
-        TableLabs_2->setItem(1, 0, __qtablewidgetitem119);
-        QTableWidgetItem *__qtablewidgetitem120 = new QTableWidgetItem();
-        TableLabs_2->setItem(2, 0, __qtablewidgetitem120);
         TableLabs_2->setObjectName("TableLabs_2");
-        TableLabs_2->setGeometry(QRect(20, 110, 1191, 401));
         TableLabs_2->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
         TableLabs_2->setAlternatingRowColors(true);
         TableLabs_2->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
         TableLabs_2->setShowGrid(false);
         TableLabs_2->setSortingEnabled(true);
         TableLabs_2->setCornerButtonEnabled(false);
-        btnVoirStatistiquesPub_2 = new QPushButton(Lab);
-        btnVoirStatistiquesPub_2->setObjectName("btnVoirStatistiquesPub_2");
-        btnVoirStatistiquesPub_2->setGeometry(QRect(980, 530, 190, 50));
+
+        verticalLayout_Lab->addWidget(TableLabs_2);
+
+        labsButtonsLayout = new QHBoxLayout();
+        labsButtonsLayout->setSpacing(10);
+        labsButtonsLayout->setObjectName("labsButtonsLayout");
         btnAjouterPub_3 = new QPushButton(Lab);
         btnAjouterPub_3->setObjectName("btnAjouterPub_3");
-        btnAjouterPub_3->setGeometry(QRect(20, 540, 170, 41));
+
+        labsButtonsLayout->addWidget(btnAjouterPub_3);
+
         btnAjouterPub_2 = new QPushButton(Lab);
         btnAjouterPub_2->setObjectName("btnAjouterPub_2");
-        btnAjouterPub_2->setGeometry(QRect(251, 540, 170, 41));
+
+        labsButtonsLayout->addWidget(btnAjouterPub_2);
+
         btnModifierPub_2 = new QPushButton(Lab);
         btnModifierPub_2->setObjectName("btnModifierPub_2");
-        btnModifierPub_2->setGeometry(QRect(491, 540, 170, 41));
+
+        labsButtonsLayout->addWidget(btnModifierPub_2);
+
         btnSupprimerPub_2 = new QPushButton(Lab);
         btnSupprimerPub_2->setObjectName("btnSupprimerPub_2");
-        btnSupprimerPub_2->setGeometry(QRect(732, 540, 170, 41));
+
+        labsButtonsLayout->addWidget(btnSupprimerPub_2);
+
         btnLabReserveProduct = new QPushButton(Lab);
         btnLabReserveProduct->setObjectName("btnLabReserveProduct");
-        btnLabReserveProduct->setGeometry(QRect(20, 595, 280, 41));
-        LabsCardFilter_2 = new QFrame(Lab);
-        LabsCardFilter_2->setObjectName("LabsCardFilter_2");
-        LabsCardFilter_2->setGeometry(QRect(11, 11, 1194, 91));
-        LabsCardFilter_2->setFrameShape(QFrame::Shape::NoFrame);
-        LabsSearch_2 = new QLineEdit(LabsCardFilter_2);
-        LabsSearch_2->setObjectName("LabsSearch_2");
-        LabsSearch_2->setGeometry(QRect(21, 20, 301, 35));
-        LabsSpec_2 = new QComboBox(LabsCardFilter_2);
-        LabsSpec_2->addItem(QString());
-        LabsSpec_2->addItem(QString());
-        LabsSpec_2->addItem(QString());
-        LabsSpec_2->setObjectName("LabsSpec_2");
-        LabsSpec_2->setGeometry(QRect(390, 20, 171, 41));
-        LabsCap_2 = new QComboBox(LabsCardFilter_2);
-        LabsCap_2->addItem(QString());
-        LabsCap_2->addItem(QString());
-        LabsCap_2->addItem(QString());
-        LabsCap_2->setObjectName("LabsCap_2");
-        LabsCap_2->setGeometry(QRect(609, 20, 161, 41));
-        btnReinitialiserPub_3 = new QPushButton(LabsCardFilter_2);
-        btnReinitialiserPub_3->setObjectName("btnReinitialiserPub_3");
-        btnReinitialiserPub_3->setGeometry(QRect(880, 20, 190, 50));
+
+        labsButtonsLayout->addWidget(btnLabReserveProduct);
+
+        btnVoirStatistiquesPub_2 = new QPushButton(Lab);
+        btnVoirStatistiquesPub_2->setObjectName("btnVoirStatistiquesPub_2");
+
+        labsButtonsLayout->addWidget(btnVoirStatistiquesPub_2);
+
+
+        verticalLayout_Lab->addLayout(labsButtonsLayout);
+
         stacked_L->addWidget(Lab);
         modifierL = new QWidget();
         modifierL->setObjectName("modifierL");
-        PopupLabsCard_4 = new QFrame(modifierL);
-        PopupLabsCard_4->setObjectName("PopupLabsCard_4");
-        PopupLabsCard_4->setGeometry(QRect(10, 10, 1191, 601));
-        PopupLabsCard_4->setMinimumSize(QSize(760, 0));
-        PopupLabsCard_4->setFrameShape(QFrame::Shape::NoFrame);
-        PopupLabsForm_5 = new QFrame(PopupLabsCard_4);
-        PopupLabsForm_5->setObjectName("PopupLabsForm_5");
-        PopupLabsForm_5->setGeometry(QRect(74, 50, 1051, 461));
-        PopupLabsForm_5->setFrameShape(QFrame::Shape::NoFrame);
-        LabLocation_5 = new QLineEdit(PopupLabsForm_5);
-        LabLocation_5->setObjectName("LabLocation_5");
-        LabLocation_5->setGeometry(QRect(150, 100, 300, 40));
-        LabResponsible_5 = new QComboBox(PopupLabsForm_5);
+        gridLayout_modifierL = new QGridLayout(modifierL);
+        gridLayout_modifierL->setObjectName("gridLayout_modifierL");
+        gridLayout_modifierL->setHorizontalSpacing(40);
+        gridLayout_modifierL->setVerticalSpacing(20);
+        gridLayout_modifierL->setContentsMargins(60, 28, 60, 28);
+        lblPageTitle_4 = new QLabel(modifierL);
+        lblPageTitle_4->setObjectName("lblPageTitle_4");
+        lblPageTitle_4->setFont(font);
+        lblPageTitle_4->setAlignment(Qt::AlignmentFlag::AlignCenter);
+
+        gridLayout_modifierL->addWidget(lblPageTitle_4, 0, 0, 1, 4);
+
+        LblLabName_5 = new QLabel(modifierL);
+        LblLabName_5->setObjectName("LblLabName_5");
+
+        gridLayout_modifierL->addWidget(LblLabName_5, 1, 0, 1, 1);
+
+        LabName_5 = new QLineEdit(modifierL);
+        LabName_5->setObjectName("LabName_5");
+
+        gridLayout_modifierL->addWidget(LabName_5, 1, 1, 1, 1);
+
+        LblLabResp_5 = new QLabel(modifierL);
+        LblLabResp_5->setObjectName("LblLabResp_5");
+
+        gridLayout_modifierL->addWidget(LblLabResp_5, 1, 2, 1, 1);
+
+        LabResponsible_5 = new QComboBox(modifierL);
         LabResponsible_5->setObjectName("LabResponsible_5");
-        LabResponsible_5->setGeometry(QRect(680, 26, 300, 40));
-        LabSpec_5 = new QComboBox(PopupLabsForm_5);
+
+        gridLayout_modifierL->addWidget(LabResponsible_5, 1, 3, 1, 1);
+
+        LblLabLoc_5 = new QLabel(modifierL);
+        LblLabLoc_5->setObjectName("LblLabLoc_5");
+
+        gridLayout_modifierL->addWidget(LblLabLoc_5, 2, 0, 1, 1);
+
+        LabLocation_5 = new QLineEdit(modifierL);
+        LabLocation_5->setObjectName("LabLocation_5");
+
+        gridLayout_modifierL->addWidget(LabLocation_5, 2, 1, 1, 1);
+
+        LblLabNum_5 = new QLabel(modifierL);
+        LblLabNum_5->setObjectName("LblLabNum_5");
+
+        gridLayout_modifierL->addWidget(LblLabNum_5, 2, 2, 1, 1);
+
+        LabNumber_5 = new QLineEdit(modifierL);
+        LabNumber_5->setObjectName("LabNumber_5");
+
+        gridLayout_modifierL->addWidget(LabNumber_5, 2, 3, 1, 1);
+
+        LblLabSpec_5 = new QLabel(modifierL);
+        LblLabSpec_5->setObjectName("LblLabSpec_5");
+
+        gridLayout_modifierL->addWidget(LblLabSpec_5, 3, 0, 1, 1);
+
+        LabSpec_5 = new QComboBox(modifierL);
         LabSpec_5->addItem(QString());
         LabSpec_5->addItem(QString());
         LabSpec_5->addItem(QString());
         LabSpec_5->setObjectName("LabSpec_5");
-        LabSpec_5->setGeometry(QRect(150, 175, 300, 40));
-        LblLabCap_5 = new QLabel(PopupLabsForm_5);
+
+        gridLayout_modifierL->addWidget(LabSpec_5, 3, 1, 1, 1);
+
+        LblLabCap_5 = new QLabel(modifierL);
         LblLabCap_5->setObjectName("LblLabCap_5");
-        LblLabCap_5->setGeometry(QRect(560, 175, 150, 40));
-        LblLabLoc_5 = new QLabel(PopupLabsForm_5);
-        LblLabLoc_5->setObjectName("LblLabLoc_5");
-        LblLabLoc_5->setGeometry(QRect(0, 100, 150, 40));
-        LblLabName_5 = new QLabel(PopupLabsForm_5);
-        LblLabName_5->setObjectName("LblLabName_5");
-        LblLabName_5->setGeometry(QRect(0, 26, 150, 40));
-        LblLabNum_5 = new QLabel(PopupLabsForm_5);
-        LblLabNum_5->setObjectName("LblLabNum_5");
-        LblLabNum_5->setGeometry(QRect(560, 100, 150, 40));
-        LabName_5 = new QLineEdit(PopupLabsForm_5);
-        LabName_5->setObjectName("LabName_5");
-        LabName_5->setGeometry(QRect(150, 26, 300, 40));
-        LabNumber_5 = new QLineEdit(PopupLabsForm_5);
-        LabNumber_5->setObjectName("LabNumber_5");
-        LabNumber_5->setGeometry(QRect(680, 100, 300, 40));
-        LblLabResp_5 = new QLabel(PopupLabsForm_5);
-        LblLabResp_5->setObjectName("LblLabResp_5");
-        LblLabResp_5->setGeometry(QRect(560, 26, 150, 40));
-        LblLabSpec_5 = new QLabel(PopupLabsForm_5);
-        LblLabSpec_5->setObjectName("LblLabSpec_5");
-        LblLabSpec_5->setGeometry(QRect(0, 175, 150, 40));
-        LabCap_5 = new QComboBox(PopupLabsForm_5);
+
+        gridLayout_modifierL->addWidget(LblLabCap_5, 3, 2, 1, 1);
+
+        LabCap_5 = new QComboBox(modifierL);
         LabCap_5->addItem(QString());
         LabCap_5->addItem(QString());
         LabCap_5->addItem(QString());
         LabCap_5->setObjectName("LabCap_5");
-        LabCap_5->setGeometry(QRect(680, 175, 300, 40));
-        LblLabSpec_14 = new QLabel(PopupLabsForm_5);
+
+        gridLayout_modifierL->addWidget(LabCap_5, 3, 3, 1, 1);
+
+        LblLabSpec_14 = new QLabel(modifierL);
         LblLabSpec_14->setObjectName("LblLabSpec_14");
-        LblLabSpec_14->setGeometry(QRect(0, 240, 150, 40));
-        LblLabSpec_15 = new QLabel(PopupLabsForm_5);
-        LblLabSpec_15->setObjectName("LblLabSpec_15");
-        LblLabSpec_15->setGeometry(QRect(560, 240, 150, 40));
-        LabCap_6 = new QComboBox(PopupLabsForm_5);
-        LabCap_6->addItem(QString());
-        LabCap_6->addItem(QString());
-        LabCap_6->addItem(QString());
-        LabCap_6->setObjectName("LabCap_6");
-        LabCap_6->setGeometry(QRect(680, 240, 300, 40));
-        LabSpec_6 = new QComboBox(PopupLabsForm_5);
+
+        gridLayout_modifierL->addWidget(LblLabSpec_14, 4, 0, 1, 1);
+
+        LabSpec_6 = new QComboBox(modifierL);
         LabSpec_6->addItem(QString());
         LabSpec_6->addItem(QString());
         LabSpec_6->addItem(QString());
         LabSpec_6->addItem(QString());
         LabSpec_6->setObjectName("LabSpec_6");
-        LabSpec_6->setGeometry(QRect(150, 240, 300, 40));
-        BtnPopupResetLabs_5 = new QPushButton(PopupLabsForm_5);
-        BtnPopupResetLabs_5->setObjectName("BtnPopupResetLabs_5");
-        BtnPopupResetLabs_5->setEnabled(true);
-        BtnPopupResetLabs_5->setGeometry(QRect(-500, 350, 190, 50));
-        label_22 = new QLabel(PopupLabsForm_5);
+
+        gridLayout_modifierL->addWidget(LabSpec_6, 4, 1, 1, 1);
+
+        LblLabSpec_15 = new QLabel(modifierL);
+        LblLabSpec_15->setObjectName("LblLabSpec_15");
+
+        gridLayout_modifierL->addWidget(LblLabSpec_15, 4, 2, 1, 1);
+
+        LabCap_6 = new QComboBox(modifierL);
+        LabCap_6->addItem(QString());
+        LabCap_6->addItem(QString());
+        LabCap_6->addItem(QString());
+        LabCap_6->setObjectName("LabCap_6");
+
+        gridLayout_modifierL->addWidget(LabCap_6, 4, 3, 1, 1);
+
+        label_22 = new QLabel(modifierL);
         label_22->setObjectName("label_22");
-        label_22->setGeometry(QRect(0, 320, 130, 40));
-        label_23 = new QLabel(PopupLabsForm_5);
-        label_23->setObjectName("label_23");
-        label_23->setGeometry(QRect(0, 1000, 130, 40));
-        label_24 = new QLabel(PopupLabsForm_5);
-        label_24->setObjectName("label_24");
-        label_24->setGeometry(QRect(560, 320, 130, 40));
-        LabMontant_5 = new QDoubleSpinBox(PopupLabsForm_5);
+
+        gridLayout_modifierL->addWidget(label_22, 5, 0, 1, 1);
+
+        LabMontant_5 = new QDoubleSpinBox(modifierL);
         LabMontant_5->setObjectName("LabMontant_5");
-        LabMontant_5->setGeometry(QRect(150, 320, 300, 40));
-        LabReste_5 = new QLineEdit(PopupLabsForm_5);
-        LabReste_5->setObjectName("LabReste_5");
-        LabReste_5->setGeometry(QRect(150, 1000, 300, 40));
-        LabMontantPaye_5 = new QDoubleSpinBox(PopupLabsForm_5);
+
+        gridLayout_modifierL->addWidget(LabMontant_5, 5, 1, 1, 1);
+
+        label_24 = new QLabel(modifierL);
+        label_24->setObjectName("label_24");
+
+        gridLayout_modifierL->addWidget(label_24, 5, 2, 1, 1);
+
+        LabMontantPaye_5 = new QDoubleSpinBox(modifierL);
         LabMontantPaye_5->setObjectName("LabMontantPaye_5");
-        LabMontantPaye_5->setGeometry(QRect(680, 320, 300, 40));
-        BtnPopupSaveLabs_5 = new QPushButton(PopupLabsCard_4);
+
+        gridLayout_modifierL->addWidget(LabMontantPaye_5, 5, 3, 1, 1);
+
+        label_23 = new QLabel(modifierL);
+        label_23->setObjectName("label_23");
+
+        gridLayout_modifierL->addWidget(label_23, 6, 0, 1, 1);
+
+        LabReste_5 = new QLineEdit(modifierL);
+        LabReste_5->setObjectName("LabReste_5");
+        LabReste_5->setReadOnly(true);
+
+        gridLayout_modifierL->addWidget(LabReste_5, 6, 1, 1, 1);
+
+        hboxLayout = new QHBoxLayout();
+        hboxLayout->setObjectName("hboxLayout");
+        BtnPopupSaveLabs_5 = new QPushButton(modifierL);
         BtnPopupSaveLabs_5->setObjectName("BtnPopupSaveLabs_5");
-        BtnPopupSaveLabs_5->setGeometry(QRect(210, 540, 190, 50));
-        btnAjouterPub_4 = new QPushButton(PopupLabsCard_4);
+
+        hboxLayout->addWidget(BtnPopupSaveLabs_5);
+
+        btnAjouterPub_4 = new QPushButton(modifierL);
         btnAjouterPub_4->setObjectName("btnAjouterPub_4");
-        btnAjouterPub_4->setGeometry(QRect(490, 540, 190, 50));
-        retour_stat_9 = new QPushButton(PopupLabsCard_4);
+
+        hboxLayout->addWidget(btnAjouterPub_4);
+
+        BtnPopupResetLabs_5 = new QPushButton(modifierL);
+        BtnPopupResetLabs_5->setObjectName("BtnPopupResetLabs_5");
+
+        hboxLayout->addWidget(BtnPopupResetLabs_5);
+
+        retour_stat_9 = new QPushButton(modifierL);
         retour_stat_9->setObjectName("retour_stat_9");
-        retour_stat_9->setGeometry(QRect(790, 540, 190, 50));
-        lblPageTitle_4 = new QLabel(PopupLabsCard_4);
-        lblPageTitle_4->setObjectName("lblPageTitle_4");
-        lblPageTitle_4->setGeometry(QRect(430, 10, 251, 51));
-        lblPageTitle_4->setFont(font);
-        lblPageTitle_4->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
+
+        hboxLayout->addWidget(retour_stat_9);
+
+
+        gridLayout_modifierL->addLayout(hboxLayout, 7, 0, 1, 4);
+
         stacked_L->addWidget(modifierL);
         ajouterL = new QWidget();
         ajouterL->setObjectName("ajouterL");
-        PopupLabsCard_3 = new QFrame(ajouterL);
-        PopupLabsCard_3->setObjectName("PopupLabsCard_3");
-        PopupLabsCard_3->setGeometry(QRect(0, 0, 1211, 611));
-        PopupLabsCard_3->setMinimumSize(QSize(760, 0));
-        PopupLabsCard_3->setFrameShape(QFrame::Shape::NoFrame);
-        PopupLabsForm_3 = new QFrame(PopupLabsCard_3);
-        PopupLabsForm_3->setObjectName("PopupLabsForm_3");
-        PopupLabsForm_3->setGeometry(QRect(84, 50, 1041, 471));
-        PopupLabsForm_3->setFrameShape(QFrame::Shape::NoFrame);
-        LabLocation_3 = new QLineEdit(PopupLabsForm_3);
-        LabLocation_3->setObjectName("LabLocation_3");
-        LabLocation_3->setGeometry(QRect(140, 125, 300, 40));
-        LabResponsible_3 = new QComboBox(PopupLabsForm_3);
-        LabResponsible_3->setObjectName("LabResponsible_3");
-        LabResponsible_3->setGeometry(QRect(677, 50, 300, 40));
-        LabSpec_3 = new QComboBox(PopupLabsForm_3);
-        LabSpec_3->addItem(QString());
-        LabSpec_3->addItem(QString());
-        LabSpec_3->addItem(QString());
-        LabSpec_3->setObjectName("LabSpec_3");
-        LabSpec_3->setGeometry(QRect(140, 200, 300, 40));
-        LblLabCap_3 = new QLabel(PopupLabsForm_3);
-        LblLabCap_3->setObjectName("LblLabCap_3");
-        LblLabCap_3->setGeometry(QRect(520, 200, 150, 30));
-        LblLabLoc_3 = new QLabel(PopupLabsForm_3);
-        LblLabLoc_3->setObjectName("LblLabLoc_3");
-        LblLabLoc_3->setGeometry(QRect(0, 125, 150, 30));
-        LblLabName_3 = new QLabel(PopupLabsForm_3);
-        LblLabName_3->setObjectName("LblLabName_3");
-        LblLabName_3->setGeometry(QRect(0, 50, 150, 30));
-        LblLabNum_3 = new QLabel(PopupLabsForm_3);
-        LblLabNum_3->setObjectName("LblLabNum_3");
-        LblLabNum_3->setGeometry(QRect(520, 125, 150, 30));
-        LabName_3 = new QLineEdit(PopupLabsForm_3);
-        LabName_3->setObjectName("LabName_3");
-        LabName_3->setGeometry(QRect(140, 50, 300, 40));
-        LabNumber_3 = new QLineEdit(PopupLabsForm_3);
-        LabNumber_3->setObjectName("LabNumber_3");
-        LabNumber_3->setGeometry(QRect(677, 125, 300, 40));
-        LblLabResp_3 = new QLabel(PopupLabsForm_3);
-        LblLabResp_3->setObjectName("LblLabResp_3");
-        LblLabResp_3->setGeometry(QRect(520, 50, 150, 30));
-        LblLabSpec_3 = new QLabel(PopupLabsForm_3);
-        LblLabSpec_3->setObjectName("LblLabSpec_3");
-        LblLabSpec_3->setGeometry(QRect(0, 200, 150, 30));
-        LabCap_3 = new QComboBox(PopupLabsForm_3);
+        gridLayout_ajouterL = new QGridLayout(ajouterL);
+        gridLayout_ajouterL->setObjectName("gridLayout_ajouterL");
+        gridLayout_ajouterL->setHorizontalSpacing(40);
+        gridLayout_ajouterL->setVerticalSpacing(20);
+        gridLayout_ajouterL->setContentsMargins(60, 28, 60, 28);
+        LabCap_3 = new QComboBox(ajouterL);
         LabCap_3->addItem(QString());
         LabCap_3->addItem(QString());
         LabCap_3->addItem(QString());
         LabCap_3->setObjectName("LabCap_3");
-        LabCap_3->setGeometry(QRect(677, 200, 300, 40));
-        LblLabSpec_12 = new QLabel(PopupLabsForm_3);
-        LblLabSpec_12->setObjectName("LblLabSpec_12");
-        LblLabSpec_12->setGeometry(QRect(0, 275, 150, 30));
-        LblLabSpec_13 = new QLabel(PopupLabsForm_3);
-        LblLabSpec_13->setObjectName("LblLabSpec_13");
-        LblLabSpec_13->setGeometry(QRect(520, 275, 150, 30));
-        LabCap_4 = new QComboBox(PopupLabsForm_3);
+
+        gridLayout_ajouterL->addWidget(LabCap_3, 2, 3, 1, 1);
+
+        LblLabCap_3 = new QLabel(ajouterL);
+        LblLabCap_3->setObjectName("LblLabCap_3");
+
+        gridLayout_ajouterL->addWidget(LblLabCap_3, 2, 2, 1, 1);
+
+        hboxLayout1 = new QHBoxLayout();
+        hboxLayout1->setObjectName("hboxLayout1");
+        BtnPopupSaveLabs_3 = new QPushButton(ajouterL);
+        BtnPopupSaveLabs_3->setObjectName("BtnPopupSaveLabs_3");
+
+        hboxLayout1->addWidget(BtnPopupSaveLabs_3);
+
+        btnAjouterPub_5 = new QPushButton(ajouterL);
+        btnAjouterPub_5->setObjectName("btnAjouterPub_5");
+
+        hboxLayout1->addWidget(btnAjouterPub_5);
+
+        BtnPopupResetLabs_3 = new QPushButton(ajouterL);
+        BtnPopupResetLabs_3->setObjectName("BtnPopupResetLabs_3");
+
+        hboxLayout1->addWidget(BtnPopupResetLabs_3);
+
+        retour_stat_8 = new QPushButton(ajouterL);
+        retour_stat_8->setObjectName("retour_stat_8");
+
+        hboxLayout1->addWidget(retour_stat_8);
+
+
+        gridLayout_ajouterL->addLayout(hboxLayout1, 6, 0, 1, 4);
+
+        label_21 = new QLabel(ajouterL);
+        label_21->setObjectName("label_21");
+
+        gridLayout_ajouterL->addWidget(label_21, 5, 0, 1, 1);
+
+        LabMontantPaye_3 = new QDoubleSpinBox(ajouterL);
+        LabMontantPaye_3->setObjectName("LabMontantPaye_3");
+
+        gridLayout_ajouterL->addWidget(LabMontantPaye_3, 4, 3, 1, 1);
+
+        LabName_3 = new QLineEdit(ajouterL);
+        LabName_3->setObjectName("LabName_3");
+
+        gridLayout_ajouterL->addWidget(LabName_3, 0, 1, 1, 1);
+
+        LblLabName_3 = new QLabel(ajouterL);
+        LblLabName_3->setObjectName("LblLabName_3");
+
+        gridLayout_ajouterL->addWidget(LblLabName_3, 0, 0, 1, 1);
+
+        LabLocation_3 = new QLineEdit(ajouterL);
+        LabLocation_3->setObjectName("LabLocation_3");
+
+        gridLayout_ajouterL->addWidget(LabLocation_3, 1, 1, 1, 1);
+
+        LabResponsible_3 = new QComboBox(ajouterL);
+        LabResponsible_3->setObjectName("LabResponsible_3");
+
+        gridLayout_ajouterL->addWidget(LabResponsible_3, 0, 3, 1, 1);
+
+        LabCap_4 = new QComboBox(ajouterL);
         LabCap_4->addItem(QString());
         LabCap_4->addItem(QString());
         LabCap_4->addItem(QString());
         LabCap_4->setObjectName("LabCap_4");
-        LabCap_4->setGeometry(QRect(680, 270, 300, 40));
-        LabSpec_4 = new QComboBox(PopupLabsForm_3);
+
+        gridLayout_ajouterL->addWidget(LabCap_4, 3, 3, 1, 1);
+
+        LabMontant_3 = new QDoubleSpinBox(ajouterL);
+        LabMontant_3->setObjectName("LabMontant_3");
+
+        gridLayout_ajouterL->addWidget(LabMontant_3, 4, 1, 1, 1);
+
+        LabReste_3 = new QLineEdit(ajouterL);
+        LabReste_3->setObjectName("LabReste_3");
+        LabReste_3->setReadOnly(true);
+
+        gridLayout_ajouterL->addWidget(LabReste_3, 5, 1, 1, 1);
+
+        LblLabSpec_13 = new QLabel(ajouterL);
+        LblLabSpec_13->setObjectName("LblLabSpec_13");
+
+        gridLayout_ajouterL->addWidget(LblLabSpec_13, 3, 2, 1, 1);
+
+        LblLabSpec_3 = new QLabel(ajouterL);
+        LblLabSpec_3->setObjectName("LblLabSpec_3");
+
+        gridLayout_ajouterL->addWidget(LblLabSpec_3, 2, 0, 1, 1);
+
+        LblLabNum_3 = new QLabel(ajouterL);
+        LblLabNum_3->setObjectName("LblLabNum_3");
+
+        gridLayout_ajouterL->addWidget(LblLabNum_3, 1, 2, 1, 1);
+
+        LblLabResp_3 = new QLabel(ajouterL);
+        LblLabResp_3->setObjectName("LblLabResp_3");
+
+        gridLayout_ajouterL->addWidget(LblLabResp_3, 0, 2, 1, 1);
+
+        LblLabLoc_3 = new QLabel(ajouterL);
+        LblLabLoc_3->setObjectName("LblLabLoc_3");
+
+        gridLayout_ajouterL->addWidget(LblLabLoc_3, 1, 0, 1, 1);
+
+        label_20 = new QLabel(ajouterL);
+        label_20->setObjectName("label_20");
+
+        gridLayout_ajouterL->addWidget(label_20, 4, 0, 1, 1);
+
+        LblLabSpec_12 = new QLabel(ajouterL);
+        LblLabSpec_12->setObjectName("LblLabSpec_12");
+
+        gridLayout_ajouterL->addWidget(LblLabSpec_12, 3, 0, 1, 1);
+
+        LabSpec_3 = new QComboBox(ajouterL);
+        LabSpec_3->addItem(QString());
+        LabSpec_3->addItem(QString());
+        LabSpec_3->addItem(QString());
+        LabSpec_3->setObjectName("LabSpec_3");
+
+        gridLayout_ajouterL->addWidget(LabSpec_3, 2, 1, 1, 1);
+
+        LabNumber_3 = new QLineEdit(ajouterL);
+        LabNumber_3->setObjectName("LabNumber_3");
+
+        gridLayout_ajouterL->addWidget(LabNumber_3, 1, 3, 1, 1);
+
+        label_19 = new QLabel(ajouterL);
+        label_19->setObjectName("label_19");
+
+        gridLayout_ajouterL->addWidget(label_19, 4, 2, 1, 1);
+
+        LabSpec_4 = new QComboBox(ajouterL);
         LabSpec_4->addItem(QString());
         LabSpec_4->addItem(QString());
         LabSpec_4->addItem(QString());
         LabSpec_4->addItem(QString());
         LabSpec_4->setObjectName("LabSpec_4");
-        LabSpec_4->setGeometry(QRect(140, 270, 300, 40));
-        label_19 = new QLabel(PopupLabsForm_3);
-        label_19->setObjectName("label_19");
-        label_19->setGeometry(QRect(520, 350, 130, 40));
-        label_20 = new QLabel(PopupLabsForm_3);
-        label_20->setObjectName("label_20");
-        label_20->setGeometry(QRect(0, 350, 130, 40));
-        label_21 = new QLabel(PopupLabsForm_3);
-        label_21->setObjectName("label_21");
-        label_21->setGeometry(QRect(0, 1000, 130, 40));
-        LabMontant_3 = new QDoubleSpinBox(PopupLabsForm_3);
-        LabMontant_3->setObjectName("LabMontant_3");
-        LabMontant_3->setGeometry(QRect(140, 350, 300, 40));
-        LabReste_3 = new QLineEdit(PopupLabsForm_3);
-        LabReste_3->setObjectName("LabReste_3");
-        LabReste_3->setGeometry(QRect(140, 1000, 300, 40));
-        LabMontantPaye_3 = new QDoubleSpinBox(PopupLabsForm_3);
-        LabMontantPaye_3->setObjectName("LabMontantPaye_3");
-        LabMontantPaye_3->setGeometry(QRect(680, 350, 300, 40));
-        BtnPopupSaveLabs_3 = new QPushButton(PopupLabsCard_3);
-        BtnPopupSaveLabs_3->setObjectName("BtnPopupSaveLabs_3");
-        BtnPopupSaveLabs_3->setGeometry(QRect(130, 550, 200, 50));
-        BtnPopupResetLabs_3 = new QPushButton(PopupLabsCard_3);
-        BtnPopupResetLabs_3->setObjectName("BtnPopupResetLabs_3");
-        BtnPopupResetLabs_3->setGeometry(QRect(690, 550, 200, 50));
-        btnAjouterPub_5 = new QPushButton(PopupLabsCard_3);
-        btnAjouterPub_5->setObjectName("btnAjouterPub_5");
-        btnAjouterPub_5->setGeometry(QRect(420, 550, 190, 50));
-        retour_stat_8 = new QPushButton(PopupLabsCard_3);
-        retour_stat_8->setObjectName("retour_stat_8");
-        retour_stat_8->setGeometry(QRect(960, 550, 190, 50));
-        lblPageTitle_3 = new QLabel(PopupLabsCard_3);
-        lblPageTitle_3->setObjectName("lblPageTitle_3");
-        lblPageTitle_3->setGeometry(QRect(460, 10, 251, 51));
-        lblPageTitle_3->setFont(font);
-        lblPageTitle_3->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
+
+        gridLayout_ajouterL->addWidget(LabSpec_4, 3, 1, 1, 1);
+
         stacked_L->addWidget(ajouterL);
         statL = new QWidget();
         statL->setObjectName("statL");
@@ -3594,8 +3680,8 @@ public:
         TableLabReserveProducts->setObjectName("TableLabReserveProducts");
         TableLabReserveProducts->setGeometry(QRect(20, 95, 1150, 380));
         TableLabReserveProducts->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
-        TableLabReserveProducts->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
         TableLabReserveProducts->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+        TableLabReserveProducts->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
         TableLabReserveProducts->setSortingEnabled(false);
         lblLabReserveQty = new QLabel(labReserveProduct);
         lblLabReserveQty->setObjectName("lblLabReserveQty");
@@ -3676,22 +3762,22 @@ public:
         tableProjets = new QTableWidget(page_proj_list);
         if (tableProjets->columnCount() < 8)
             tableProjets->setColumnCount(8);
-        QTableWidgetItem *__qtablewidgetitem121 = new QTableWidgetItem();
-        tableProjets->setHorizontalHeaderItem(0, __qtablewidgetitem121);
-        QTableWidgetItem *__qtablewidgetitem122 = new QTableWidgetItem();
-        tableProjets->setHorizontalHeaderItem(1, __qtablewidgetitem122);
-        QTableWidgetItem *__qtablewidgetitem123 = new QTableWidgetItem();
-        tableProjets->setHorizontalHeaderItem(2, __qtablewidgetitem123);
-        QTableWidgetItem *__qtablewidgetitem124 = new QTableWidgetItem();
-        tableProjets->setHorizontalHeaderItem(3, __qtablewidgetitem124);
-        QTableWidgetItem *__qtablewidgetitem125 = new QTableWidgetItem();
-        tableProjets->setHorizontalHeaderItem(4, __qtablewidgetitem125);
-        QTableWidgetItem *__qtablewidgetitem126 = new QTableWidgetItem();
-        tableProjets->setHorizontalHeaderItem(5, __qtablewidgetitem126);
-        QTableWidgetItem *__qtablewidgetitem127 = new QTableWidgetItem();
-        tableProjets->setHorizontalHeaderItem(6, __qtablewidgetitem127);
-        QTableWidgetItem *__qtablewidgetitem128 = new QTableWidgetItem();
-        tableProjets->setHorizontalHeaderItem(7, __qtablewidgetitem128);
+        QTableWidgetItem *__qtablewidgetitem100 = new QTableWidgetItem();
+        tableProjets->setHorizontalHeaderItem(0, __qtablewidgetitem100);
+        QTableWidgetItem *__qtablewidgetitem101 = new QTableWidgetItem();
+        tableProjets->setHorizontalHeaderItem(1, __qtablewidgetitem101);
+        QTableWidgetItem *__qtablewidgetitem102 = new QTableWidgetItem();
+        tableProjets->setHorizontalHeaderItem(2, __qtablewidgetitem102);
+        QTableWidgetItem *__qtablewidgetitem103 = new QTableWidgetItem();
+        tableProjets->setHorizontalHeaderItem(3, __qtablewidgetitem103);
+        QTableWidgetItem *__qtablewidgetitem104 = new QTableWidgetItem();
+        tableProjets->setHorizontalHeaderItem(4, __qtablewidgetitem104);
+        QTableWidgetItem *__qtablewidgetitem105 = new QTableWidgetItem();
+        tableProjets->setHorizontalHeaderItem(5, __qtablewidgetitem105);
+        QTableWidgetItem *__qtablewidgetitem106 = new QTableWidgetItem();
+        tableProjets->setHorizontalHeaderItem(6, __qtablewidgetitem106);
+        QTableWidgetItem *__qtablewidgetitem107 = new QTableWidgetItem();
+        tableProjets->setHorizontalHeaderItem(7, __qtablewidgetitem107);
         if (tableProjets->rowCount() < 9)
             tableProjets->setRowCount(9);
         tableProjets->setObjectName("tableProjets");
@@ -4010,12 +4096,12 @@ public:
 
         retranslateUi(MainWindow);
 
-        stackedWidget->setCurrentIndex(0);
+        stackedWidget->setCurrentIndex(4);
         stack_emp->setCurrentIndex(1);
         stacked_I->setCurrentIndex(1);
         stack_pub->setCurrentIndex(0);
         stacked_F->setCurrentIndex(2);
-        stacked_L->setCurrentIndex(0);
+        stacked_L->setCurrentIndex(2);
         stack_proj->setCurrentIndex(0);
 
 
@@ -4554,7 +4640,6 @@ public:
         BtnDelete->setText(QCoreApplication::translate("MainWindow", "Supprimer", nullptr));
         BtnAdd_4->setText(QCoreApplication::translate("MainWindow", "Statistique", nullptr));
         BtnExport->setText(QCoreApplication::translate("MainWindow", "Exporter", nullptr));
-        PopupTitleFinance->setText(QCoreApplication::translate("MainWindow", "Ajouter une transaction", nullptr));
         LblAmount->setText(QCoreApplication::translate("MainWindow", "Montant", nullptr));
         FormPayMode->setItemText(0, QCoreApplication::translate("MainWindow", "Especes", nullptr));
         FormPayMode->setItemText(1, QCoreApplication::translate("MainWindow", "Cheque", nullptr));
@@ -4590,7 +4675,6 @@ public:
 #endif // QT_CONFIG(tooltip)
         BtnOcrReceipt->setText(QCoreApplication::translate("MainWindow", "\360\237\223\267   Scanner un re\303\247u ou une facture   \342\200\224   remplissage automatique du formulaire", nullptr));
         LblOcrHint->setText(QCoreApplication::translate("MainWindow", "\360\237\222\241  Conseil : utilisez une photo nette, bien \303\251clair\303\251e pour une meilleure pr\303\251cision de reconnaissance.", nullptr));
-        PopupTitleFinance_2->setText(QCoreApplication::translate("MainWindow", "Modifier une transaction", nullptr));
         FormPayMode_2->setItemText(0, QCoreApplication::translate("MainWindow", "Especes", nullptr));
         FormPayMode_2->setItemText(1, QCoreApplication::translate("MainWindow", "Cheque", nullptr));
         FormPayMode_2->setItemText(2, QCoreApplication::translate("MainWindow", "Virement", nullptr));
@@ -4600,7 +4684,7 @@ public:
 
         FormCategory_2->setPlaceholderText(QString());
         LblCode_2->setText(QCoreApplication::translate("MainWindow", "Code transaction", nullptr));
-        FormType_2->setItemText(0, QCoreApplication::translate("MainWindow", "Depense", nullptr));
+        FormType_2->setItemText(0, QCoreApplication::translate("MainWindow", "D\303\251pense", nullptr));
         FormType_2->setItemText(1, QCoreApplication::translate("MainWindow", "Revenu", nullptr));
 
         LblCreated_2->setText(QCoreApplication::translate("MainWindow", "Date cr\303\251ation", nullptr));
@@ -4615,12 +4699,17 @@ public:
         FormDesc_2->setPlaceholderText(QCoreApplication::translate("MainWindow", "D\303\251tails\342\200\246", nullptr));
         LblFType_2->setText(QCoreApplication::translate("MainWindow", "Type", nullptr));
         BtnAmountDecr_2->setText(QCoreApplication::translate("MainWindow", "\342\210\222", nullptr));
-        FormAmount_2->setPlaceholderText(QString());
+        FormAmount_2->setPlaceholderText(QCoreApplication::translate("MainWindow", "ex: 2500", nullptr));
         BtnAmountIncr_2->setText(QCoreApplication::translate("MainWindow", "+", nullptr));
 #if QT_CONFIG(tooltip)
         BtnConvertCurrency_2->setToolTip(QCoreApplication::translate("MainWindow", "Convertir EUR / USD / GBP \342\206\222 DT en temps r\303\251el", nullptr));
 #endif // QT_CONFIG(tooltip)
-        BtnConvertCurrency_2->setText(QCoreApplication::translate("MainWindow", "\360\237\222\261 Convertir", nullptr));
+        BtnConvertCurrency_2->setText(QCoreApplication::translate("MainWindow", " Convertir \360\237\222\261", nullptr));
+#if QT_CONFIG(tooltip)
+        BtnOcrReceipt_2->setToolTip(QCoreApplication::translate("MainWindow", "Importez une image de re\303\247u : montant, date et cat\303\251gorie extraits automatiquement", nullptr));
+#endif // QT_CONFIG(tooltip)
+        BtnOcrReceipt_2->setText(QCoreApplication::translate("MainWindow", "\360\237\223\267   Scanner un re\303\247u ou une facture   \342\200\224   remplissage automatique du formulaire", nullptr));
+        LblOcrHint_2->setText(QCoreApplication::translate("MainWindow", "\360\237\222\241  Conseil : utilisez une photo nette, bien \303\251clair\303\251e pour une meilleure pr\303\251cision de reconnaissance.", nullptr));
         comboBox_3->setItemText(0, QCoreApplication::translate("MainWindow", "D\303\251penses vs Revenus", nullptr));
         comboBox_3->setItemText(1, QCoreApplication::translate("MainWindow", "Statistiques de Revenus", nullptr));
         comboBox_3->setItemText(2, QCoreApplication::translate("MainWindow", "Statistiques de D\303\251penses", nullptr));
@@ -4629,62 +4718,6 @@ public:
         retour_stat_4->setText(QCoreApplication::translate("MainWindow", "Retour", nullptr));
         retour_stat_5->setText(QCoreApplication::translate("MainWindow", "Retour", nullptr));
         stat_pub_4->setText(QString());
-        QTableWidgetItem *___qtablewidgetitem75 = TableLabs_2->horizontalHeaderItem(0);
-        ___qtablewidgetitem75->setText(QCoreApplication::translate("MainWindow", "Nom Labo", nullptr));
-        QTableWidgetItem *___qtablewidgetitem76 = TableLabs_2->horizontalHeaderItem(1);
-        ___qtablewidgetitem76->setText(QCoreApplication::translate("MainWindow", "Responsable", nullptr));
-        QTableWidgetItem *___qtablewidgetitem77 = TableLabs_2->horizontalHeaderItem(2);
-        ___qtablewidgetitem77->setText(QCoreApplication::translate("MainWindow", "Num\303\251ro", nullptr));
-        QTableWidgetItem *___qtablewidgetitem78 = TableLabs_2->horizontalHeaderItem(3);
-        ___qtablewidgetitem78->setText(QCoreApplication::translate("MainWindow", "Localisation", nullptr));
-        QTableWidgetItem *___qtablewidgetitem79 = TableLabs_2->horizontalHeaderItem(4);
-        ___qtablewidgetitem79->setText(QCoreApplication::translate("MainWindow", "disponibilite", nullptr));
-        QTableWidgetItem *___qtablewidgetitem80 = TableLabs_2->horizontalHeaderItem(5);
-        ___qtablewidgetitem80->setText(QCoreApplication::translate("MainWindow", "Sp\303\251cialit\303\251", nullptr));
-        QTableWidgetItem *___qtablewidgetitem81 = TableLabs_2->horizontalHeaderItem(6);
-        ___qtablewidgetitem81->setText(QCoreApplication::translate("MainWindow", "Paiement", nullptr));
-        QTableWidgetItem *___qtablewidgetitem82 = TableLabs_2->horizontalHeaderItem(7);
-        ___qtablewidgetitem82->setText(QCoreApplication::translate("MainWindow", "Montant", nullptr));
-        QTableWidgetItem *___qtablewidgetitem83 = TableLabs_2->horizontalHeaderItem(8);
-        ___qtablewidgetitem83->setText(QCoreApplication::translate("MainWindow", "Montant_paye", nullptr));
-        QTableWidgetItem *___qtablewidgetitem84 = TableLabs_2->horizontalHeaderItem(9);
-        ___qtablewidgetitem84->setText(QCoreApplication::translate("MainWindow", "Reste", nullptr));
-        QTableWidgetItem *___qtablewidgetitem85 = TableLabs_2->horizontalHeaderItem(10);
-        ___qtablewidgetitem85->setText(QCoreApplication::translate("MainWindow", "Resultat", nullptr));
-
-        const bool __sortingEnabled1 = TableLabs_2->isSortingEnabled();
-        TableLabs_2->setSortingEnabled(false);
-        QTableWidgetItem *___qtablewidgetitem86 = TableLabs_2->item(0, 0);
-        ___qtablewidgetitem86->setText(QCoreApplication::translate("MainWindow", "aya ", nullptr));
-        QTableWidgetItem *___qtablewidgetitem87 = TableLabs_2->item(0, 1);
-        ___qtablewidgetitem87->setText(QCoreApplication::translate("MainWindow", "aza", nullptr));
-        QTableWidgetItem *___qtablewidgetitem88 = TableLabs_2->item(0, 2);
-        ___qtablewidgetitem88->setText(QCoreApplication::translate("MainWindow", "24851", nullptr));
-        QTableWidgetItem *___qtablewidgetitem89 = TableLabs_2->item(0, 3);
-        ___qtablewidgetitem89->setText(QCoreApplication::translate("MainWindow", "mrj", nullptr));
-        QTableWidgetItem *___qtablewidgetitem90 = TableLabs_2->item(0, 4);
-        ___qtablewidgetitem90->setText(QCoreApplication::translate("MainWindow", "dispo", nullptr));
-        QTableWidgetItem *___qtablewidgetitem91 = TableLabs_2->item(0, 5);
-        ___qtablewidgetitem91->setText(QCoreApplication::translate("MainWindow", "interieur", nullptr));
-        QTableWidgetItem *___qtablewidgetitem92 = TableLabs_2->item(0, 6);
-        ___qtablewidgetitem92->setText(QCoreApplication::translate("MainWindow", "payer", nullptr));
-        QTableWidgetItem *___qtablewidgetitem93 = TableLabs_2->item(0, 10);
-        ___qtablewidgetitem93->setText(QCoreApplication::translate("MainWindow", "pret", nullptr));
-        QTableWidgetItem *___qtablewidgetitem94 = TableLabs_2->item(1, 0);
-        ___qtablewidgetitem94->setText(QCoreApplication::translate("MainWindow", "chh", nullptr));
-        QTableWidgetItem *___qtablewidgetitem95 = TableLabs_2->item(2, 0);
-        ___qtablewidgetitem95->setText(QCoreApplication::translate("MainWindow", "ahmmed", nullptr));
-        TableLabs_2->setSortingEnabled(__sortingEnabled1);
-
-        btnVoirStatistiquesPub_2->setText(QCoreApplication::translate("MainWindow", "voir statistiques", nullptr));
-        btnAjouterPub_3->setText(QCoreApplication::translate("MainWindow", "Afficher", nullptr));
-        btnAjouterPub_2->setText(QCoreApplication::translate("MainWindow", "Ajouter", nullptr));
-        btnModifierPub_2->setText(QCoreApplication::translate("MainWindow", "Modifier", nullptr));
-        btnSupprimerPub_2->setText(QCoreApplication::translate("MainWindow", "Supprimer", nullptr));
-        btnLabReserveProduct->setText(QCoreApplication::translate("MainWindow", "R\303\251server un produit (inventaire)", nullptr));
-#if QT_CONFIG(tooltip)
-        btnLabReserveProduct->setToolTip(QCoreApplication::translate("MainWindow", "S\303\251lectionner un produit du stock et une quantit\303\251 r\303\251serv\303\251e pour les laboratoires (refl\303\251t\303\251 dans les statistiques inventaire)", nullptr));
-#endif // QT_CONFIG(tooltip)
         LabsSearch_2->setPlaceholderText(QCoreApplication::translate("MainWindow", "nom, responsable, localisation, num\303\251ro\342\200\246", nullptr));
         LabsSpec_2->setItemText(0, QCoreApplication::translate("MainWindow", "choisir un specialite", nullptr));
         LabsSpec_2->setItemText(1, QCoreApplication::translate("MainWindow", "interieur", nullptr));
@@ -4695,84 +4728,91 @@ public:
         LabsCap_2->setItemText(2, QCoreApplication::translate("MainWindow", "Occupe", nullptr));
 
         btnReinitialiserPub_3->setText(QCoreApplication::translate("MainWindow", "R\303\251initialiser", nullptr));
-        LabLocation_5->setPlaceholderText(QCoreApplication::translate("MainWindow", "Bloc B, Salle 204", nullptr));
+        btnAjouterPub_3->setText(QCoreApplication::translate("MainWindow", "Afficher", nullptr));
+        btnAjouterPub_2->setText(QCoreApplication::translate("MainWindow", "Ajouter", nullptr));
+        btnModifierPub_2->setText(QCoreApplication::translate("MainWindow", "Modifier", nullptr));
+        btnSupprimerPub_2->setText(QCoreApplication::translate("MainWindow", "Supprimer", nullptr));
+#if QT_CONFIG(tooltip)
+        btnLabReserveProduct->setToolTip(QCoreApplication::translate("MainWindow", "S\303\251lectionner un produit du stock et une quantit\303\251 r\303\251serv\303\251e pour les laboratoires (refl\303\251t\303\251 dans les statistiques inventaire)", nullptr));
+#endif // QT_CONFIG(tooltip)
+        btnLabReserveProduct->setText(QCoreApplication::translate("MainWindow", "R\303\251server un produit (inventaire)", nullptr));
+        btnVoirStatistiquesPub_2->setText(QCoreApplication::translate("MainWindow", "voir statistiques", nullptr));
+        lblPageTitle_4->setText(QCoreApplication::translate("MainWindow", "Modifier un laboratoire", nullptr));
+        LblLabName_5->setText(QCoreApplication::translate("MainWindow", "Nom labo", nullptr));
+        LabName_5->setPlaceholderText(QCoreApplication::translate("MainWindow", "Laboratoire IA", nullptr));
+        LblLabResp_5->setText(QCoreApplication::translate("MainWindow", "Responsable", nullptr));
         LabResponsible_5->setPlaceholderText(QCoreApplication::translate("MainWindow", "Nom responsable", nullptr));
+        LblLabLoc_5->setText(QCoreApplication::translate("MainWindow", "Localisation", nullptr));
+        LabLocation_5->setPlaceholderText(QCoreApplication::translate("MainWindow", "Bloc B, Salle 204", nullptr));
+        LblLabNum_5->setText(QCoreApplication::translate("MainWindow", "Num\303\251ro", nullptr));
+        LabNumber_5->setPlaceholderText(QCoreApplication::translate("MainWindow", "204", nullptr));
+        LblLabSpec_5->setText(QCoreApplication::translate("MainWindow", "Sp\303\251cialit\303\251", nullptr));
         LabSpec_5->setItemText(0, QCoreApplication::translate("MainWindow", "modifier votre specialite", nullptr));
         LabSpec_5->setItemText(1, QCoreApplication::translate("MainWindow", "interieur", nullptr));
         LabSpec_5->setItemText(2, QCoreApplication::translate("MainWindow", "exterieur", nullptr));
 
         LblLabCap_5->setText(QCoreApplication::translate("MainWindow", "Disponabilite", nullptr));
-        LblLabLoc_5->setText(QCoreApplication::translate("MainWindow", "Localisation", nullptr));
-        LblLabName_5->setText(QCoreApplication::translate("MainWindow", "Nom labo", nullptr));
-        LblLabNum_5->setText(QCoreApplication::translate("MainWindow", "Num\303\251ro", nullptr));
-        LabName_5->setPlaceholderText(QCoreApplication::translate("MainWindow", "Laboratoire IA", nullptr));
-        LabNumber_5->setPlaceholderText(QCoreApplication::translate("MainWindow", "204", nullptr));
-        LblLabResp_5->setText(QCoreApplication::translate("MainWindow", "Responsable", nullptr));
-        LblLabSpec_5->setText(QCoreApplication::translate("MainWindow", "Sp\303\251cialit\303\251", nullptr));
         LabCap_5->setItemText(0, QCoreApplication::translate("MainWindow", "choisir votre Disponabilite", nullptr));
         LabCap_5->setItemText(1, QCoreApplication::translate("MainWindow", "Disponible", nullptr));
         LabCap_5->setItemText(2, QCoreApplication::translate("MainWindow", "Occupe", nullptr));
 
         LblLabSpec_14->setText(QCoreApplication::translate("MainWindow", "Resultat", nullptr));
-        LblLabSpec_15->setText(QCoreApplication::translate("MainWindow", "Paiement", nullptr));
-        LabCap_6->setItemText(0, QCoreApplication::translate("MainWindow", "choisir votre paiement", nullptr));
-        LabCap_6->setItemText(1, QCoreApplication::translate("MainWindow", "payer", nullptr));
-        LabCap_6->setItemText(2, QCoreApplication::translate("MainWindow", "non payer", nullptr));
-
         LabSpec_6->setItemText(0, QCoreApplication::translate("MainWindow", "modifier votre resultat", nullptr));
         LabSpec_6->setItemText(1, QCoreApplication::translate("MainWindow", "pr\303\251t", nullptr));
         LabSpec_6->setItemText(2, QCoreApplication::translate("MainWindow", "En attente", nullptr));
         LabSpec_6->setItemText(3, QCoreApplication::translate("MainWindow", "En ex\303\251cution", nullptr));
 
-        BtnPopupResetLabs_5->setText(QCoreApplication::translate("MainWindow", "Retour", nullptr));
-        BtnPopupResetLabs_5->setProperty("property", QVariant(QCoreApplication::translate("MainWindow", "ghost", nullptr)));
+        LblLabSpec_15->setText(QCoreApplication::translate("MainWindow", "Paiement", nullptr));
+        LabCap_6->setItemText(0, QCoreApplication::translate("MainWindow", "choisir votre paiement", nullptr));
+        LabCap_6->setItemText(1, QCoreApplication::translate("MainWindow", "payer", nullptr));
+        LabCap_6->setItemText(2, QCoreApplication::translate("MainWindow", "non payer", nullptr));
+
         label_22->setText(QCoreApplication::translate("MainWindow", "Montant", nullptr));
-        label_23->setText(QCoreApplication::translate("MainWindow", "Reste", nullptr));
         label_24->setText(QCoreApplication::translate("MainWindow", "Montant_paye", nullptr));
+        label_23->setText(QCoreApplication::translate("MainWindow", "Reste", nullptr));
         BtnPopupSaveLabs_5->setText(QCoreApplication::translate("MainWindow", "Modifier", nullptr));
         BtnPopupSaveLabs_5->setProperty("property", QVariant(QCoreApplication::translate("MainWindow", "primary", nullptr)));
         btnAjouterPub_4->setText(QCoreApplication::translate("MainWindow", "Maps", nullptr));
+        BtnPopupResetLabs_5->setText(QCoreApplication::translate("MainWindow", "R\303\251initialiser", nullptr));
         retour_stat_9->setText(QCoreApplication::translate("MainWindow", "retour", nullptr));
-        lblPageTitle_4->setText(QCoreApplication::translate("MainWindow", "Modifier un laboratoire", nullptr));
-        LabLocation_3->setPlaceholderText(QCoreApplication::translate("MainWindow", "Bloc B, Salle 204", nullptr));
-        LabResponsible_3->setPlaceholderText(QCoreApplication::translate("MainWindow", "Nom responsable", nullptr));
-        LabSpec_3->setItemText(0, QCoreApplication::translate("MainWindow", "choisir un  specialite", nullptr));
-        LabSpec_3->setItemText(1, QCoreApplication::translate("MainWindow", "interieur", nullptr));
-        LabSpec_3->setItemText(2, QCoreApplication::translate("MainWindow", "exterieur", nullptr));
-
-        LblLabCap_3->setText(QCoreApplication::translate("MainWindow", "Disponabilite", nullptr));
-        LblLabLoc_3->setText(QCoreApplication::translate("MainWindow", "Localisation", nullptr));
-        LblLabName_3->setText(QCoreApplication::translate("MainWindow", "Nom labo", nullptr));
-        LblLabNum_3->setText(QCoreApplication::translate("MainWindow", "Num\303\251ro", nullptr));
-        LabName_3->setPlaceholderText(QCoreApplication::translate("MainWindow", "Laboratoire IA", nullptr));
-        LabNumber_3->setPlaceholderText(QCoreApplication::translate("MainWindow", "204", nullptr));
-        LblLabResp_3->setText(QCoreApplication::translate("MainWindow", "Responsable", nullptr));
-        LblLabSpec_3->setText(QCoreApplication::translate("MainWindow", "Sp\303\251cialit\303\251", nullptr));
         LabCap_3->setItemText(0, QCoreApplication::translate("MainWindow", "choisir le Disponabilite", nullptr));
         LabCap_3->setItemText(1, QCoreApplication::translate("MainWindow", "Disponible", nullptr));
         LabCap_3->setItemText(2, QCoreApplication::translate("MainWindow", "Occupe", nullptr));
 
-        LblLabSpec_12->setText(QCoreApplication::translate("MainWindow", "Resultat", nullptr));
-        LblLabSpec_13->setText(QCoreApplication::translate("MainWindow", "Paiement", nullptr));
+        LblLabCap_3->setText(QCoreApplication::translate("MainWindow", "Disponabilite", nullptr));
+        BtnPopupSaveLabs_3->setText(QCoreApplication::translate("MainWindow", "Enregistrer", nullptr));
+        BtnPopupSaveLabs_3->setProperty("property", QVariant(QCoreApplication::translate("MainWindow", "primary", nullptr)));
+        btnAjouterPub_5->setText(QCoreApplication::translate("MainWindow", "Maps", nullptr));
+        BtnPopupResetLabs_3->setText(QCoreApplication::translate("MainWindow", "Vider", nullptr));
+        BtnPopupResetLabs_3->setProperty("property", QVariant(QCoreApplication::translate("MainWindow", "ghost", nullptr)));
+        retour_stat_8->setText(QCoreApplication::translate("MainWindow", "retour", nullptr));
+        label_21->setText(QCoreApplication::translate("MainWindow", "Reste", nullptr));
+        LabName_3->setPlaceholderText(QCoreApplication::translate("MainWindow", "Laboratoire IA", nullptr));
+        LblLabName_3->setText(QCoreApplication::translate("MainWindow", "Nom labo", nullptr));
+        LabLocation_3->setPlaceholderText(QCoreApplication::translate("MainWindow", "Bloc B, Salle 204", nullptr));
+        LabResponsible_3->setPlaceholderText(QCoreApplication::translate("MainWindow", "Nom responsable", nullptr));
         LabCap_4->setItemText(0, QCoreApplication::translate("MainWindow", "choisir le Paiement", nullptr));
         LabCap_4->setItemText(1, QCoreApplication::translate("MainWindow", "payer", nullptr));
         LabCap_4->setItemText(2, QCoreApplication::translate("MainWindow", "non payer", nullptr));
 
+        LblLabSpec_13->setText(QCoreApplication::translate("MainWindow", "Paiement", nullptr));
+        LblLabSpec_3->setText(QCoreApplication::translate("MainWindow", "Sp\303\251cialit\303\251", nullptr));
+        LblLabNum_3->setText(QCoreApplication::translate("MainWindow", "Num\303\251ro", nullptr));
+        LblLabResp_3->setText(QCoreApplication::translate("MainWindow", "Responsable", nullptr));
+        LblLabLoc_3->setText(QCoreApplication::translate("MainWindow", "Localisation", nullptr));
+        label_20->setText(QCoreApplication::translate("MainWindow", "Montant", nullptr));
+        LblLabSpec_12->setText(QCoreApplication::translate("MainWindow", "Resultat", nullptr));
+        LabSpec_3->setItemText(0, QCoreApplication::translate("MainWindow", "choisir un  specialite", nullptr));
+        LabSpec_3->setItemText(1, QCoreApplication::translate("MainWindow", "interieur", nullptr));
+        LabSpec_3->setItemText(2, QCoreApplication::translate("MainWindow", "exterieur", nullptr));
+
+        LabNumber_3->setPlaceholderText(QCoreApplication::translate("MainWindow", "204", nullptr));
+        label_19->setText(QCoreApplication::translate("MainWindow", "Montant_paye", nullptr));
         LabSpec_4->setItemText(0, QCoreApplication::translate("MainWindow", "choisir un  resultat", nullptr));
         LabSpec_4->setItemText(1, QCoreApplication::translate("MainWindow", "En ex\303\251cution", nullptr));
         LabSpec_4->setItemText(2, QCoreApplication::translate("MainWindow", "En attente", nullptr));
         LabSpec_4->setItemText(3, QCoreApplication::translate("MainWindow", "Pr\303\252t", nullptr));
 
-        label_19->setText(QCoreApplication::translate("MainWindow", "Montant_paye", nullptr));
-        label_20->setText(QCoreApplication::translate("MainWindow", "Montant", nullptr));
-        label_21->setText(QCoreApplication::translate("MainWindow", "Reste", nullptr));
-        BtnPopupSaveLabs_3->setText(QCoreApplication::translate("MainWindow", "Enregistrer", nullptr));
-        BtnPopupSaveLabs_3->setProperty("property", QVariant(QCoreApplication::translate("MainWindow", "primary", nullptr)));
-        BtnPopupResetLabs_3->setText(QCoreApplication::translate("MainWindow", "Vider", nullptr));
-        BtnPopupResetLabs_3->setProperty("property", QVariant(QCoreApplication::translate("MainWindow", "ghost", nullptr)));
-        btnAjouterPub_5->setText(QCoreApplication::translate("MainWindow", "Maps", nullptr));
-        retour_stat_8->setText(QCoreApplication::translate("MainWindow", "retour", nullptr));
-        lblPageTitle_3->setText(QCoreApplication::translate("MainWindow", "Ajouter un laboratoire", nullptr));
         retour_stat_2->setText(QCoreApplication::translate("MainWindow", "retour", nullptr));
         comboBox_2->setItemText(0, QCoreApplication::translate("MainWindow", "Choisir votre domaine", nullptr));
         comboBox_2->setItemText(1, QCoreApplication::translate("MainWindow", "statistiques par Specialite", nullptr));
@@ -4829,22 +4869,22 @@ public:
         btnFiltrerDateProj->setText(QCoreApplication::translate("MainWindow", "Chercher par date", nullptr));
         lblCategorieProj->setText(QCoreApplication::translate("MainWindow", "TRIER PAR :", nullptr));
         lblPeriodeDuProj->setText(QCoreApplication::translate("MainWindow", "DATE", nullptr));
-        QTableWidgetItem *___qtablewidgetitem96 = tableProjets->horizontalHeaderItem(0);
-        ___qtablewidgetitem96->setText(QCoreApplication::translate("MainWindow", "nom_Projet ", nullptr));
-        QTableWidgetItem *___qtablewidgetitem97 = tableProjets->horizontalHeaderItem(1);
-        ___qtablewidgetitem97->setText(QCoreApplication::translate("MainWindow", "description", nullptr));
-        QTableWidgetItem *___qtablewidgetitem98 = tableProjets->horizontalHeaderItem(2);
-        ___qtablewidgetitem98->setText(QCoreApplication::translate("MainWindow", "objectifs  ", nullptr));
-        QTableWidgetItem *___qtablewidgetitem99 = tableProjets->horizontalHeaderItem(3);
-        ___qtablewidgetitem99->setText(QCoreApplication::translate("MainWindow", "date_D\303\251but    ", nullptr));
-        QTableWidgetItem *___qtablewidgetitem100 = tableProjets->horizontalHeaderItem(4);
-        ___qtablewidgetitem100->setText(QCoreApplication::translate("MainWindow", "date_Fin_Prevue  ", nullptr));
-        QTableWidgetItem *___qtablewidgetitem101 = tableProjets->horizontalHeaderItem(5);
-        ___qtablewidgetitem101->setText(QCoreApplication::translate("MainWindow", "date_Fin_Reelle  ", nullptr));
-        QTableWidgetItem *___qtablewidgetitem102 = tableProjets->horizontalHeaderItem(6);
-        ___qtablewidgetitem102->setText(QCoreApplication::translate("MainWindow", "statut  ", nullptr));
-        QTableWidgetItem *___qtablewidgetitem103 = tableProjets->horizontalHeaderItem(7);
-        ___qtablewidgetitem103->setText(QCoreApplication::translate("MainWindow", "priorite ", nullptr));
+        QTableWidgetItem *___qtablewidgetitem75 = tableProjets->horizontalHeaderItem(0);
+        ___qtablewidgetitem75->setText(QCoreApplication::translate("MainWindow", "nom_Projet ", nullptr));
+        QTableWidgetItem *___qtablewidgetitem76 = tableProjets->horizontalHeaderItem(1);
+        ___qtablewidgetitem76->setText(QCoreApplication::translate("MainWindow", "description", nullptr));
+        QTableWidgetItem *___qtablewidgetitem77 = tableProjets->horizontalHeaderItem(2);
+        ___qtablewidgetitem77->setText(QCoreApplication::translate("MainWindow", "objectifs  ", nullptr));
+        QTableWidgetItem *___qtablewidgetitem78 = tableProjets->horizontalHeaderItem(3);
+        ___qtablewidgetitem78->setText(QCoreApplication::translate("MainWindow", "date_D\303\251but    ", nullptr));
+        QTableWidgetItem *___qtablewidgetitem79 = tableProjets->horizontalHeaderItem(4);
+        ___qtablewidgetitem79->setText(QCoreApplication::translate("MainWindow", "date_Fin_Prevue  ", nullptr));
+        QTableWidgetItem *___qtablewidgetitem80 = tableProjets->horizontalHeaderItem(5);
+        ___qtablewidgetitem80->setText(QCoreApplication::translate("MainWindow", "date_Fin_Reelle  ", nullptr));
+        QTableWidgetItem *___qtablewidgetitem81 = tableProjets->horizontalHeaderItem(6);
+        ___qtablewidgetitem81->setText(QCoreApplication::translate("MainWindow", "statut  ", nullptr));
+        QTableWidgetItem *___qtablewidgetitem82 = tableProjets->horizontalHeaderItem(7);
+        ___qtablewidgetitem82->setText(QCoreApplication::translate("MainWindow", "priorite ", nullptr));
         btnAjouterProj->setText(QCoreApplication::translate("MainWindow", "Ajouter", nullptr));
         btnModifierProj->setText(QCoreApplication::translate("MainWindow", "Modifier", nullptr));
         btnSupprimerProj->setText(QCoreApplication::translate("MainWindow", "Supprimer", nullptr));

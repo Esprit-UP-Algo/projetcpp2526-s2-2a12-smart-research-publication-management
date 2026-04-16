@@ -2,5 +2,7 @@
 #include "EWIEGA46WW/moc_currencyconverter.cpp"
 #include "EWIEGA46WW/moc_logindialog.cpp"
 #include "EWIEGA46WW/moc_mainwindow.cpp"
+#include "EWIEGA46WW/moc_mapdialog.cpp"
 #include "EWIEGA46WW/moc_ocrscanner.cpp"
 #include "EWIEGA46WW/moc_rfidhandler.cpp"
+#include "EWIEGA46WW/moc_tilemapwidget.cpp"

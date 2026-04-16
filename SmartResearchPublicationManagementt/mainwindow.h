@@ -321,6 +321,7 @@ protected:
     void on_BtnReset_clicked();
     void on_BtnExport_clicked();
     void on_BtnOcrReceipt_clicked();
+    void on_BtnOcrReceipt_2_clicked();
 
     // Projects slots
     void on_btnRetourEditProj_clicked();
