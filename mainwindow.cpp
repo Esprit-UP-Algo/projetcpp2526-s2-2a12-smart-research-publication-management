@@ -6482,11 +6482,6 @@ void MainWindow::on_btnSaveEmployee_clicked()
 
     // --- 2. CONTRÔLES DE SÉCURITÉ & SAISIE ---
 
-    // A. Vérification des champs vides obligatoires
-    if (cin.isEmpty() || username.isEmpty() || password.isEmpty() || nom.isEmpty() || prenom.isEmpty() || email.isEmpty()) {
-        QMessageBox::warning(this, "Champs manquants", "Tous les champs obligatoires doivent être remplis.");
-        return;
-    }
 
     // B. Contrôle CIN (8 chiffres exactement)
     QRegularExpression rxCin("^[0-9]{8}$");
@@ -6500,6 +6495,32 @@ void MainWindow::on_btnSaveEmployee_clicked()
         ui->lineCINAdd->setFocus();
         return;
     }
+    if (Employe::usernameExiste(username)) {
+        QMessageBox::critical(this, "Erreur Doublon", "Ce username est déjà enregistré dans le système.");
+        ui->lineUsernameAdd->setFocus();
+        return;
+    }
+    // B. CONTRÔLE STRICT DU MOT DE PASSE (Vortex-Shield)
+        int scorePassword = Employe::motDePasseForcePourcent(password);
+        QRegularExpression rxLower("[a-z]");
+        QRegularExpression rxUpper("[A-Z]");
+        QRegularExpression rxDigit("[0-9]");
+        QRegularExpression rxSpec("[^a-zA-Z0-9]");
+
+        QStringList erreursMdp;
+        if (password.length() < 10)      erreursMdp << "- Au moins 10 caractères";
+        if (!password.contains(rxLower)) erreursMdp << "- Au moins une minuscule";
+        if (!password.contains(rxUpper)) erreursMdp << "- Au moins une majuscule";
+        if (!password.contains(rxDigit)) erreursMdp << "- Au moins un chiffre";
+        if (!password.contains(rxSpec))  erreursMdp << "- Au moins un caractère spécial";
+        if (scorePassword < 50)          erreursMdp << "- Score de force global insuffisant (min 50%)";
+
+        if (!erreursMdp.isEmpty()) {
+            QMessageBox::warning(this, "Sécurité Insuffisante",
+                "Le mot de passe ne respecte pas les critères requis :\n\n" + erreursMdp.join("\n"));
+            ui->linePasswordAdd->setFocus();
+            return;
+        }
 
     // C. Contrôle Nom et Prénom (Lettres uniquement)
     QRegularExpression rxAlpha("^[A-Za-zÀ-ÿ\\s-]+$");
@@ -6554,7 +6575,11 @@ void MainWindow::on_btnSaveEmployee_clicked()
         QMessageBox::warning(this, "Biométrie manquante", "Veuillez scanner le visage de l'employé avant l'enregistrement.");
         return;
     }
-
+    // A. Vérification des champs vides obligatoires
+    if (cin.isEmpty() || username.isEmpty() || password.isEmpty() || nom.isEmpty() || prenom.isEmpty() || email.isEmpty()) {
+        QMessageBox::warning(this, "Champs manquants", "Tous les champs obligatoires doivent être remplis.");
+        return;
+    }
     // --- 3. SYSTÈME DE VÉRIFICATION PAR MAIL (OTP) ---
 
     int codeGenere = QRandomGenerator::global()->bounded(100000, 999999);
@@ -6582,6 +6607,8 @@ void MainWindow::on_btnSaveEmployee_clicked()
         QMessageBox::warning(this, "Vérification échouée", "Code incorrect ou opération annulée.");
         return;
     }
+
+
 
     // --- 4. TRAITEMENT ET ENREGISTREMENT FINAL ---
 
