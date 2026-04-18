@@ -56,6 +56,13 @@ set(PROJECT_SOURCES
     arduino.cpp
     rfidhandler.h
     rfidhandler.cpp
+<<<<<<< HEAD:SPM/CMakeLists.txt
+=======
+    mapdialog.h
+    mapdialog.cpp
+    tilemapwidget.h
+    tilemapwidget.cpp
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/CMakeLists.txt
 )
 
 # --- 4. CRÉATION DE L'EXÉCUTABLE ---

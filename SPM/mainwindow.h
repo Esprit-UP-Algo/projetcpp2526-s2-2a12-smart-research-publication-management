@@ -20,8 +20,11 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QProcess>
+<<<<<<< HEAD:SPM/mainwindow.h
 #include <QTimer>
 #include <QStringList>
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.h
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -168,6 +171,7 @@ private:
     void toggleSidebar();
     void animateActiveIndicator(QPushButton *btn);
     void animateButtonClick(QPushButton *btn);
+<<<<<<< HEAD:SPM/mainwindow.h
     void resetInactivityTimer();
     void handleSessionTimeout();
     void showProfilePermissions();
@@ -175,6 +179,8 @@ private:
     QStringList activeTemporaryModulesForUser(const QString &idEmploye) const;
     QStringList activeTemporaryAccessDescriptionsForUser(const QString &idEmploye) const;
     void showRhTempAccessDialog();
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.h
 
     bool m_isDarkTheme = false;
     bool m_isAutoLogoutInProgress = false;
@@ -182,6 +188,16 @@ private:
     QTimer *m_tempAccessRefreshTimer = nullptr;
     QPushButton *m_btnProfile = nullptr;
     QPushButton *m_btnTempAccess = nullptr;
+
+    // Animation members
+    QGraphicsDropShadowEffect *m_logoGlowEffect    = nullptr;
+    QPropertyAnimation        *m_logoGlowAnim      = nullptr;
+    bool                       m_sidebarExpanded   = true;
+    QFrame                    *m_activeIndicator   = nullptr;
+    QPushButton               *m_btnToggleSidebar  = nullptr;
+    QGraphicsOpacityEffect    *m_titleFadeEffect   = nullptr;
+    QWidget                   *m_vignetteOverlay   = nullptr;
+    QTimer                    *m_fontScaleTimer    = nullptr;
 
     // Animation members
     QGraphicsDropShadowEffect *m_logoGlowEffect    = nullptr;
@@ -335,6 +351,7 @@ protected:
     void on_BtnReset_clicked();
     void on_BtnExport_clicked();
     void on_BtnOcrReceipt_clicked();
+    void on_BtnOcrReceipt_2_clicked();
 
     // Projects slots
     void on_btnRetourEditProj_clicked();
