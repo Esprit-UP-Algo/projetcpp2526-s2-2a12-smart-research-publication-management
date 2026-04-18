@@ -11,6 +11,7 @@
 #include "finance.h"
 #include "ocrscanner.h"
 #include "publication.h"
+#include "arduino.h"
 #include "labs.h"
 #include "employe.h"
 #include "inventory.h"
@@ -19,6 +20,8 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QProcess>
+#include <QTimer>
+#include <QStringList>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,9 +32,12 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(Arduino *arduino, QWidget *parent = nullptr);
     ~MainWindow();
     void notifierConnexion(); // Pour signaler l'entrée de l'utilisateur
+
+public slots:
+    void onPointageRfid(const QString &prenom, const QString &heure); // rafraîchit le tableau employés après pointage RFID
 
 private:
     Ui::MainWindow *ui;
@@ -40,6 +46,10 @@ private:
     QNetworkAccessManager *networkManager; // Pour envoyer les requêtes    QString m_tempFaceEncoding; // Pour stocker la signature
     void lancerServeurIA(); // La fonction qui crée et lance Python
     QString m_tempFaceEncoding;
+
+    // ===== ARDUINO RFID =====
+    Arduino   *A = nullptr;    // pointeur vers l'Arduino (initialisé dans main.cpp avant login)
+    QByteArray rfidBuffer;     // Tampon pour accumuler les octets série
 
     // ===== FINANCE =====
     Finance::Row selectedFinanceRowFromTable(bool *ok=nullptr) const;
@@ -90,7 +100,7 @@ private:
     void filterEmployees(const QString &searchText);
     void sortByEmbaucheDate();
     bool embaucheAscending = true;
-    void configurerPermissions();
+    void configurerPermissions(bool preserveCurrentPage = false);
     void on_btn_reset_clicked();
     void genererScriptPython();
 
@@ -158,8 +168,20 @@ private:
     void toggleSidebar();
     void animateActiveIndicator(QPushButton *btn);
     void animateButtonClick(QPushButton *btn);
+    void resetInactivityTimer();
+    void handleSessionTimeout();
+    void showProfilePermissions();
+    void refreshTemporaryAccessRealtime();
+    QStringList activeTemporaryModulesForUser(const QString &idEmploye) const;
+    QStringList activeTemporaryAccessDescriptionsForUser(const QString &idEmploye) const;
+    void showRhTempAccessDialog();
 
     bool m_isDarkTheme = false;
+    bool m_isAutoLogoutInProgress = false;
+    QTimer *m_inactivityTimer = nullptr;
+    QTimer *m_tempAccessRefreshTimer = nullptr;
+    QPushButton *m_btnProfile = nullptr;
+    QPushButton *m_btnTempAccess = nullptr;
 
     // Animation members
     QGraphicsDropShadowEffect *m_logoGlowEffect    = nullptr;
@@ -198,6 +220,7 @@ private slots:
     void on_btnCancelEditEmp_clicked();
     void on_btn_exportt_clicked();      // Le slot pour ton bouton Export Excel
     void simulerPointage();
+    void traiter_rfid();       // conservé pour compatibilité (logique déplacée dans RfidHandler)
     void on_btnStat_emp_clicked();
     void on_btn_ret_clicked();
 

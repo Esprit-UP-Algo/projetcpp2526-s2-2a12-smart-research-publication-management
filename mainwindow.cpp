@@ -76,6 +76,12 @@
 #include <QSettings>
 #include <QFile>
 #include <QRandomGenerator>
+#include <QDialog>
+#include <QListWidget>
+#include <QDialogButtonBox>
+#include <QFormLayout>
+#include <QDateTimeEdit>
+#include <QHash>
 
 
 
@@ -89,6 +95,10 @@
 #include <QHttpMultiPart>
 #include <QHttpPart>
 #include <QNetworkRequest>
+#include <QTcpSocket>
+#include <QThread>
+#include <QProcessEnvironment>
+#include <QStandardPaths>
 
 
 #include <QCamera>
@@ -125,6 +135,75 @@ static void setupTable(QTableWidget* t)
     t->setEditTriggers(QAbstractItemView::NoEditTriggers);
     t->setWordWrap(false);
     t->setSortingEnabled(true);
+}
+
+static QStringList permissionsForRole(const QString &role)
+{
+    if (role == "Admin") {
+        return {"Employés", "Inventaire", "Publications", "Finance", "Laboratoires", "Projets"};
+    }
+    if (role == "RH") {
+        return {"Employés"};
+    }
+    if (role == "Responsable_financier") {
+        return {"Finance"};
+    }
+    if (role == "Responsable_de_stock") {
+        return {"Inventaire"};
+    }
+    if (role == "Responsable_Labos") {
+        return {"Laboratoires"};
+    }
+    if (role == "Chercheur") {
+        return {"Publications"};
+    }
+    if (role == "Directeur_de_projet") {
+        return {"Projets", "Publications"};
+    }
+    return {};
+}
+
+static QList<QString> allModuleCodes()
+{
+    return {"Employés", "Inventaire", "Publications", "Finance", "Laboratoires", "Projets"};
+}
+
+static QJsonArray loadTempAccessEntries()
+{
+    QSettings s("SmartResearchLab", "TempAccess");
+    const QString raw = s.value("entries_json").toString();
+    if (raw.trimmed().isEmpty()) return QJsonArray();
+
+    QJsonParseError err{};
+    const QJsonDocument doc = QJsonDocument::fromJson(raw.toUtf8(), &err);
+    if (err.error != QJsonParseError::NoError || !doc.isArray()) {
+        return QJsonArray();
+    }
+    return doc.array();
+}
+
+static void saveTempAccessEntries(const QJsonArray &entries)
+{
+    QSettings s("SmartResearchLab", "TempAccess");
+    s.setValue("entries_json", QString::fromUtf8(QJsonDocument(entries).toJson(QJsonDocument::Compact)));
+}
+
+static QString formatRemainingDuration(qint64 totalSeconds)
+{
+    if (totalSeconds <= 0) return "expire";
+    const qint64 days = totalSeconds / 86400;
+    totalSeconds %= 86400;
+    const qint64 hours = totalSeconds / 3600;
+    totalSeconds %= 3600;
+    const qint64 minutes = totalSeconds / 60;
+
+    if (days > 0) {
+        return QString("%1 j %2 h").arg(days).arg(hours);
+    }
+    if (hours > 0) {
+        return QString("%1 h %2 min").arg(hours).arg(minutes);
+    }
+    return QString("%1 min").arg(qMax<qint64>(1, minutes));
 }
 
 static double parseAmount(const QString& raw, bool *okOut=nullptr)
@@ -301,8 +380,10 @@ static void makePageResponsive(QWidget *page)
 // (makeQrLabs supprimé : la colonne QRLABS n'existe pas dans la table)
 
 
-MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
+MainWindow::MainWindow(Arduino *arduino, QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
+    // ─── Récupérer le pointeur Arduino connecté depuis main.cpp ──────────────
+    A = arduino;
 
     // On installe le filtre sur le champ de localisation
     ui->setupUi(this);
@@ -379,6 +460,36 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     // ── Système de notifications ──────────────────────────────────────────
     setupNotifButton();
+    m_btnProfile = new QPushButton(ui->topBar);
+    m_btnProfile->setObjectName("btnProfile");
+    m_btnProfile->setText("Profil");
+    m_btnProfile->setFixedSize(86, 36);
+    m_btnProfile->setCursor(Qt::PointingHandCursor);
+    m_btnProfile->setToolTip("Mon profil et mes permissions");
+    m_btnProfile->setFocusPolicy(Qt::NoFocus);
+    connect(m_btnProfile, &QPushButton::clicked, this, &MainWindow::showProfilePermissions);
+
+    m_btnTempAccess = new QPushButton(ui->topBar);
+    m_btnTempAccess->setObjectName("btnTempAccess");
+    m_btnTempAccess->setText("Acces RH");
+    m_btnTempAccess->setFixedSize(94, 36);
+    m_btnTempAccess->setCursor(Qt::PointingHandCursor);
+    m_btnTempAccess->setToolTip("Acces temporaire pour un employe");
+    m_btnTempAccess->setFocusPolicy(Qt::NoFocus);
+    connect(m_btnTempAccess, &QPushButton::clicked, this, &MainWindow::showRhTempAccessDialog);
+
+    // Timeout session inactivité (12 minutes) + re-auth via retour login.
+    m_inactivityTimer = new QTimer(this);
+    m_inactivityTimer->setSingleShot(true);
+    m_inactivityTimer->setInterval(12 * 60 * 1000);
+    connect(m_inactivityTimer, &QTimer::timeout, this, &MainWindow::handleSessionTimeout);
+    resetInactivityTimer();
+
+    // Rafraîchissement temps réel des accès temporaires (toutes les 30 sec).
+    m_tempAccessRefreshTimer = new QTimer(this);
+    m_tempAccessRefreshTimer->setInterval(30 * 1000);
+    connect(m_tempAccessRefreshTimer, &QTimer::timeout, this, &MainWindow::refreshTemporaryAccessRealtime);
+    m_tempAccessRefreshTimer->start();
 
 
 
@@ -516,7 +627,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     // ==========================================
     //    GESTION DES RÔLES (Session)
     // ==========================================
-    configurerPermissions();
+    configurerPermissions(false);
 
     // Finance : connexions explicites (slots déclarés en protected:, pas private slots:)
     connect(ui->BtnAdd,                  &QPushButton::clicked, this, &MainWindow::on_BtnAdd_clicked);
@@ -606,6 +717,11 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     // ─── Animations ───────────────────────────────────────────────────────────
     QTimer::singleShot(50, this, [this]() { initAnimations(); });
+
+    // ─── Arduino RFID ─────────────────────────────────────────────────────────
+    // La logique RFID est gérée par RfidHandler (actif avant le login).
+    // MainWindow reçoit juste le signal pointageEffectue via onPointageRfid()
+    // pour rafraîchir le tableau employés. Connexion faite dans main.cpp.
 }
 
 
@@ -776,7 +892,132 @@ void MainWindow::simulerPointage() {
     model->setQuery("SELECT CIN, NOM, PRENOM, USERNAME, DATE_POINTAGE, HEURE_ARRIVEE, HEURE_DEPART, STATUT_JOURNALIER FROM EMPLOYES");
 }
 
+// ─── Slot Arduino RFID : traiter les données reçues sur le port série ─────────
+// Protocole Arduino → Qt  :  "UID:<hex_uid>:<id_labo>\n"
+// Protocole Qt → Arduino  :  "1:<prenom>:<HH:MM>\n"   (accès OK)
+//                             "0\n"                    (accès refusé)
+void MainWindow::traiter_rfid()
+{
+    // Accumuler les octets reçus dans le tampon
+    if (!A) return;
+    rfidBuffer += A->read_from_arduino();
+
+    // Traiter toutes les lignes complètes (terminées par \n)
+    while (rfidBuffer.contains('\n')) {
+        int idx = rfidBuffer.indexOf('\n');
+        QByteArray ligne = rfidBuffer.left(idx).trimmed();
+        rfidBuffer = rfidBuffer.mid(idx + 1);
+
+        if (ligne.isEmpty()) continue;
+
+        QString message = QString::fromUtf8(ligne);
+        qDebug() << "[RFID] Reçu :" << message;
+
+        // ── Vérifier que le message commence par "UID:" ─────────────────────
+        if (!message.startsWith("UID:")) continue;
+
+        // ── Parser  "UID:<hex_uid>:<id_labo>" ───────────────────────────────
+        QStringList parts = message.split(':');
+        // parts[0]="UID"  parts[1]=hex_uid  parts[2]=id_labo
+        if (parts.size() < 3) {
+            qDebug() << "[RFID] Format invalide :" << message;
+            A->write_to_arduino("0\n");
+            continue;
+        }
+
+        QString uidCarte = parts[1].trimmed().toUpper();
+        QString idLabo   = parts[2].trimmed();
+
+        // ── Requête : l'employé porteur de cette carte a-t-il accès à ce labo ?
+        QSqlQuery q;
+        // Utilise les tables existantes : EMPLOYES + LABS (via IDEMP)
+        // L'employé doit avoir la carte ET être responsable de ce labo
+        q.prepare(
+            "SELECT e.ID_EMPLOYE, e.PRENOM "
+            "FROM HICHEM.EMPLOYES e "
+            "JOIN HICHEM.LABS l ON l.IDEMP = e.ID_EMPLOYE "
+            "WHERE e.UID_CARTE = :uid AND l.IDLABO = :labo"
+        );
+        q.bindValue(":uid",  uidCarte);
+        q.bindValue(":labo", idLabo);
+
+        if (!q.exec()) {
+            qDebug() << "[RFID] Erreur SQL :" << q.lastError().text();
+            A->write_to_arduino("0\n");
+            continue;
+        }
+
+        if (q.next()) {
+            // ── Accès autorisé ───────────────────────────────────────────────
+            QString idEmploye = q.value("ID_EMPLOYE").toString();
+            QString prenom    = q.value("PRENOM").toString();
+            QString heure     = QTime::currentTime().toString("HH:mm");
+            QString date      = QDate::currentDate().toString("yyyy-MM-dd");
+
+            // Enregistrer le pointage dans la base
+            QSqlQuery upd;
+            upd.prepare(
+                "UPDATE HICHEM.EMPLOYES "
+                "SET DATE_POINTAGE    = TO_DATE(:d, 'YYYY-MM-DD'), "
+                "    HEURE_ARRIVEE    = :h, "
+                "    STATUT_JOURNALIER = 'Présent' "
+                "WHERE ID_EMPLOYE = :id"
+            );
+            upd.bindValue(":d",  date);
+            upd.bindValue(":h",  heure);
+            upd.bindValue(":id", idEmploye);
+
+            if (upd.exec()) {
+                qDebug() << "[RFID] Pointage enregistré pour" << prenom << "à" << heure;
+            } else {
+                qDebug() << "[RFID] Erreur UPDATE pointage :" << upd.lastError().text();
+            }
+
+            // Envoyer la confirmation à l'Arduino : "1:Prenom:HH:MM\n"
+            // L'Arduino affichera sur LCD :
+            //   Ligne 1 : "Bienvenue Prenom"
+            //   Ligne 2 : "Pointe a HH:MM"
+            QString reponse = QString("1:%1:%2\n").arg(prenom, heure);
+            A->write_to_arduino(reponse.toUtf8());
+
+            // Rafraîchir le tableau employés dans l'UI
+            model->setQuery(
+                "SELECT CIN, NOM, PRENOM, USERNAME, DATE_POINTAGE, "
+                "HEURE_ARRIVEE, HEURE_DEPART, STATUT_JOURNALIER FROM EMPLOYES"
+            );
+
+        } else {
+            // ── Accès refusé ─────────────────────────────────────────────────
+            qDebug() << "[RFID] Accès refusé pour UID" << uidCarte << "labo" << idLabo;
+            A->write_to_arduino("0\n");
+        }
+    }
+}
+
+// ─── Slot appelé par RfidHandler quand un pointage RFID réussit ──────────────
+// Rafraîchit le tableau employés dans l'interface
+void MainWindow::onPointageRfid(const QString &prenom, const QString &heure)
+{
+    qDebug() << "[MainWindow] Pointage RFID reçu :" << prenom << "à" << heure;
+    model->setQuery(
+        "SELECT CIN, NOM, PRENOM, USERNAME, DATE_POINTAGE, "
+        "HEURE_ARRIVEE, HEURE_DEPART, STATUT_JOURNALIER FROM EMPLOYES"
+    );
+}
+
 bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
+    if (event) {
+        const QEvent::Type t = event->type();
+        if (t == QEvent::MouseButtonPress
+            || t == QEvent::MouseButtonRelease
+            || t == QEvent::MouseMove
+            || t == QEvent::KeyPress
+            || t == QEvent::Wheel
+            || t == QEvent::TouchBegin) {
+            resetInactivityTimer();
+        }
+    }
+
     // ── Fermer le panneau de notifications si clic en dehors ─────────────
     if (m_notifPanel && m_notifPanel->isVisible()
         && event->type() == QEvent::MouseButtonPress) {
@@ -801,6 +1042,32 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
         return true;
     }
     return QMainWindow::eventFilter(obj, event);
+}
+
+void MainWindow::resetInactivityTimer()
+{
+    if (!m_inactivityTimer || m_isAutoLogoutInProgress) {
+        return;
+    }
+    m_inactivityTimer->start();
+}
+
+void MainWindow::handleSessionTimeout()
+{
+    if (m_isAutoLogoutInProgress) {
+        return;
+    }
+    m_isAutoLogoutInProgress = true;
+
+    QMessageBox::information(
+        this,
+        "Session verrouillée",
+        "Session expirée après inactivité.\n"
+        "Veuillez vous reconnecter pour continuer."
+    );
+
+    emit logoutRequested();
+    this->close();
 }
 
 void MainWindow::on_btn_exportt_clicked() {
@@ -890,7 +1157,7 @@ void MainWindow::on_pointage_clicked()
 
 
 
-void MainWindow::configurerPermissions() {
+void MainWindow::configurerPermissions(bool preserveCurrentPage) {
     Session& session = Session::instance();
     QString role = session.getRole();
 
@@ -945,6 +1212,19 @@ void MainWindow::configurerPermissions() {
         defaultPage = 5;
     }
 
+    const QStringList tempModules = activeTemporaryModulesForUser(session.getId());
+    auto authorizeModule = [&](const QString &module) {
+        if (module == "Employés") authorized << ui->btnEmployee;
+        else if (module == "Inventaire") authorized << ui->btnInventaire;
+        else if (module == "Publications") authorized << ui->btnPublication;
+        else if (module == "Finance") authorized << ui->btnFinance;
+        else if (module == "Laboratoires") authorized << ui->btnLaboratoires;
+        else if (module == "Projets") authorized << ui->btnProjets;
+    };
+    for (const QString &m : tempModules) {
+        authorizeModule(m);
+    }
+
     // Afficher TOUS les boutons — activer les autorisés, verrouiller les autres
     for (const auto &b : allBtns) {
         bool auth = authorized.contains(b.btn);
@@ -961,9 +1241,40 @@ void MainWindow::configurerPermissions() {
         b.btn->style()->polish(b.btn);
     }
 
-    ui->stackedWidget->setCurrentIndex(defaultPage);
-    setActiveButton(defaultBtn);
-    updateTopTitle(ui->stackedWidget->currentIndex());
+    if (!preserveCurrentPage) {
+        ui->stackedWidget->setCurrentIndex(defaultPage);
+        setActiveButton(defaultBtn);
+        updateTopTitle(ui->stackedWidget->currentIndex());
+    } else {
+        const int currentPage = ui->stackedWidget->currentIndex();
+        QPushButton *currentBtn = nullptr;
+        switch (currentPage) {
+        case 0: currentBtn = ui->btnEmployee; break;
+        case 1: currentBtn = ui->btnInventaire; break;
+        case 2: currentBtn = ui->btnPublication; break;
+        case 3: currentBtn = ui->btnFinance; break;
+        case 4: currentBtn = ui->btnLaboratoires; break;
+        case 5: currentBtn = ui->btnProjets; break;
+        default: break;
+        }
+
+        if (!currentBtn || !currentBtn->isEnabled()) {
+            ui->stackedWidget->setCurrentIndex(defaultPage);
+            setActiveButton(defaultBtn);
+        } else {
+            setActiveButton(currentBtn);
+        }
+        updateTopTitle(ui->stackedWidget->currentIndex());
+    }
+    if (m_btnProfile) {
+        m_btnProfile->setEnabled(true);
+        m_btnProfile->setToolTip(QString("Profil connecté : %1").arg(role));
+    }
+    if (m_btnTempAccess) {
+        const bool canManageTempAccess = (role == "RH" || role == "Admin");
+        m_btnTempAccess->setVisible(canManageTempAccess);
+        m_btnTempAccess->setEnabled(canManageTempAccess);
+    }
 }
 
 
@@ -1035,10 +1346,22 @@ void MainWindow::resizeEvent(QResizeEvent *event)
         (w - ui->lblPageTitle->width()) / 2,
         (h - ui->lblPageTitle->height()) / 2);
 
-    // btnNotif : aligné à droite avec marge de 10px
-    const int btnNx = w - ui->btnNotif->width() - 10;
+    // btnNotif + btnProfile : alignés à droite
     const int btnNy = (h - ui->btnNotif->height()) / 2;
+    const int btnNx = w - ui->btnNotif->width() - 10;
     ui->btnNotif->move(btnNx, btnNy);
+    if (m_btnProfile) {
+        const int profileY = (h - m_btnProfile->height()) / 2;
+        const int profileX = btnNx - m_btnProfile->width() - 10;
+        m_btnProfile->move(profileX, profileY);
+        m_btnProfile->raise();
+        if (m_btnTempAccess) {
+            const int accessY = (h - m_btnTempAccess->height()) / 2;
+            const int accessX = profileX - m_btnTempAccess->width() - 10;
+            m_btnTempAccess->move(accessX, accessY);
+            m_btnTempAccess->raise();
+        }
+    }
 
     // Badge : coin supérieur-droit du bouton
     if (m_notifBadge) {
@@ -2296,9 +2619,274 @@ void MainWindow::onDeconnecter()
         );
 
     if (reply == QMessageBox::Yes) {
+        m_isAutoLogoutInProgress = true;
         emit logoutRequested();
         this->close();
     }
+}
+
+void MainWindow::showProfilePermissions()
+{
+    const Session &session = Session::instance();
+    const QString role = session.getRole();
+    const QStringList rolePermissions = permissionsForRole(role);
+    const QStringList tempPermissions = activeTemporaryAccessDescriptionsForUser(session.getId());
+
+    QDialog dlg(this);
+    dlg.setWindowTitle("Mon profil - Permissions");
+    dlg.setMinimumWidth(460);
+
+    auto *layout = new QVBoxLayout(&dlg);
+    auto *title = new QLabel(QString("<b>%1</b>").arg(session.getNom()), &dlg);
+    auto *roleLbl = new QLabel(QString("Role courant : <b>%1</b>").arg(role), &dlg);
+    auto *hint = new QLabel("Permissions activees pour cette session :", &dlg);
+    auto *list = new QListWidget(&dlg);
+
+    for (const QString &p : rolePermissions) {
+        list->addItem("Acces module : " + p);
+    }
+    for (const QString &p : tempPermissions) {
+        list->addItem("Acces temporaire actif : " + p);
+    }
+    if (rolePermissions.isEmpty() && tempPermissions.isEmpty()) {
+        list->addItem("Aucune permission applicative assignee.");
+    }
+
+    auto *security = new QLabel(
+        QString("Securite session : deconnexion auto apres %1 minutes d'inactivite.")
+            .arg(m_inactivityTimer ? m_inactivityTimer->interval() / 60000 : 0),
+        &dlg
+    );
+
+    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok, &dlg);
+    connect(buttons, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+
+    layout->addWidget(title);
+    layout->addWidget(roleLbl);
+    layout->addSpacing(8);
+    layout->addWidget(hint);
+    layout->addWidget(list);
+    layout->addWidget(security);
+    layout->addWidget(buttons);
+    dlg.exec();
+}
+
+QStringList MainWindow::activeTemporaryModulesForUser(const QString &idEmploye) const
+{
+    QStringList modules;
+    if (idEmploye.trimmed().isEmpty()) return modules;
+
+    const QDateTime now = QDateTime::currentDateTime();
+    const QJsonArray entries = loadTempAccessEntries();
+    for (const QJsonValue &v : entries) {
+        if (!v.isObject()) continue;
+        const QJsonObject o = v.toObject();
+        if (o.value("employee_id").toString().trimmed() != idEmploye.trimmed()) continue;
+
+        const QDateTime startAt = QDateTime::fromString(o.value("start_at").toString(), Qt::ISODate);
+        const QDateTime endAt = QDateTime::fromString(o.value("end_at").toString(), Qt::ISODate);
+        if (!startAt.isValid() || !endAt.isValid()) continue;
+        if (now < startAt || now > endAt) continue;
+
+        const QString module = o.value("module_code").toString().trimmed();
+        if (!module.isEmpty() && !modules.contains(module)) {
+            modules << module;
+        }
+    }
+    return modules;
+}
+
+QStringList MainWindow::activeTemporaryAccessDescriptionsForUser(const QString &idEmploye) const
+{
+    QStringList details;
+    if (idEmploye.trimmed().isEmpty()) return details;
+
+    const QDateTime now = QDateTime::currentDateTime();
+    const QJsonArray entries = loadTempAccessEntries();
+    QHash<QString, QDateTime> maxEndByModule;
+
+    for (const QJsonValue &v : entries) {
+        if (!v.isObject()) continue;
+        const QJsonObject o = v.toObject();
+        if (o.value("employee_id").toString().trimmed() != idEmploye.trimmed()) continue;
+
+        const QDateTime startAt = QDateTime::fromString(o.value("start_at").toString(), Qt::ISODate);
+        const QDateTime endAt = QDateTime::fromString(o.value("end_at").toString(), Qt::ISODate);
+        if (!startAt.isValid() || !endAt.isValid()) continue;
+        if (now < startAt || now > endAt) continue;
+
+        const QString module = o.value("module_code").toString().trimmed();
+        if (module.isEmpty()) continue;
+
+        if (!maxEndByModule.contains(module) || maxEndByModule.value(module) < endAt) {
+            maxEndByModule.insert(module, endAt);
+        }
+    }
+
+    const QStringList modules = maxEndByModule.keys();
+    for (const QString &module : modules) {
+        const qint64 remainingSeconds = now.secsTo(maxEndByModule.value(module));
+        details << QString("%1 (temps restant: %2)").arg(module, formatRemainingDuration(remainingSeconds));
+    }
+
+    details.sort();
+    return details;
+}
+
+void MainWindow::showRhTempAccessDialog()
+{
+    const QString role = Session::instance().getRole();
+    if (role != "RH" && role != "Admin") {
+        QMessageBox::warning(this, "Acces refuse",
+                             "Seuls RH/Admin peuvent gerer les acces temporaires.");
+        return;
+    }
+    bool okMode = false;
+    const QString mode = QInputDialog::getItem(
+        this,
+        "Acces RH",
+        "Operation :",
+        {"Attribuer permissions", "Retirer permissions"},
+        0,
+        false,
+        &okMode
+    );
+    if (!okMode || mode.isEmpty()) return;
+
+    const bool isRevokeMode = (mode == "Retirer permissions");
+
+    QDialog dlg(this);
+    dlg.setWindowTitle(isRevokeMode ? "Retirer des permissions temporaires"
+                                    : "Attribuer un acces temporaire");
+    dlg.setMinimumWidth(520);
+    auto *mainLayout = new QVBoxLayout(&dlg);
+    auto *form = new QFormLayout();
+
+    auto *cbEmployee = new QComboBox(&dlg);
+    QSqlQuery empQuery;
+    empQuery.prepare(
+        "SELECT ID_EMPLOYE, USERNAME, NOM, PRENOM, ROLE "
+        "FROM EMPLOYES "
+        "WHERE UPPER(ROLE) <> 'ADMIN' "
+        "ORDER BY USERNAME"
+    );
+    if (!empQuery.exec()) {
+        QMessageBox::critical(this, "Erreur SQL", empQuery.lastError().text());
+        return;
+    }
+    while (empQuery.next()) {
+        const QString id = empQuery.value(0).toString();
+        const QString username = empQuery.value(1).toString();
+        const QString nom = empQuery.value(2).toString();
+        const QString prenom = empQuery.value(3).toString();
+        const QString empRole = empQuery.value(4).toString();
+        cbEmployee->addItem(QString("%1 (%2 %3) - %4").arg(username, nom, prenom, empRole), id);
+    }
+    if (cbEmployee->count() == 0) {
+        QMessageBox::warning(this, "Aucun employe", "Aucun employe eligible.");
+        return;
+    }
+
+    auto *listModules = new QListWidget(&dlg);
+    listModules->setSelectionMode(QAbstractItemView::MultiSelection);
+    for (const QString &module : allModuleCodes()) {
+        listModules->addItem(module);
+    }
+
+    form->addRow("Employe cible :", cbEmployee);
+    QDateTimeEdit *startEdit = nullptr;
+    QDateTimeEdit *endEdit = nullptr;
+    if (!isRevokeMode) {
+        startEdit = new QDateTimeEdit(QDateTime::currentDateTime(), &dlg);
+        endEdit = new QDateTimeEdit(QDateTime::currentDateTime().addDays(1), &dlg);
+        startEdit->setCalendarPopup(true);
+        endEdit->setCalendarPopup(true);
+        startEdit->setDisplayFormat("yyyy-MM-dd HH:mm");
+        endEdit->setDisplayFormat("yyyy-MM-dd HH:mm");
+        form->addRow("Debut :", startEdit);
+        form->addRow("Fin :", endEdit);
+    }
+    form->addRow("Modules autorises :", listModules);
+    mainLayout->addLayout(form);
+
+    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
+    connect(buttons, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+    mainLayout->addWidget(buttons);
+
+    if (dlg.exec() != QDialog::Accepted) return;
+
+    QStringList modules;
+    for (QListWidgetItem *item : listModules->selectedItems()) {
+        modules << item->text();
+    }
+    if (modules.isEmpty()) {
+        QMessageBox::warning(this, "Aucun module", "Selectionnez au moins un module.");
+        return;
+    }
+
+    const QString idEmp = cbEmployee->currentData().toString();
+
+    if (!isRevokeMode) {
+        if (endEdit->dateTime() <= startEdit->dateTime()) {
+            QMessageBox::warning(this, "Periode invalide",
+                                 "La date de fin doit etre posterieure a la date de debut.");
+            return;
+        }
+
+        QJsonArray entries = loadTempAccessEntries();
+        for (const QString &module : modules) {
+            QJsonObject o;
+            o.insert("employee_id", idEmp);
+            o.insert("module_code", module);
+            o.insert("start_at", startEdit->dateTime().toString(Qt::ISODate));
+            o.insert("end_at", endEdit->dateTime().toString(Qt::ISODate));
+            o.insert("granted_by", Session::instance().getId());
+            o.insert("created_at", QDateTime::currentDateTime().toString(Qt::ISODate));
+            entries.append(o);
+        }
+        saveTempAccessEntries(entries);
+
+        QMessageBox::information(this, "Succes",
+                                 "Acces temporaire enregistre. Il sera actif uniquement sur la periode definie.");
+    } else {
+        const QJsonArray entries = loadTempAccessEntries();
+        QJsonArray kept;
+        int removedCount = 0;
+
+        for (const QJsonValue &v : entries) {
+            if (!v.isObject()) {
+                kept.append(v);
+                continue;
+            }
+            const QJsonObject o = v.toObject();
+            const QString emp = o.value("employee_id").toString().trimmed();
+            const QString module = o.value("module_code").toString().trimmed();
+            const bool target = (emp == idEmp && modules.contains(module));
+
+            if (target) {
+                ++removedCount;
+            } else {
+                kept.append(o);
+            }
+        }
+
+        saveTempAccessEntries(kept);
+        QMessageBox::information(
+            this,
+            "Permissions retirees",
+            removedCount > 0
+                ? QString("Suppression effectuee (%1 autorisation(s) retiree(s)).").arg(removedCount)
+                : QString("Aucune autorisation correspondante a retirer.")
+        );
+    }
+
+    configurerPermissions(true);
+}
+
+void MainWindow::refreshTemporaryAccessRealtime()
+{
+    configurerPermissions(true);
 }
 
 void MainWindow::updateTopTitle(int index)
@@ -5558,20 +6146,20 @@ void MainWindow::on_btnMailingPub_clicked()
 }
 // ==================== EMPLOYEE CRUD ====================
 void MainWindow::lancerServeurIA() {
-    // 1. Définition du chemin (Portabilité respectée)
     QString scriptPath = QCoreApplication::applicationDirPath() + "/face_id_vortex.py";
     QFile file(scriptPath);
 
-    // 2. Écriture du script avec TRUNCATE (pour forcer la mise à jour)
-    if (file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&file);
         out << "from flask import Flask, request, jsonify\n"
             << "import cv2\n"
             << "import numpy as np\n"
             << "import os\n\n"
             << "app = Flask(__name__)\n"
-            // Utilisation de la détection de visage OpenCV standard
             << "face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')\n\n"
+            << "@app.route('/health', methods=['GET'])\n"
+            << "def health():\n"
+            << "    return jsonify({'ok': True})\n\n"
 
             << "@app.route('/enroll', methods=['POST'])\n"
             << "def enroll():\n"
@@ -5606,33 +6194,105 @@ void MainWindow::lancerServeurIA() {
             << "if __name__ == '__main__':\n"
             << "    app.run(host='127.0.0.1', port=5000)\n";
         file.close();
+    } else {
+        qWarning() << "Impossible d'écrire face_id_vortex.py dans" << scriptPath;
+        return;
     }
 
-    // 3. Gestion du processus QProcess
     if (!processIA) {
         processIA = new QProcess(this);
+        processIA->setProcessChannelMode(QProcess::MergedChannels);
+        connect(processIA, &QProcess::readyReadStandardOutput, this, [this]() {
+            const QByteArray logs = processIA->readAllStandardOutput();
+            if (!logs.trimmed().isEmpty()) {
+                qDebug().noquote() << "[FaceID IA]" << QString::fromUtf8(logs).trimmed();
+            }
+        });
     }
 
-    // Si le processus tourne déjà, on ne fait rien
-    if (processIA->state() == QProcess::NotRunning) {
+    if (processIA->state() != QProcess::NotRunning) {
+        return; // Déjà lancé, on évite un doublon
+    }
 
-        // Capture des erreurs Python pour le débuggage dans Qt Creator
-        connect(processIA, &QProcess::readyReadStandardError, [this]() {
-            qDebug() << "PYTHON ERROR LOG:" << processIA->readAllStandardError();
-        });
+    // Environnement Python "nettoyé" pour éviter l'erreur:
+    // "Fatal Python error: Failed to import encodings module".
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.remove("PYTHONHOME");
+    env.remove("PYTHONPATH");
+    env.insert("PYTHONUTF8", "1");
+    processIA->setProcessEnvironment(env);
 
-        connect(processIA, &QProcess::readyReadStandardOutput, [this]() {
-            qDebug() << "PYTHON OUTPUT:" << processIA->readAllStandardOutput();
-        });
+    const QString pythonExe = QStandardPaths::findExecutable("python");
+    const QString pyLauncherExe = QStandardPaths::findExecutable("py");
 
-        // Lancement (vérifie que 'python' est dans ton PATH Windows)
-        processIA->start("python", QStringList() << scriptPath);
+    QString selectedExe;
+    QStringList selectedArgs;
+    if (!pythonExe.isEmpty()) {
+        selectedExe = pythonExe;
+        selectedArgs = QStringList() << scriptPath;
+    } else if (!pyLauncherExe.isEmpty()) {
+        selectedExe = pyLauncherExe;
+        selectedArgs = QStringList() << "-3" << scriptPath;
+    }
 
-        if (!processIA->waitForStarted(3000)) {
-            qDebug() << "ERREUR : Impossible de démarrer le processus Python.";
-        } else {
-            qDebug() << "Serveur IA Vortex lancé avec succès sur le port 5000.";
+    if (selectedExe.isEmpty()) {
+        qWarning() << "Serveur FaceID non démarré automatiquement (python/py introuvable).";
+        return;
+    }
+
+    // Pré-check dépendances : si elles manquent, le script Flask se ferme immédiatement.
+    {
+        QProcess depCheck(this);
+        depCheck.setProcessEnvironment(env);
+        depCheck.setWorkingDirectory(QCoreApplication::applicationDirPath());
+        QStringList checkArgs;
+        if (selectedExe.endsWith("/py") || selectedExe.endsWith("\\py.exe")) {
+            checkArgs << "-3";
         }
+        checkArgs << "-c" << "import flask, cv2, numpy; print('deps_ok')";
+        depCheck.start(selectedExe, checkArgs);
+        if (depCheck.waitForFinished(8000)) {
+            const QString out = QString::fromUtf8(depCheck.readAllStandardOutput()).trimmed();
+            const QString err = QString::fromUtf8(depCheck.readAllStandardError()).trimmed();
+            if (depCheck.exitStatus() != QProcess::NormalExit || depCheck.exitCode() != 0 || !out.contains("deps_ok")) {
+                qWarning() << "Dépendances Python manquantes (flask/cv2/numpy)."
+                           << "stdout:" << out << "stderr:" << err;
+                return;
+            }
+        } else {
+            depCheck.kill();
+            qWarning() << "Vérification Python expirée avant démarrage FaceID.";
+            return;
+        }
+    }
+
+    bool started = false;
+    processIA->setWorkingDirectory(QCoreApplication::applicationDirPath());
+    processIA->start(selectedExe, selectedArgs);
+    started = processIA->waitForStarted(6000);
+    if (!started) {
+        qWarning() << "Serveur FaceID non démarré automatiquement (échec lancement process).";
+        return;
+    }
+
+    // Vérifie que le port Flask est vraiment prêt avant d'utiliser FaceID.
+    bool serverReady = false;
+    for (int i = 0; i < 12; ++i) {
+        QTcpSocket socket;
+        socket.connectToHost("127.0.0.1", 5000);
+        if (socket.waitForConnected(500)) {
+            serverReady = true;
+            socket.disconnectFromHost();
+            break;
+        }
+        QThread::msleep(250);
+    }
+
+    if (!serverReady) {
+        const QString logs = QString::fromUtf8(processIA->readAllStandardOutput()).trimmed();
+        qWarning() << "Serveur FaceID lancé mais port 5000 non prêt."
+                   << "state:" << processIA->state()
+                   << "logs:" << logs;
     }
 }
 static void updatePasswordStrengthUiAddEmp(const QString &password, QProgressBar *bar, QLabel *label)
