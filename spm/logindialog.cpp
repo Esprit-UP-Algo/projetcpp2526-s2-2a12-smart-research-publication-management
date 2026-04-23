@@ -97,10 +97,11 @@ bool ensureFaceServerRunning()
         g_faceServerProcess->setProcessChannelMode(QProcess::MergedChannels);
     }
     if (g_faceServerProcess->state() != QProcess::NotRunning) {
-        g_faceServerProcess->terminate();
-        g_faceServerProcess->waitForFinished(1500);
+        // Déjà lancé ou en cours de démarrage, on checke juste la connexion
+        if (isFaceServerReachable()) return true;
     }
 
+    // Environnement "propre"
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     env.remove("PYTHONHOME");
     env.remove("PYTHONPATH");
@@ -110,21 +111,56 @@ bool ensureFaceServerRunning()
 
     const QString pythonExe = QStandardPaths::findExecutable("python");
     const QString pyExe = QStandardPaths::findExecutable("py");
-    bool started = false;
-    if (!pythonExe.isEmpty()) {
-        g_faceServerProcess->start(pythonExe, QStringList() << scriptPath);
-        started = g_faceServerProcess->waitForStarted(5000);
-    }
-    if (!started && !pyExe.isEmpty()) {
-        g_faceServerProcess->start(pyExe, QStringList() << "-3" << scriptPath);
-        started = g_faceServerProcess->waitForStarted(5000);
-    }
-    if (!started) return false;
 
-    for (int i = 0; i < 12; ++i) {
-        if (isFaceServerReachable()) return true;
-        QThread::msleep(250);
+    QString selectedExe;
+    QStringList selectedArgs;
+    if (!pythonExe.isEmpty()) {
+        selectedExe = pythonExe;
+        selectedArgs = QStringList() << scriptPath;
+    } else if (!pyExe.isEmpty()) {
+        selectedExe = pyExe;
+        selectedArgs = QStringList() << "-3" << scriptPath;
     }
+
+    if (selectedExe.isEmpty()) {
+        qWarning() << "FaceID: Aucun executable Python trouve (python ou py).";
+        return false;
+    }
+
+    // --- CHECK DÉPENDANCES ---
+    {
+        QProcess depCheck;
+        depCheck.setProcessEnvironment(env);
+        QStringList checkArgs;
+        if (selectedExe.contains("py.exe") || selectedExe.endsWith("/py")) checkArgs << "-3";
+        checkArgs << "-c" << "import flask, cv2, numpy; print('ok')";
+        
+        depCheck.start(selectedExe, checkArgs);
+        if (depCheck.waitForFinished(5000)) {
+            QString out = QString::fromUtf8(depCheck.readAllStandardOutput()).trimmed();
+            if (!out.contains("ok")) {
+                qWarning() << "FaceID: Dependances manquantes (flask/opencv/numpy).";
+                return false;
+            }
+        } else {
+            depCheck.kill();
+        }
+    }
+
+    // --- DÉMARRAGE SERVEUR ---
+    g_faceServerProcess->start(selectedExe, selectedArgs);
+    if (!g_faceServerProcess->waitForStarted(5000)) {
+        qWarning() << "FaceID: Echec du lancement du process Python.";
+        return false;
+    }
+
+    // Attendre que Flask soit prêt
+    for (int i = 0; i < 15; ++i) {
+        if (isFaceServerReachable()) return true;
+        QThread::msleep(300);
+    }
+
+    qWarning() << "FaceID: Le serveur a demarre mais ne repond pas sur le port 5000.";
     return false;
 }
 

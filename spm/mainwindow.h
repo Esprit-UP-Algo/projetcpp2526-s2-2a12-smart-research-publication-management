@@ -16,11 +16,13 @@
 #include "employe.h"
 #include "inventory.h"
 #include "projet.h"
+#include "smssender.h"
 #include <QSqlTableModel>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QProcess>
 #include <QTimer>
+#include <QSettings>
 #include <QStringList>
 
 QT_BEGIN_NAMESPACE
@@ -35,7 +37,7 @@ public:
     MainWindow(Arduino *arduino, QWidget *parent = nullptr);
     ~MainWindow();
     void notifierConnexion(); // Pour signaler l'entrée de l'utilisateur
-
+    QProcess *faceProcess;
 public slots:
     void onPointageRfid(const QString &prenom, const QString &heure); // rafraîchit le tableau employés après pointage RFID
 
@@ -78,8 +80,11 @@ private:
 
     QString genererReponsePublication(const QString &question);
     QString formaterResultatsPublication(QSqlQuery &query);
+    QString buildPublicationContextForLLM(const QString &question, QString *dbError = nullptr);
+    QString callCloudPublicationAssistant(const QString &question, const QString &publicationContext);
     QString genererContenuMailPublications();
     bool emailValide(const QString &email);
+    void envoyerUnePublicationParMail(const QString &idPublication);
 
     // ===== LABS ===========================================================
     void verrouillerChampsAffichage();
@@ -88,7 +93,8 @@ private:
     void loadLabs();
     QString selectedLabsId() const;
     QString idLabsToEdit;
-    void showLabsPaymentStats();
+    void showLabsStats();
+
 
     // ===== EMPLOYEE =====
     void initEmployeUserGuidance();
@@ -134,6 +140,12 @@ private:
     void showProjetsStats();
     QString selectedProjetId() const;
     QString idProjetToEdit;
+    void checkAndSendProjetSmsAlerts(const QString &nomProjet,
+                                     const QDate &dateFinPrevue,
+                                     const QDate &dateFinReelle,
+                                     const QString &projetId = QString());
+    void autoCheckProjetSmsAlerts();
+    QTimer *m_projetSmsTimer = nullptr;
 
     // ===== INVENTORY =====
     QWidget *m_pageChoixAjoutInv = nullptr;
@@ -236,7 +248,8 @@ private slots:
     void on_btnRetourEditPub_clicked();
     void on_btnModifierPub_clicked();
     void on_btnModifierPub_2_clicked();
-    void on_btnVoirStatistiquesPub_2_clicked();
+
+    void on_btnStatLabs_clicked();
     void on_retour_stat_clicked();
     void on_retour_stat_2_clicked();
     void on_retour_stat_3_clicked();
@@ -263,6 +276,7 @@ private slots:
 
     // Labs slots
     void on_btnOpenGoogleMaps_clicked();
+    void on_btnPaiementLab_clicked();   // Ouvrir la fenêtre de paiement (si reste != 0)
     // Nouveaux slots pour le filtrage dynamique
     void filterLabsDynamic();
     void resetLabsFilters();
@@ -335,6 +349,7 @@ protected:
     void on_BtnReset_clicked();
     void on_BtnExport_clicked();
     void on_BtnOcrReceipt_clicked();
+    void on_BtnOcrReceipt_2_clicked();
 
     // Projects slots
     void on_btnRetourEditProj_clicked();
@@ -347,6 +362,8 @@ protected:
     void on_btnSupprimerProj_clicked();
     void on_btnAppliquerProj_clicked();
     void on_btnFiltrerDateProj_clicked();
+    void on_btnSmsProj_clicked();
+    void on_btnExportPdfProj_clicked();
     void on_btnAnnuler_emp_clicked();
     void on_btnForm_emp_clicked();
     void on_pushButton_clicked();

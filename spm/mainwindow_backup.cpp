@@ -1,6 +1,10 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "ocrscanner.h"
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+#include "session.h"  // <--- INDISPENSABLE pour lire le rÃ´le
+========
 #include "session.h"  // <--- INDISPENSABLE pour lire le rôle
 #include <QResizeEvent>
 #include <QPropertyAnimation>
@@ -10,14 +14,22 @@
 #include <QGraphicsOpacityEffect>
 #include <QEasingCurve>
 #include "projet.h"
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
 #include <QGraphicsDropShadowEffect>
 #include <QDir>
+=======
+#include "session.h"  // <--- INDISPENSABLE pour lire le rÃ´le
+#include <QGraphicsDropShadowEffect>
+#include <QDir> // Ajoutez ceci en haut du fichier si absent
+#include "ui_mainwindow.h"
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 #include "finance.h"
 #include "labs.h"
 #include "employe.h"
 #include "inventory.h"
 #include <QSpinBox>
 #include <QDoubleSpinBox>
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 #include <QDateEdit>
 #include <QAbstractSpinBox>
 #include <QVBoxLayout>
@@ -25,6 +37,11 @@
 #include <QComboBox>
 #include <QApplication>
 #include <QMessageBox>
+=======
+#include <QApplication>
+#include <QMessageBox>
+#include <QGraphicsDropShadowEffect>
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 #include <QStyle>
 #include <QTableWidgetItem>
 #include <QDate>
@@ -39,8 +56,15 @@
 #include <QDateTime>
 #include <QDesktopServices>
 #include <QUrl>
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+#include "mapdialog.h"
 #include <QTime>
 #include <QCryptographicHash>
+=======
+#include <QTime>
+#include <QCryptographicHash>
+#include "session.h"
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 #include <QtCharts/QBarSeries>
 #include <QtCharts/QBarSet>
 #include <QtCharts/QBarCategoryAxis>
@@ -48,12 +72,31 @@
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 #include <QtSql/QSqlQuery>
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlRecord>
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 #include <QClipboard>
 
 #include <QMouseEvent>
 #include "publication.h"
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+#include <QHeaderView>
+#include <QTableWidgetItem>
+#include <QMessageBox>
+
+#include <QPdfWriter>
+#include <QPainter>
+#include <QFileDialog>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QDate>
+#include <QTime>
+#include <QMessageBox>
+#include <QHeaderView>
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
 #include <QLayout>
 
@@ -63,12 +106,27 @@
 
 
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QMessageBox>
+#include <QDebug>
+
+#include <QtCharts/QChartView>
+#include <QtCharts/QChart>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QBarCategoryAxis>
+#include <QtCharts/QValueAxis>
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
 
 
 
 
 #include "mailsender.h"
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 #include <QLabel>
 #include <QProgressBar>
 #include "currencyconverter.h"
@@ -76,12 +134,6 @@
 #include <QSettings>
 #include <QFile>
 #include <QRandomGenerator>
-#include <QDialog>
-#include <QListWidget>
-#include <QDialogButtonBox>
-#include <QFormLayout>
-#include <QDateTimeEdit>
-#include <QHash>
 
 
 
@@ -95,10 +147,6 @@
 #include <QHttpMultiPart>
 #include <QHttpPart>
 #include <QNetworkRequest>
-#include <QTcpSocket>
-#include <QThread>
-#include <QProcessEnvironment>
-#include <QStandardPaths>
 
 
 #include <QCamera>
@@ -112,6 +160,16 @@ class QProgressBar;
 class QLabel;
 static void updatePasswordStrengthUiAddEmp(const QString &, QProgressBar *, QLabel *);
 
+=======
+#include "currencyconverter.h"
+#include <QInputDialog>
+#include <QRegularExpression>
+#include <QSettings>
+#include <QFile>
+
+
+
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
 
 
@@ -137,75 +195,6 @@ static void setupTable(QTableWidget* t)
     t->setSortingEnabled(true);
 }
 
-static QStringList permissionsForRole(const QString &role)
-{
-    if (role == "Admin") {
-        return {"Employés", "Inventaire", "Publications", "Finance", "Laboratoires", "Projets"};
-    }
-    if (role == "RH") {
-        return {"Employés"};
-    }
-    if (role == "Responsable_financier") {
-        return {"Finance"};
-    }
-    if (role == "Responsable_de_stock") {
-        return {"Inventaire"};
-    }
-    if (role == "Responsable_Labos") {
-        return {"Laboratoires"};
-    }
-    if (role == "Chercheur") {
-        return {"Publications"};
-    }
-    if (role == "Directeur_de_projet") {
-        return {"Projets", "Publications"};
-    }
-    return {};
-}
-
-static QList<QString> allModuleCodes()
-{
-    return {"Employés", "Inventaire", "Publications", "Finance", "Laboratoires", "Projets"};
-}
-
-static QJsonArray loadTempAccessEntries()
-{
-    QSettings s("SmartResearchLab", "TempAccess");
-    const QString raw = s.value("entries_json").toString();
-    if (raw.trimmed().isEmpty()) return QJsonArray();
-
-    QJsonParseError err{};
-    const QJsonDocument doc = QJsonDocument::fromJson(raw.toUtf8(), &err);
-    if (err.error != QJsonParseError::NoError || !doc.isArray()) {
-        return QJsonArray();
-    }
-    return doc.array();
-}
-
-static void saveTempAccessEntries(const QJsonArray &entries)
-{
-    QSettings s("SmartResearchLab", "TempAccess");
-    s.setValue("entries_json", QString::fromUtf8(QJsonDocument(entries).toJson(QJsonDocument::Compact)));
-}
-
-static QString formatRemainingDuration(qint64 totalSeconds)
-{
-    if (totalSeconds <= 0) return "expire";
-    const qint64 days = totalSeconds / 86400;
-    totalSeconds %= 86400;
-    const qint64 hours = totalSeconds / 3600;
-    totalSeconds %= 3600;
-    const qint64 minutes = totalSeconds / 60;
-
-    if (days > 0) {
-        return QString("%1 j %2 h").arg(days).arg(hours);
-    }
-    if (hours > 0) {
-        return QString("%1 h %2 min").arg(hours).arg(minutes);
-    }
-    return QString("%1 min").arg(qMax<qint64>(1, minutes));
-}
-
 static double parseAmount(const QString& raw, bool *okOut=nullptr)
 {
     bool ok = false;
@@ -228,6 +217,7 @@ static QString makeInvoiceNumber()
            + "-" + QTime::currentTime().toString("hhmmss");
 }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 static bool inventorySkuExists(const QString &sku, const QString &excludeId = QString())
 {
     if (sku.trimmed().isEmpty()) return false;
@@ -376,10 +366,15 @@ static void makePageResponsive(QWidget *page)
     layout->addWidget(gb);
 }
 
+=======
+static void drawRect(QPainter& p, const QRect& r) { p.drawRect(r); }
+
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 // ==================== LABS HELPERS ====================
-// (makeQrLabs supprimé : la colonne QRLABS n'existe pas dans la table)
+// (makeQrLabs supprimÃ© : la colonne QRLABS n'existe pas dans la table)
 
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 MainWindow::MainWindow(Arduino *arduino, QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
     // ─── Récupérer le pointeur Arduino connecté depuis main.cpp ──────────────
@@ -393,6 +388,13 @@ MainWindow::MainWindow(Arduino *arduino, QWidget *parent): QMainWindow(parent), 
     // C'est cette ligne qui fait tout le travail invisible !
     this->lancerServeurIA();
 
+=======
+MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
+{
+
+    // On installe le filtre sur le champ de localisation
+    ui->setupUi(this);
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     ui->textChatPub->setStyleSheet("background-color: white; color: black;");
     connect(ui->btnEnvoyerQuestionPub, &QPushButton::clicked,
             this, &MainWindow::on_btnEnvoyerQuestionPub_clicked);
@@ -403,15 +405,16 @@ MainWindow::MainWindow(Arduino *arduino, QWidget *parent): QMainWindow(parent), 
         QVBoxLayout *layout = new QVBoxLayout(ui->statsWidgetPub);
         ui->statsWidgetPub->setLayout(layout);
     }
-    // On active la détection d'événements sur le champ aff2
+    // On active la dÃ©tection d'Ã©vÃ©nements sur le champ aff2
     ui->aff2->installEventFilter(this);
 
-    // Optionnel : verrouiller les champs dès le démarrage
+    // Optionnel : verrouiller les champs dÃ¨s le dÃ©marrage
     verrouillerChampsAffichage();
     // === STATISTIQUES LABORATOIRES ===
     connect(ui->btnVoirStatistiquesPub_2, &QPushButton::clicked,
             this, &MainWindow::showLabsPaymentStats);
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 
     //employee
 
@@ -437,77 +440,56 @@ MainWindow::MainWindow(Arduino *arduino, QWidget *parent): QMainWindow(parent), 
     // Optionnel : Définir la date actuelle par défaut au lieu de 1/1/2000
     ui->dateEmbaucheAdd->setDate(QDate::currentDate());
     ui->dateEmbaucheEmp->setDate(QDate::currentDate());
+=======
+    //employee
 
-    // --- CONTROLE SALAIRE (Nombres décimaux uniquement) ---
-    // Autorise les nombres de 0 à 999,999.99
+    ui->lineCINAdd->setInputMask("99999999");
+    ui->lineCIN_emp->setInputMask("99999999");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+
+    // --- CONTROLE SALAIRE (Nombres dÃ©cimaux uniquement) ---
+    // Autorise les nombres de 0 Ã  999,999.99
     QDoubleValidator *salaryValidator = new QDoubleValidator(0.0, 999999.0, 2, this);
     salaryValidator->setNotation(QDoubleValidator::StandardNotation);
     ui->lineSalaireAdd->setValidator(salaryValidator);
     ui->lineSalaireEmp->setValidator(salaryValidator);
 
     // --- CONTROLE NOM / PRENOM (Lettres uniquement) ---
-    QRegularExpression nameRegex("^[a-zA-ZáàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ ]*$");
+    QRegularExpression nameRegex("^[a-zA-ZÃ¡Ã Ã¢Ã¤Ã£Ã¥Ã§Ã©Ã¨ÃªÃ«Ã­Ã¬Ã®Ã¯Ã±Ã³Ã²Ã´Ã¶ÃµÃºÃ¹Ã»Ã¼Ã½Ã¿Ã¦Å“ÃÃ€Ã‚Ã„ÃƒÃ…Ã‡Ã‰ÃˆÃŠÃ‹ÃÃŒÃŽÃÃ‘Ã“Ã’Ã”Ã–Ã•ÃšÃ™Ã›ÃœÃÅ¸Ã†Å’ ]*$");
     QRegularExpressionValidator *nameValidator = new QRegularExpressionValidator(nameRegex, this);
     ui->lineNomAdd->setValidator(nameValidator);
     ui->linePrenomAdd->setValidator(nameValidator);
     ui->lineNomEmp->setValidator(nameValidator);
     ui->linePrenomEmp->setValidator(nameValidator);
-    // Force la connexion si l'auto-connect échoue
+    // Force la connexion si l'auto-connect Ã©choue
 
 
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 
 
     // ── Système de notifications ──────────────────────────────────────────
     setupNotifButton();
-    m_btnProfile = new QPushButton(ui->topBar);
-    m_btnProfile->setObjectName("btnProfile");
-    m_btnProfile->setText("Profil");
-    m_btnProfile->setFixedSize(86, 36);
-    m_btnProfile->setCursor(Qt::PointingHandCursor);
-    m_btnProfile->setToolTip("Mon profil et mes permissions");
-    m_btnProfile->setFocusPolicy(Qt::NoFocus);
-    connect(m_btnProfile, &QPushButton::clicked, this, &MainWindow::showProfilePermissions);
-
-    m_btnTempAccess = new QPushButton(ui->topBar);
-    m_btnTempAccess->setObjectName("btnTempAccess");
-    m_btnTempAccess->setText("Acces RH");
-    m_btnTempAccess->setFixedSize(94, 36);
-    m_btnTempAccess->setCursor(Qt::PointingHandCursor);
-    m_btnTempAccess->setToolTip("Acces temporaire pour un employe");
-    m_btnTempAccess->setFocusPolicy(Qt::NoFocus);
-    connect(m_btnTempAccess, &QPushButton::clicked, this, &MainWindow::showRhTempAccessDialog);
-
-    // Timeout session inactivité (12 minutes) + re-auth via retour login.
-    m_inactivityTimer = new QTimer(this);
-    m_inactivityTimer->setSingleShot(true);
-    m_inactivityTimer->setInterval(12 * 60 * 1000);
-    connect(m_inactivityTimer, &QTimer::timeout, this, &MainWindow::handleSessionTimeout);
-    resetInactivityTimer();
-
-    // Rafraîchissement temps réel des accès temporaires (toutes les 30 sec).
-    m_tempAccessRefreshTimer = new QTimer(this);
-    m_tempAccessRefreshTimer->setInterval(30 * 1000);
-    connect(m_tempAccessRefreshTimer, &QTimer::timeout, this, &MainWindow::refreshTemporaryAccessRealtime);
-    m_tempAccessRefreshTimer->start();
 
 
 
 
 
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     //pointage
 
 
     model = new QSqlQueryModel(this);
 
-    // 3. La requête avec TES colonnes exactes
+    // 3. La requÃªte avec TES colonnes exactes
     QString queryStr = "SELECT CIN, NOM, PRENOM, USERNAME, DATE_POINTAGE, HEURE_ARRIVEE, HEURE_DEPART, STATUT_JOURNALIER FROM EMPLOYES";
 
     model->setQuery(queryStr);
 
-    // 4. Vérification d'erreur (Indispensable pour Oracle)
+    // 4. VÃ©rification d'erreur (Indispensable pour Oracle)
     if (model->lastError().isValid()) {
-        QMessageBox::critical(this, "Erreur Oracle", "Détail : " + model->lastError().text());
+        QMessageBox::critical(this, "Erreur Oracle", "DÃ©tail : " + model->lastError().text());
     } else {
         // 5. Liaison avec l'interface
         ui->tableView->setModel(model);
@@ -517,20 +499,20 @@ MainWindow::MainWindow(Arduino *arduino, QWidget *parent): QMainWindow(parent), 
         ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     }
 
-    // 7. Connexion du scanner (Vérifie que l'objet s'appelle bien input_badge)
+    // 7. Connexion du scanner (VÃ©rifie que l'objet s'appelle bien input_badge)
     connect(ui->input_badge, &QLineEdit::returnPressed, this, &MainWindow::simulerPointage);
 
 
 
 
 
-    // --- STYLE DU TABLEAU (Géré par le QSS global) ---
+    // --- STYLE DU TABLEAU (GÃ©rÃ© par le QSS global) ---
     ui->tableView->setStyleSheet("");
 
     // --- OPTIONS D'AFFICHAGE ---
-    ui->tableView->setAlternatingRowColors(true); // Active les couleurs alternées
-    ui->tableView->verticalHeader()->setVisible(false); // Cache la colonne des numéros (1, 2, 3...)
-    ui->tableView->setFrameShape(QFrame::NoFrame); // Enlève le cadre lourd
+    ui->tableView->setAlternatingRowColors(true); // Active les couleurs alternÃ©es
+    ui->tableView->verticalHeader()->setVisible(false); // Cache la colonne des numÃ©ros (1, 2, 3...)
+    ui->tableView->setFrameShape(QFrame::NoFrame); // EnlÃ¨ve le cadre lourd
     ui->tableView->setShowGrid(false); // Plus moderne sans les lignes de grille
     //pointage
 
@@ -556,6 +538,7 @@ MainWindow::MainWindow(Arduino *arduino, QWidget *parent): QMainWindow(parent), 
     initLabsUi();
     initInventoryUi();
     loadEmployees();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     initProjetsUi();
 
     // --- Explicit project button connections ---
@@ -576,6 +559,10 @@ MainWindow::MainWindow(Arduino *arduino, QWidget *parent): QMainWindow(parent), 
     });
     updatePasswordStrengthUiAddEmp(QString(), ui->passwordStrengthBarAdd, ui->passwordStrengthLabelAdd);
     initEmployeUserGuidance();
+=======
+
+    // --- Connexions Signaux/Slots ---
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     connect(ui->lineSearchEmp, &QLineEdit::textChanged, this, &MainWindow::filterEmployees);
     connect(ui->btnTrier_emp, &QPushButton::clicked, this, &MainWindow::sortByEmbaucheDate);
     connect(ui->stackedWidget, &QStackedWidget::currentChanged, this, &MainWindow::updateTopTitle);
@@ -619,17 +606,35 @@ MainWindow::MainWindow(Arduino *arduino, QWidget *parent): QMainWindow(parent), 
     connect(ui->btnDeconnecter,   &QPushButton::clicked, this, &MainWindow::onDeconnecter);
     connect(ui->btnThemeToggle,   &QPushButton::clicked, this, &MainWindow::toggleTheme);
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    // --- Effets Visuels (Ombres) ---
+    auto shadowSidebar = new QGraphicsDropShadowEffect(this);
+    shadowSidebar->setBlurRadius(22);
+    shadowSidebar->setOffset(0, 6);
+    shadowSidebar->setColor(QColor(0, 0, 0, 60));
+    ui->sidebarFrame->setGraphicsEffect(shadowSidebar);
+
+    // NOTE: Ne pas appliquer QGraphicsEffect sur stackedWidget â€”
+    // cela casse la rÃ©ception des clics sur tous les boutons enfants.
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
     // NOTE: Ne pas appliquer QGraphicsEffect sur sidebarFrame NI sur stackedWidget —
     // un QGraphicsEffect sur un widget PARENT empêche les effets enfants (opacité,
     // glow, ripple) de se composer correctement : tout passe par un buffer offscreen
     // partagé et les rendus entrent en conflit. L'ombre est reproduite en CSS.
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     // ==========================================
-    //    GESTION DES RÔLES (Session)
+    //    GESTION DES RÃ”LES (Session)
     // ==========================================
-    configurerPermissions(false);
+    configurerPermissions();
 
-    // Finance : connexions explicites (slots déclarés en protected:, pas private slots:)
+    // Finance : connexions explicites (slots dÃ©clarÃ©s en protected:, pas private slots:)
     connect(ui->BtnAdd,                  &QPushButton::clicked, this, &MainWindow::on_BtnAdd_clicked);
     connect(ui->BtnEdit,                 &QPushButton::clicked, this, &MainWindow::on_BtnEdit_clicked);
     connect(ui->BtnDelete,               &QPushButton::clicked, this, &MainWindow::on_BtnDelete_clicked);
@@ -648,6 +653,10 @@ MainWindow::MainWindow(Arduino *arduino, QWidget *parent): QMainWindow(parent), 
             ui->FormAmount_2->setText(QString::number(dlg.convertedAmountDT(), 'f', 3));
     });
     connect(ui->BtnOcrReceipt,           &QPushButton::clicked, this, &MainWindow::on_BtnOcrReceipt_clicked);
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    connect(ui->BtnOcrReceipt_2,         &QPushButton::clicked, this, &MainWindow::on_BtnOcrReceipt_2_clicked);
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     connect(ui->BtnExportLabsDirect, &QPushButton::clicked, this, &MainWindow::on_BtnExportLabsDirect_clicked);
     connect(ui->btn_reset, &QPushButton::clicked,
@@ -662,6 +671,9 @@ MainWindow::MainWindow(Arduino *arduino, QWidget *parent): QMainWindow(parent), 
             this, &MainWindow::on_BtnPopupCancelLabs_8_clicked);
     connect(ui->BtnPopupCancelLabs_10, &QPushButton::clicked,
             this, &MainWindow::on_BtnPopupCancelLabs_10_clicked);
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
     networkManager = new QNetworkAccessManager(this);
 
     // ─── Rendre responsive toutes les pages à positionnement absolu ─────────
@@ -722,6 +734,9 @@ MainWindow::MainWindow(Arduino *arduino, QWidget *parent): QMainWindow(parent), 
     // La logique RFID est gérée par RfidHandler (actif avant le login).
     // MainWindow reçoit juste le signal pointageEffectue via onPointageRfid()
     // pour rafraîchir le tableau employés. Connexion faite dans main.cpp.
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 }
 
 
@@ -731,19 +746,56 @@ MainWindow::MainWindow(Arduino *arduino, QWidget *parent): QMainWindow(parent), 
 
 void MainWindow::on_btnStat_emp_clicked()
 {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     // 1. DÉTERMINATION DE LA PÉRIODE (Janvier à Aujourd'hui)
     QDate dateActuelle = QDate::currentDate();
     int moisFin = dateActuelle.month(); // ex: 4 pour Avril
     int annee = dateActuelle.year();
 
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    // 2. RÃ‰CUPÃ‰RATION DES DONNÃ‰ES (AjustÃ© selon ta photo SQL Developer)
+    // J'utilise NVL pour transformer les cases vides (NULL) en 0
+    QSqlQuery query("SELECT NOM, NVL(NB_ABSENCES, 0) FROM EMPLOYES ORDER BY NB_ABSENCES DESC");
+========
     // Noms des mois en français pour le titre
     QString nomMoisDebut = QLocale(QLocale::French).monthName(1); // Janvier
     QString nomMoisFin = QLocale(QLocale::French).monthName(moisFin); // Avril
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
 
     // 2. RÉCUPÉRATION DES DONNÉES SQL
     QSqlQuery query;
     query.prepare("SELECT NOM, NVL(NB_ABSENCES, 0) AS TOTAL FROM EMPLOYES ORDER BY TOTAL DESC");
 
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+    QStringList categories;
+    QList<double> valeurs;
+
+    // 2. RÃ‰CUPÃ‰RATION DES DONNÃ‰ES (AjustÃ© selon ta photo SQL Developer)
+    // J'utilise NVL pour transformer les cases vides (NULL) en 0
+    QSqlQuery query("SELECT NOM, NVL(NB_ABSENCES, 0) FROM EMPLOYES ORDER BY NB_ABSENCES DESC");
+
+    bool hasData = false;
+    while (query.next()) {
+        hasData = true;
+        QString nom = query.value(0).toString();
+        int nbAbsences = query.value(1).toInt();
+        double taux = (static_cast<double>(nbAbsences) / 22.0) * 100.0;
+        valeurs    << taux;
+        categories << nom;
+    }
+
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    if (!hasData) {
+        QMessageBox::warning(this, "Stats", "Aucune donnÃ©e d'absence trouvÃ©e dans la base !");
+        return;
+    }
+
+    // 3. CrÃ©ation de la sÃ©rie
+    QBarSet *set = new QBarSet("Taux d'absentÃ©isme (%)");
+    for (double v : std::as_const(valeurs)) *set << v;
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
     if (!query.exec()) {
         QMessageBox::critical(this, "Erreur SQL", query.lastError().text());
         return;
@@ -780,6 +832,7 @@ void MainWindow::on_btnStat_emp_clicked()
     }
 
     // 4. CONFIGURATION DU GRAPH (DÉTAILS MAXIMUM)
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
     QBarSeries *series = new QBarSeries();
     series->append(setNormal);
     series->append(setAlerte);
@@ -789,6 +842,26 @@ void MainWindow::on_btnStat_emp_clicked()
 
     QChart *chart = new QChart();
     chart->addSeries(series);
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+    QBarSeries *series = new QBarSeries();
+    series->append(set);
+
+    // Optionnel : Afficher la valeur au-dessus de chaque barre
+    series->setLabelsVisible(true);
+    series->setLabelsFormat("@value%");
+
+    // 4. Configuration du Graphique
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    chart->setTitle("Analyse de l'AbsentÃ©isme par EmployÃ©");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
 
     // Titre ultra-précis
     chart->setTitle(QString("<b>ANALYSE RH DÉTAILLÉE</b><br>"
@@ -812,8 +885,12 @@ void MainWindow::on_btnStat_emp_clicked()
 
     QValueAxis *axisY = new QValueAxis();
     axisY->setRange(0, 100);
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    axisY->setTitleText("Taux d'absentÃ©isme (%)");
+========
     axisY->setLabelFormat("%i%");
     axisY->setTitleText("Taux d'Absentéisme (%)");
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
     chart->addAxis(axisY, Qt::AlignLeft);
     series->attachAxis(axisY);
     limitLine->attachAxis(axisY);
@@ -823,6 +900,26 @@ void MainWindow::on_btnStat_emp_clicked()
     chartView->setRenderHint(QPainter::Antialiasing);
     chartView->setMinimumSize(1000, 600);
     chartView->setWindowTitle("Système Vortex - Rapport Statistiques");
+=======
+
+    // 5. Axes
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    axisX->append(categories);
+    chart->addAxis(axisX, Qt::AlignBottom);
+    series->attachAxis(axisX);
+
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setRange(0, 100);
+    axisY->setTitleText("Taux d'absentÃ©isme (%)");
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
+
+    // 6. Affichage
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    chartView->setMinimumSize(800, 500);
+    chartView->setWindowTitle("Statistiques RH - Vortex");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     chartView->show();
 }
 void MainWindow::simulerPointage() {
@@ -833,19 +930,19 @@ void MainWindow::simulerPointage() {
     QString dateAujourdhui = QDate::currentDate().toString("yyyy-MM-dd");
     QSqlQuery query;
 
-    // 1. ON VÉRIFIE SI L'EMPLOYÉ A DÉJÀ POINTÉ AUJOURD'HUI
+    // 1. ON VÃ‰RIFIE SI L'EMPLOYÃ‰ A DÃ‰JÃ€ POINTÃ‰ AUJOURD'HUI
     query.prepare("SELECT HEURE_ARRIVEE, HEURE_DEPART, PRENOM FROM EMPLOYES "
                   "WHERE CIN = :cin AND DATE_POINTAGE = TO_DATE(:d, 'YYYY-MM-DD')");
     query.bindValue(":cin", cinSaisi);
     query.bindValue(":d", dateAujourdhui);
 
     if (query.exec() && query.next()) {
-        // --- L'EMPLOYÉ EST DÉJÀ DANS LA TABLE POUR AUJOURD'HUI ---
+        // --- L'EMPLOYÃ‰ EST DÃ‰JÃ€ DANS LA TABLE POUR AUJOURD'HUI ---
         QString hArrivee = query.value("HEURE_ARRIVEE").toString();
         QString hDepart = query.value("HEURE_DEPART").toString();
 
         if (!hArrivee.isEmpty() && hDepart.isEmpty()) {
-            // Il a une arrivée mais pas de départ -> On enregistre le DÉPART
+            // Il a une arrivÃ©e mais pas de dÃ©part -> On enregistre le DÃ‰PART
             QSqlQuery upd;
             upd.prepare("UPDATE EMPLOYES SET HEURE_DEPART = :h "
                         "WHERE CIN = :cin AND DATE_POINTAGE = TO_DATE(:d, 'YYYY-MM-DD')");
@@ -854,17 +951,17 @@ void MainWindow::simulerPointage() {
             upd.bindValue(":d", dateAujourdhui);
 
             if(upd.exec()) {
-                ui->label_feedback->setText("👋 DÉPART ENREGISTRÉ : " + query.value("PRENOM").toString());
+                ui->label_feedback->setText("ðŸ‘‹ DÃ‰PART ENREGISTRÃ‰ : " + query.value("PRENOM").toString());
                 ui->label_feedback->setStyleSheet("color: blue; font-weight: bold;");
             }
         } else {
-            ui->label_feedback->setText("⚠️ DÉJÀ POINTÉ POUR AUJOURD'HUI");
+            ui->label_feedback->setText("âš ï¸ DÃ‰JÃ€ POINTÃ‰ POUR AUJOURD'HUI");
             ui->label_feedback->setStyleSheet("color: orange; font-weight: bold;");
         }
 
     } else {
-        // --- PREMIER PASSAGE DE LA JOURNÉE (ARRIVÉE) ---
-        // On vérifie d'abord que le CIN existe dans la base globale
+        // --- PREMIER PASSAGE DE LA JOURNÃ‰E (ARRIVÃ‰E) ---
+        // On vÃ©rifie d'abord que le CIN existe dans la base globale
         QSqlQuery checkExist;
         checkExist.prepare("SELECT PRENOM FROM EMPLOYES WHERE CIN = :cin");
         checkExist.bindValue(":cin", cinSaisi);
@@ -872,26 +969,27 @@ void MainWindow::simulerPointage() {
         if (checkExist.exec() && checkExist.next()) {
             QSqlQuery ins;
             ins.prepare("UPDATE EMPLOYES SET DATE_POINTAGE = TO_DATE(:d, 'YYYY-MM-DD'), "
-                        "HEURE_ARRIVEE = :h, STATUT_JOURNALIER = 'Présent' "
+                        "HEURE_ARRIVEE = :h, STATUT_JOURNALIER = 'PrÃ©sent' "
                         "WHERE CIN = :cin");
             ins.bindValue(":d", dateAujourdhui);
             ins.bindValue(":h", QTime::currentTime().toString("hh:mm"));
             ins.bindValue(":cin", cinSaisi);
 
             if (ins.exec()) {
-                ui->label_feedback->setText("✅ ARRIVÉE ENREGISTRÉE : " + checkExist.value("PRENOM").toString());
+                ui->label_feedback->setText("âœ… ARRIVÃ‰E ENREGISTRÃ‰E : " + checkExist.value("PRENOM").toString());
                 ui->label_feedback->setStyleSheet("color: green; font-weight: bold;");
             }
         } else {
-            ui->label_feedback->setText("❌ CIN INCONNU");
+            ui->label_feedback->setText("âŒ CIN INCONNU");
             ui->label_feedback->setStyleSheet("color: red; font-weight: bold;");
         }
     }
 
-    // MISE À JOUR DU TABLEAU VISUEL
+    // MISE Ã€ JOUR DU TABLEAU VISUEL
     model->setQuery("SELECT CIN, NOM, PRENOM, USERNAME, DATE_POINTAGE, HEURE_ARRIVEE, HEURE_DEPART, STATUT_JOURNALIER FROM EMPLOYES");
 }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 // ─── Slot Arduino RFID : traiter les données reçues sur le port série ─────────
 // Protocole Arduino → Qt  :  "UID:<hex_uid>:<id_labo>\n"
 // Protocole Qt → Arduino  :  "1:<prenom>:<HH:MM>\n"   (accès OK)
@@ -933,7 +1031,9 @@ void MainWindow::traiter_rfid()
         // Utilise les tables existantes : EMPLOYES + LABS (via IDEMP)
         // L'employé doit avoir la carte ET être responsable de ce labo
         q.prepare(
-            "SELECT e.ID_EMPLOYE, e.PRENOM "
+            "SELECT e.ID_EMPLOYE, e.PRENOM, "
+            "       e.HEURE_ARRIVEE, e.HEURE_DEPART, "
+            "       TO_CHAR(e.DATE_POINTAGE, 'YYYY-MM-DD') AS DATE_POINTAGE "
             "FROM HICHEM.EMPLOYES e "
             "JOIN HICHEM.LABS l ON l.IDEMP = e.ID_EMPLOYE "
             "WHERE e.UID_CARTE = :uid AND l.IDLABO = :labo"
@@ -948,37 +1048,62 @@ void MainWindow::traiter_rfid()
         }
 
         if (q.next()) {
-            // ── Accès autorisé ───────────────────────────────────────────────
-            QString idEmploye = q.value("ID_EMPLOYE").toString();
-            QString prenom    = q.value("PRENOM").toString();
-            QString heure     = QTime::currentTime().toString("HH:mm");
-            QString date      = QDate::currentDate().toString("yyyy-MM-dd");
+            // ── Accès autorisé : déterminer arrivée / départ / déjà pointé ──
+            QString idEmploye   = q.value("ID_EMPLOYE").toString();
+            QString prenom      = q.value("PRENOM").toString();
+            QString hArrivee    = q.value("HEURE_ARRIVEE").toString().trimmed();
+            QString hDepart     = q.value("HEURE_DEPART").toString().trimmed();
+            QString datePointage= q.value("DATE_POINTAGE").toString().trimmed();
+            QString heure       = QTime::currentTime().toString("HH:mm");
+            QString dateAuj     = QDate::currentDate().toString("yyyy-MM-dd");
 
-            // Enregistrer le pointage dans la base
-            QSqlQuery upd;
-            upd.prepare(
-                "UPDATE HICHEM.EMPLOYES "
-                "SET DATE_POINTAGE    = TO_DATE(:d, 'YYYY-MM-DD'), "
-                "    HEURE_ARRIVEE    = :h, "
-                "    STATUT_JOURNALIER = 'Présent' "
-                "WHERE ID_EMPLOYE = :id"
-            );
-            upd.bindValue(":d",  date);
-            upd.bindValue(":h",  heure);
-            upd.bindValue(":id", idEmploye);
+            // Déjà pointé ET parti aujourd'hui → LCD "Déjà pointé"
+            if (datePointage == dateAuj && !hArrivee.isEmpty() && !hDepart.isEmpty()) {
+                qDebug() << "[RFID] Déjà pointé (arrivée+départ) :" << prenom;
+                A->write_to_arduino(QString("3:%1\n").arg(prenom).toUtf8());
 
-            if (upd.exec()) {
-                qDebug() << "[RFID] Pointage enregistré pour" << prenom << "à" << heure;
+            // Arrivée enregistrée mais pas encore parti → enregistrer le DÉPART
+            } else if (datePointage == dateAuj && !hArrivee.isEmpty() && hDepart.isEmpty()) {
+                QSqlQuery upd;
+                upd.prepare(
+                    "UPDATE HICHEM.EMPLOYES "
+                    "SET HEURE_DEPART = :h "
+                    "WHERE ID_EMPLOYE = :id"
+                );
+                upd.bindValue(":h",  heure);
+                upd.bindValue(":id", idEmploye);
+
+                if (upd.exec()) {
+                    qDebug() << "[RFID] Départ enregistré pour" << prenom << "à" << heure;
+                } else {
+                    qDebug() << "[RFID] Erreur UPDATE départ :" << upd.lastError().text();
+                }
+                // Code "2:" → LCD affiche "Départ"
+                A->write_to_arduino(QString("2:%1:%2\n").arg(prenom, heure).toUtf8());
+
+            // Premier passage de la journée → enregistrer l'ARRIVÉE
             } else {
-                qDebug() << "[RFID] Erreur UPDATE pointage :" << upd.lastError().text();
-            }
+                QSqlQuery upd;
+                upd.prepare(
+                    "UPDATE HICHEM.EMPLOYES "
+                    "SET DATE_POINTAGE     = TO_DATE(:d, 'YYYY-MM-DD'), "
+                    "    HEURE_ARRIVEE     = :h, "
+                    "    HEURE_DEPART      = NULL, "
+                    "    STATUT_JOURNALIER = 'Présent' "
+                    "WHERE ID_EMPLOYE = :id"
+                );
+                upd.bindValue(":d",  dateAuj);
+                upd.bindValue(":h",  heure);
+                upd.bindValue(":id", idEmploye);
 
-            // Envoyer la confirmation à l'Arduino : "1:Prenom:HH:MM\n"
-            // L'Arduino affichera sur LCD :
-            //   Ligne 1 : "Bienvenue Prenom"
-            //   Ligne 2 : "Pointe a HH:MM"
-            QString reponse = QString("1:%1:%2\n").arg(prenom, heure);
-            A->write_to_arduino(reponse.toUtf8());
+                if (upd.exec()) {
+                    qDebug() << "[RFID] Arrivée enregistrée pour" << prenom << "à" << heure;
+                } else {
+                    qDebug() << "[RFID] Erreur UPDATE arrivée :" << upd.lastError().text();
+                }
+                // Code "1:" → LCD affiche "Arrivée"
+                A->write_to_arduino(QString("1:%1:%2\n").arg(prenom, heure).toUtf8());
+            }
 
             // Rafraîchir le tableau employés dans l'UI
             model->setQuery(
@@ -1006,18 +1131,6 @@ void MainWindow::onPointageRfid(const QString &prenom, const QString &heure)
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
-    if (event) {
-        const QEvent::Type t = event->type();
-        if (t == QEvent::MouseButtonPress
-            || t == QEvent::MouseButtonRelease
-            || t == QEvent::MouseMove
-            || t == QEvent::KeyPress
-            || t == QEvent::Wheel
-            || t == QEvent::TouchBegin) {
-            resetInactivityTimer();
-        }
-    }
-
     // ── Fermer le panneau de notifications si clic en dehors ─────────────
     if (m_notifPanel && m_notifPanel->isVisible()
         && event->type() == QEvent::MouseButtonPress) {
@@ -1030,6 +1143,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
         }
     }
 
+=======
+bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     if (obj == ui->aff2 && event->type() == QEvent::MouseButtonDblClick) {
         QClipboard *clipboard = QApplication::clipboard();
         QString texte = clipboard->text();
@@ -1044,37 +1160,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
     return QMainWindow::eventFilter(obj, event);
 }
 
-void MainWindow::resetInactivityTimer()
-{
-    if (!m_inactivityTimer || m_isAutoLogoutInProgress) {
-        return;
-    }
-    m_inactivityTimer->start();
-}
-
-void MainWindow::handleSessionTimeout()
-{
-    if (m_isAutoLogoutInProgress) {
-        return;
-    }
-    m_isAutoLogoutInProgress = true;
-
-    QMessageBox::information(
-        this,
-        "Session verrouillée",
-        "Session expirée après inactivité.\n"
-        "Veuillez vous reconnecter pour continuer."
-    );
-
-    emit logoutRequested();
-    this->close();
-}
-
 void MainWindow::on_btn_exportt_clicked() {
-    // 1. Récupérer la date du jour et la formater (ex: 25_03_2026)
+    // 1. RÃ©cupÃ©rer la date du jour et la formater (ex: 25_03_2026)
     QString dateStr = QDate::currentDate().toString("dd_MM_yyyy");
 
-    // 2. Proposer le nom de fichier avec la date par défaut
+    // 2. Proposer le nom de fichier avec la date par dÃ©faut
     QString defaultName = QString("Pointage_%1.csv").arg(dateStr);
 
     QString fileName = QFileDialog::getSaveFileName(this, "Exporter Pointage", defaultName, "Excel (*.csv)");
@@ -1092,7 +1182,7 @@ void MainWindow::on_btn_exportt_clicked() {
         }
         out << "\n";
 
-        // Données des lignes
+        // DonnÃ©es des lignes
         for (int r = 0; r < model->rowCount(); r++) {
             for (int c = 0; c < model->columnCount(); c++) {
                 out << model->index(r, c).data().toString() << (c == model->columnCount()-1 ? "" : ";");
@@ -1100,40 +1190,40 @@ void MainWindow::on_btn_exportt_clicked() {
             out << "\n";
         }
         file.close();
-        QMessageBox::information(this, "Succès", "Fichier Excel généré !");
+        QMessageBox::information(this, "SuccÃ¨s", "Fichier Excel gÃ©nÃ©rÃ© !");
     }
 }
 void MainWindow::on_btn_reset_clicked() {
     // 1. Demander confirmation
-    auto reply = QMessageBox::question(this, "Clôture de journée",
-                                       "Voulez-vous comptabiliser les absences et préparer la nouvelle journée ?",
+    auto reply = QMessageBox::question(this, "ClÃ´ture de journÃ©e",
+                                       "Voulez-vous comptabiliser les absences et prÃ©parer la nouvelle journÃ©e ?",
                                        QMessageBox::Yes | QMessageBox::No);
 
     if (reply == QMessageBox::Yes) {
         QSqlQuery query;
 
-        // --- ÉTAPE A : INCRÉMENTATION ---
-        // On ajoute +1 à la colonne NB_ABSENCES pour tous ceux qui sont marqués 'Absent'
-        // IMPORTANT : Vérifie que ta colonne s'appelle bien NB_ABSENCES dans ta table EMPLOYES
+        // --- Ã‰TAPE A : INCRÃ‰MENTATION ---
+        // On ajoute +1 Ã  la colonne NB_ABSENCES pour tous ceux qui sont marquÃ©s 'Absent'
+        // IMPORTANT : VÃ©rifie que ta colonne s'appelle bien NB_ABSENCES dans ta table EMPLOYES
         bool okInc = query.exec("UPDATE EMPLOYES SET NB_ABSENCES = NVL(NB_ABSENCES, 0) + 1 "
                                 "WHERE STATUT_JOURNALIER = 'Absent'");
 
         if (!okInc) {
-            QMessageBox::critical(this, "Erreur", "Échec de la comptabilisation : " + query.lastError().text());
-            return; // On arrête tout si le calcul échoue pour ne pas perdre les données
+            QMessageBox::critical(this, "Erreur", "Ã‰chec de la comptabilisation : " + query.lastError().text());
+            return; // On arrÃªte tout si le calcul Ã©choue pour ne pas perdre les donnÃ©es
         }
 
-        // --- ÉTAPE B : RESET DU TABLEAU ---
-        // On remet tout à NULL et on remet tout le monde à 'Absent' par défaut pour demain
+        // --- Ã‰TAPE B : RESET DU TABLEAU ---
+        // On remet tout Ã  NULL et on remet tout le monde Ã  'Absent' par dÃ©faut pour demain
         if (query.exec("UPDATE EMPLOYES SET DATE_POINTAGE = NULL, HEURE_ARRIVEE = NULL, "
                        "HEURE_DEPART = NULL, STATUT_JOURNALIER = 'Absent'")) {
 
-            // Rafraîchissement du modèle (le tableau que l'on voit à l'écran)
+            // RafraÃ®chissement du modÃ¨le (le tableau que l'on voit Ã  l'Ã©cran)
             model->setQuery("SELECT CIN, NOM, PRENOM, USERNAME, DATE_POINTAGE, HEURE_ARRIVEE, HEURE_DEPART, STATUT_JOURNALIER FROM EMPLOYES");
 
-            QMessageBox::information(this, "Succès", "Absences enregistrées et système réinitialisé !");
+            QMessageBox::information(this, "SuccÃ¨s", "Absences enregistrÃ©es et systÃ¨me rÃ©initialisÃ© !");
 
-            // OPTIONNEL : Si ton graphique est ouvert, on le met à jour
+            // OPTIONNEL : Si ton graphique est ouvert, on le met Ã  jour
             // on_btnStat_emp_clicked();
 
         } else {
@@ -1157,10 +1247,81 @@ void MainWindow::on_pointage_clicked()
 
 
 
-void MainWindow::configurerPermissions(bool preserveCurrentPage) {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+void MainWindow::configurerPermissions() {
     Session& session = Session::instance();
     QString role = session.getRole();
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    // --- Ã‰TAPE 1 : Nettoyage (On cache tout la sidebar) ---
+    ui->btnEmployee->hide();
+    ui->btnInventaire->hide();
+    ui->btnPublication->hide();
+    ui->btnFinance->hide();
+    ui->btnLaboratoires->hide();
+    ui->btnProjets->hide();
+
+    // --- Ã‰TAPE 2 : Attribution de l'Environnement ---
+    if (role == "Admin") {
+        // ðŸ”¥ ADMIN : accÃ¨s total
+        ui->btnEmployee->show();
+        ui->btnInventaire->show();
+        ui->btnPublication->show();
+        ui->btnFinance->show();
+        ui->btnLaboratoires->show();
+        ui->btnProjets->show();
+
+        // Page par dÃ©faut
+        ui->stackedWidget->setCurrentIndex(0);
+        setActiveButton(ui->btnEmployee);
+    }
+    if (role == "RH") {
+        // Environnement RH : Gestion du personnel et congÃ©s
+        ui->btnEmployee->show();
+        ui->stackedWidget->setCurrentIndex(0); // Index de la page EmployÃ©s
+        setActiveButton(ui->btnEmployee);
+    }
+    else if (role == "Responsable_financier") {
+        // Environnement Finance : Salaires et budgets
+        ui->btnFinance->show();
+        ui->stackedWidget->setCurrentIndex(3); // Index de la page Finance
+        setActiveButton(ui->btnFinance);
+    }
+    else if (role == "Responsable_de_stock") {
+        // Environnement Stock : Inventaire et matÃ©riel
+        ui->btnInventaire->show();
+        ui->stackedWidget->setCurrentIndex(1); // Index de la page Inventaire
+        setActiveButton(ui->btnInventaire);
+    }
+    else if (role == "Responsable_Labos") {
+        // Environnement Laboratoire
+        ui->btnLaboratoires->show();
+        ui->stackedWidget->setCurrentIndex(4); // Index de la page Labos
+        setActiveButton(ui->btnLaboratoires);
+    }
+    else if (role == "Chercheur") {
+        // Environnement Recherche : Publications seulement
+        ui->btnPublication->show();
+        ui->stackedWidget->setCurrentIndex(2); // Index Publications
+        setActiveButton(ui->btnPublication);
+    }
+    else if (role == "Directeur_de_projet") {
+        // Environnement Management : Projets et Publications
+        ui->btnProjets->show();
+        ui->btnPublication->show();
+        ui->stackedWidget->setCurrentIndex(5); // Index Projets
+        setActiveButton(ui->btnProjets);
+    }
+
+    // Mise Ã  jour du titre en haut de l'Ã©cran
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
     // Définition de tous les modules : bouton | emoji | label | page index
     struct BtnDef {
         QPushButton *btn;
@@ -1212,19 +1373,6 @@ void MainWindow::configurerPermissions(bool preserveCurrentPage) {
         defaultPage = 5;
     }
 
-    const QStringList tempModules = activeTemporaryModulesForUser(session.getId());
-    auto authorizeModule = [&](const QString &module) {
-        if (module == "Employés") authorized << ui->btnEmployee;
-        else if (module == "Inventaire") authorized << ui->btnInventaire;
-        else if (module == "Publications") authorized << ui->btnPublication;
-        else if (module == "Finance") authorized << ui->btnFinance;
-        else if (module == "Laboratoires") authorized << ui->btnLaboratoires;
-        else if (module == "Projets") authorized << ui->btnProjets;
-    };
-    for (const QString &m : tempModules) {
-        authorizeModule(m);
-    }
-
     // Afficher TOUS les boutons — activer les autorisés, verrouiller les autres
     for (const auto &b : allBtns) {
         bool auth = authorized.contains(b.btn);
@@ -1241,46 +1389,19 @@ void MainWindow::configurerPermissions(bool preserveCurrentPage) {
         b.btn->style()->polish(b.btn);
     }
 
-    if (!preserveCurrentPage) {
-        ui->stackedWidget->setCurrentIndex(defaultPage);
-        setActiveButton(defaultBtn);
-        updateTopTitle(ui->stackedWidget->currentIndex());
-    } else {
-        const int currentPage = ui->stackedWidget->currentIndex();
-        QPushButton *currentBtn = nullptr;
-        switch (currentPage) {
-        case 0: currentBtn = ui->btnEmployee; break;
-        case 1: currentBtn = ui->btnInventaire; break;
-        case 2: currentBtn = ui->btnPublication; break;
-        case 3: currentBtn = ui->btnFinance; break;
-        case 4: currentBtn = ui->btnLaboratoires; break;
-        case 5: currentBtn = ui->btnProjets; break;
-        default: break;
-        }
-
-        if (!currentBtn || !currentBtn->isEnabled()) {
-            ui->stackedWidget->setCurrentIndex(defaultPage);
-            setActiveButton(defaultBtn);
-        } else {
-            setActiveButton(currentBtn);
-        }
-        updateTopTitle(ui->stackedWidget->currentIndex());
-    }
-    if (m_btnProfile) {
-        m_btnProfile->setEnabled(true);
-        m_btnProfile->setToolTip(QString("Profil connecté : %1").arg(role));
-    }
-    if (m_btnTempAccess) {
-        const bool canManageTempAccess = (role == "RH" || role == "Admin");
-        m_btnTempAccess->setVisible(canManageTempAccess);
-        m_btnTempAccess->setEnabled(canManageTempAccess);
-    }
+    ui->stackedWidget->setCurrentIndex(defaultPage);
+    setActiveButton(defaultBtn);
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    updateTopTitle(ui->stackedWidget->currentIndex());
 }
 
 
 
 
 //fin fct
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 void MainWindow::genererScriptPython()
 {
     // On définit le chemin : là où se trouve l'exécutable
@@ -1346,22 +1467,10 @@ void MainWindow::resizeEvent(QResizeEvent *event)
         (w - ui->lblPageTitle->width()) / 2,
         (h - ui->lblPageTitle->height()) / 2);
 
-    // btnNotif + btnProfile : alignés à droite
-    const int btnNy = (h - ui->btnNotif->height()) / 2;
+    // btnNotif : aligné à droite avec marge de 10px
     const int btnNx = w - ui->btnNotif->width() - 10;
+    const int btnNy = (h - ui->btnNotif->height()) / 2;
     ui->btnNotif->move(btnNx, btnNy);
-    if (m_btnProfile) {
-        const int profileY = (h - m_btnProfile->height()) / 2;
-        const int profileX = btnNx - m_btnProfile->width() - 10;
-        m_btnProfile->move(profileX, profileY);
-        m_btnProfile->raise();
-        if (m_btnTempAccess) {
-            const int accessY = (h - m_btnTempAccess->height()) / 2;
-            const int accessX = profileX - m_btnTempAccess->width() - 10;
-            m_btnTempAccess->move(accessX, accessY);
-            m_btnTempAccess->raise();
-        }
-    }
 
     // Badge : coin supérieur-droit du bouton
     if (m_notifBadge) {
@@ -1922,13 +2031,22 @@ void MainWindow::updateAnimationColors()
     }
 }
 
+=======
+
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 void MainWindow::applyModernStyle()
 {
-    // Lire la préférence depuis QSettings et synchroniser l'état
+    // Lire la prÃ©fÃ©rence depuis QSettings et synchroniser l'Ã©tat
     QSettings settings("SmartResearchLab", "Theme");
     m_isDarkTheme = settings.value("darkMode", false).toBool();
     updateThemeButton();
-    // Le style global a déjà été appliqué dans main.cpp au démarrage
+    // Le style global a dÃ©jÃ  Ã©tÃ© appliquÃ© dans main.cpp au dÃ©marrage
     return;
     const QString qss = R"(
 
@@ -1965,8 +2083,16 @@ QLabel#lblPageTitle {
 }
 
 QLabel#logoLabel {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     min-height: 180px;
     /* pixmap chargé via setPixmap() dans updateThemeButton — pas de background-image */
+=======
+    min-height: 210px;
+    background-image: url(":/img/images/logoLabel.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 }
 
 QLabel#stat_pub {
@@ -2253,7 +2379,7 @@ QStackedWidget#stacked_L QPushButton:pressed {
 }
 
 /* =========================================================
-   INVENTORY DETAIL VIEW (AFFICHÉ) - FLUENT BRANDED
+   INVENTORY DETAIL VIEW (AFFICHÃ‰) - FLUENT BRANDED
    ========================================================= */
 
 /* Main page background - Soft Teal Gradient instead of solid white */
@@ -2345,6 +2471,7 @@ QPushButton#retour_stat_6:hover {
     qApp->setStyleSheet(qss);
 }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 void MainWindow::updateScaledQss()
 {
     // Supprimé : qApp->setStyleSheet() sur chaque resize est trop coûteux
@@ -2352,29 +2479,47 @@ void MainWindow::updateScaledQss()
     // Le scaling des formulaires est géré par ProportionalScaler.
 }
 
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 void MainWindow::toggleTheme()
 {
     m_isDarkTheme = !m_isDarkTheme;
 
     // Charger et appliquer le fichier QSS correspondant
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     QString themeFile = m_isDarkTheme
         ? QStringLiteral(":/theme/style_dark.qss")
         : QStringLiteral(":/theme/style_light.qss");
+=======
+    QString themeFile = m_isDarkTheme ? ":/theme/style.qss" : ":/theme/style_light.qss";
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     QFile f(themeFile);
     if (f.open(QFile::ReadOnly)) {
         qApp->setStyleSheet(QLatin1String(f.readAll()));
         f.close();
     }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    // Persister la prÃ©fÃ©rence
+========
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+    // Persister la prÃ©fÃ©rence
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     QSettings settings("SmartResearchLab", "Theme");
     settings.setValue("darkMode", m_isDarkTheme);
 
     updateThemeButton();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     updateAnimationColors();
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 }
 
 void MainWindow::updateThemeButton()
 {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     // Logo sidebar commun (logo_off.png) — centré, séparé par une ligne
     {
         QPixmap pix(":/img/images/logo_off.png");
@@ -2411,6 +2556,18 @@ void MainWindow::updateThemeButton()
             "  margin-bottom: 4px;"
             "  background: transparent;"
             "}");
+=======
+    if (m_isDarkTheme) {
+        ui->btnThemeToggle->setText(QString::fromUtf8("\xe2\x98\x80\xef\xb8\x8f  Mode Jour"));
+        ui->btnThemeToggle->setToolTip("Passer en th\u00E8me clair");
+        // En mode nuit (fond bleu tr\u00e8s fonc\u00e9) : l'id\u00e9al est un texte blanc/clair pour le mot "Smart"
+        ui->lblBrand->setText(R"(<span style="color:#e2e8f0; font-weight:900;">Smart</span><span style="color:#38bdf8; font-weight:900;">ResearchLab</span>)");
+    } else {
+        ui->btnThemeToggle->setText(QString::fromUtf8("\xf0\x9f\x8c\x99  Mode Nuit"));
+        ui->btnThemeToggle->setToolTip("Passer en th\u00E8me sombre");
+        // En mode jour (fond blanc) : le mot "Smart" doit \u00eatre noir/fonc\u00e9
+        ui->lblBrand->setText(R"(<span style="color:#1e293b; font-weight:900;">Smart</span><span style="color:#1F8E95; font-weight:900;">ResearchLab</span>)");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     }
 }
 
@@ -2432,14 +2589,18 @@ void MainWindow::setActiveButton(QPushButton *btn)
         b->update();
         b->setChecked(b == btn);
     }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 
     // Barre indicatrice glissante + ripple sur le bouton cliqué
     animateActiveIndicator(btn);
     animateButtonClick(btn);
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 }
 
 /* ===================== NAVIGATION ===================== */
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 void MainWindow::initEmployeUserGuidance()
 {
     ui->groupBox_2->setTitle(QStringLiteral("Nouvel employé"));
@@ -2521,10 +2682,16 @@ void MainWindow::initEmployeUserGuidance()
 void MainWindow::goEmployee()
 {
     animatePageChange(0);
+=======
+void MainWindow::goEmployee()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     setActiveButton(ui->btnEmployee);
     loadEmployees();
 }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 void MainWindow::checkAndShowInventoryAlerts() {
     QVector<Inventory::Row> alerts;
     QString err;
@@ -2581,29 +2748,51 @@ void MainWindow::goInventaire() {
     setActiveButton(ui->btnInventaire);
     refreshInventoryTypeFilter();
     checkAndShowInventoryAlerts();
+=======
+void MainWindow::goInventaire()
+{
+    ui->stackedWidget->setCurrentIndex(1);
+    setActiveButton(ui->btnInventaire);
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 }
 
 void MainWindow::goPublication()
 {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     animatePageChange(2);
+=======
+    ui->stackedWidget->setCurrentIndex(2);
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     setActiveButton(ui->btnPublication);
 }
 
 void MainWindow::goFinance()
 {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     animatePageChange(3);
+=======
+    ui->stackedWidget->setCurrentIndex(3);
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     setActiveButton(ui->btnFinance);
 }
 
 void MainWindow::goLaboratoires()
 {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     animatePageChange(4);
+=======
+    ui->stackedWidget->setCurrentIndex(4);
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     setActiveButton(ui->btnLaboratoires);
 }
 
 void MainWindow::goProjets()
 {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     animatePageChange(5);
+=======
+    ui->stackedWidget->setCurrentIndex(5);
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     setActiveButton(ui->btnProjets);
 }
 
@@ -2613,280 +2802,15 @@ void MainWindow::onDeconnecter()
 {
     auto reply = QMessageBox::question(
         this,
-        "Déconnexion",
-        "Voulez-vous vraiment vous déconnecter ?",
+        "DÃ©connexion",
+        "Voulez-vous vraiment vous dÃ©connecter ?",
         QMessageBox::Yes | QMessageBox::No
         );
 
     if (reply == QMessageBox::Yes) {
-        m_isAutoLogoutInProgress = true;
         emit logoutRequested();
         this->close();
     }
-}
-
-void MainWindow::showProfilePermissions()
-{
-    const Session &session = Session::instance();
-    const QString role = session.getRole();
-    const QStringList rolePermissions = permissionsForRole(role);
-    const QStringList tempPermissions = activeTemporaryAccessDescriptionsForUser(session.getId());
-
-    QDialog dlg(this);
-    dlg.setWindowTitle("Mon profil - Permissions");
-    dlg.setMinimumWidth(460);
-
-    auto *layout = new QVBoxLayout(&dlg);
-    auto *title = new QLabel(QString("<b>%1</b>").arg(session.getNom()), &dlg);
-    auto *roleLbl = new QLabel(QString("Role courant : <b>%1</b>").arg(role), &dlg);
-    auto *hint = new QLabel("Permissions activees pour cette session :", &dlg);
-    auto *list = new QListWidget(&dlg);
-
-    for (const QString &p : rolePermissions) {
-        list->addItem("Acces module : " + p);
-    }
-    for (const QString &p : tempPermissions) {
-        list->addItem("Acces temporaire actif : " + p);
-    }
-    if (rolePermissions.isEmpty() && tempPermissions.isEmpty()) {
-        list->addItem("Aucune permission applicative assignee.");
-    }
-
-    auto *security = new QLabel(
-        QString("Securite session : deconnexion auto apres %1 minutes d'inactivite.")
-            .arg(m_inactivityTimer ? m_inactivityTimer->interval() / 60000 : 0),
-        &dlg
-    );
-
-    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok, &dlg);
-    connect(buttons, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
-
-    layout->addWidget(title);
-    layout->addWidget(roleLbl);
-    layout->addSpacing(8);
-    layout->addWidget(hint);
-    layout->addWidget(list);
-    layout->addWidget(security);
-    layout->addWidget(buttons);
-    dlg.exec();
-}
-
-QStringList MainWindow::activeTemporaryModulesForUser(const QString &idEmploye) const
-{
-    QStringList modules;
-    if (idEmploye.trimmed().isEmpty()) return modules;
-
-    const QDateTime now = QDateTime::currentDateTime();
-    const QJsonArray entries = loadTempAccessEntries();
-    for (const QJsonValue &v : entries) {
-        if (!v.isObject()) continue;
-        const QJsonObject o = v.toObject();
-        if (o.value("employee_id").toString().trimmed() != idEmploye.trimmed()) continue;
-
-        const QDateTime startAt = QDateTime::fromString(o.value("start_at").toString(), Qt::ISODate);
-        const QDateTime endAt = QDateTime::fromString(o.value("end_at").toString(), Qt::ISODate);
-        if (!startAt.isValid() || !endAt.isValid()) continue;
-        if (now < startAt || now > endAt) continue;
-
-        const QString module = o.value("module_code").toString().trimmed();
-        if (!module.isEmpty() && !modules.contains(module)) {
-            modules << module;
-        }
-    }
-    return modules;
-}
-
-QStringList MainWindow::activeTemporaryAccessDescriptionsForUser(const QString &idEmploye) const
-{
-    QStringList details;
-    if (idEmploye.trimmed().isEmpty()) return details;
-
-    const QDateTime now = QDateTime::currentDateTime();
-    const QJsonArray entries = loadTempAccessEntries();
-    QHash<QString, QDateTime> maxEndByModule;
-
-    for (const QJsonValue &v : entries) {
-        if (!v.isObject()) continue;
-        const QJsonObject o = v.toObject();
-        if (o.value("employee_id").toString().trimmed() != idEmploye.trimmed()) continue;
-
-        const QDateTime startAt = QDateTime::fromString(o.value("start_at").toString(), Qt::ISODate);
-        const QDateTime endAt = QDateTime::fromString(o.value("end_at").toString(), Qt::ISODate);
-        if (!startAt.isValid() || !endAt.isValid()) continue;
-        if (now < startAt || now > endAt) continue;
-
-        const QString module = o.value("module_code").toString().trimmed();
-        if (module.isEmpty()) continue;
-
-        if (!maxEndByModule.contains(module) || maxEndByModule.value(module) < endAt) {
-            maxEndByModule.insert(module, endAt);
-        }
-    }
-
-    const QStringList modules = maxEndByModule.keys();
-    for (const QString &module : modules) {
-        const qint64 remainingSeconds = now.secsTo(maxEndByModule.value(module));
-        details << QString("%1 (temps restant: %2)").arg(module, formatRemainingDuration(remainingSeconds));
-    }
-
-    details.sort();
-    return details;
-}
-
-void MainWindow::showRhTempAccessDialog()
-{
-    const QString role = Session::instance().getRole();
-    if (role != "RH" && role != "Admin") {
-        QMessageBox::warning(this, "Acces refuse",
-                             "Seuls RH/Admin peuvent gerer les acces temporaires.");
-        return;
-    }
-    bool okMode = false;
-    const QString mode = QInputDialog::getItem(
-        this,
-        "Acces RH",
-        "Operation :",
-        {"Attribuer permissions", "Retirer permissions"},
-        0,
-        false,
-        &okMode
-    );
-    if (!okMode || mode.isEmpty()) return;
-
-    const bool isRevokeMode = (mode == "Retirer permissions");
-
-    QDialog dlg(this);
-    dlg.setWindowTitle(isRevokeMode ? "Retirer des permissions temporaires"
-                                    : "Attribuer un acces temporaire");
-    dlg.setMinimumWidth(520);
-    auto *mainLayout = new QVBoxLayout(&dlg);
-    auto *form = new QFormLayout();
-
-    auto *cbEmployee = new QComboBox(&dlg);
-    QSqlQuery empQuery;
-    empQuery.prepare(
-        "SELECT ID_EMPLOYE, USERNAME, NOM, PRENOM, ROLE "
-        "FROM EMPLOYES "
-        "WHERE UPPER(ROLE) <> 'ADMIN' "
-        "ORDER BY USERNAME"
-    );
-    if (!empQuery.exec()) {
-        QMessageBox::critical(this, "Erreur SQL", empQuery.lastError().text());
-        return;
-    }
-    while (empQuery.next()) {
-        const QString id = empQuery.value(0).toString();
-        const QString username = empQuery.value(1).toString();
-        const QString nom = empQuery.value(2).toString();
-        const QString prenom = empQuery.value(3).toString();
-        const QString empRole = empQuery.value(4).toString();
-        cbEmployee->addItem(QString("%1 (%2 %3) - %4").arg(username, nom, prenom, empRole), id);
-    }
-    if (cbEmployee->count() == 0) {
-        QMessageBox::warning(this, "Aucun employe", "Aucun employe eligible.");
-        return;
-    }
-
-    auto *listModules = new QListWidget(&dlg);
-    listModules->setSelectionMode(QAbstractItemView::MultiSelection);
-    for (const QString &module : allModuleCodes()) {
-        listModules->addItem(module);
-    }
-
-    form->addRow("Employe cible :", cbEmployee);
-    QDateTimeEdit *startEdit = nullptr;
-    QDateTimeEdit *endEdit = nullptr;
-    if (!isRevokeMode) {
-        startEdit = new QDateTimeEdit(QDateTime::currentDateTime(), &dlg);
-        endEdit = new QDateTimeEdit(QDateTime::currentDateTime().addDays(1), &dlg);
-        startEdit->setCalendarPopup(true);
-        endEdit->setCalendarPopup(true);
-        startEdit->setDisplayFormat("yyyy-MM-dd HH:mm");
-        endEdit->setDisplayFormat("yyyy-MM-dd HH:mm");
-        form->addRow("Debut :", startEdit);
-        form->addRow("Fin :", endEdit);
-    }
-    form->addRow("Modules autorises :", listModules);
-    mainLayout->addLayout(form);
-
-    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
-    connect(buttons, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
-    connect(buttons, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
-    mainLayout->addWidget(buttons);
-
-    if (dlg.exec() != QDialog::Accepted) return;
-
-    QStringList modules;
-    for (QListWidgetItem *item : listModules->selectedItems()) {
-        modules << item->text();
-    }
-    if (modules.isEmpty()) {
-        QMessageBox::warning(this, "Aucun module", "Selectionnez au moins un module.");
-        return;
-    }
-
-    const QString idEmp = cbEmployee->currentData().toString();
-
-    if (!isRevokeMode) {
-        if (endEdit->dateTime() <= startEdit->dateTime()) {
-            QMessageBox::warning(this, "Periode invalide",
-                                 "La date de fin doit etre posterieure a la date de debut.");
-            return;
-        }
-
-        QJsonArray entries = loadTempAccessEntries();
-        for (const QString &module : modules) {
-            QJsonObject o;
-            o.insert("employee_id", idEmp);
-            o.insert("module_code", module);
-            o.insert("start_at", startEdit->dateTime().toString(Qt::ISODate));
-            o.insert("end_at", endEdit->dateTime().toString(Qt::ISODate));
-            o.insert("granted_by", Session::instance().getId());
-            o.insert("created_at", QDateTime::currentDateTime().toString(Qt::ISODate));
-            entries.append(o);
-        }
-        saveTempAccessEntries(entries);
-
-        QMessageBox::information(this, "Succes",
-                                 "Acces temporaire enregistre. Il sera actif uniquement sur la periode definie.");
-    } else {
-        const QJsonArray entries = loadTempAccessEntries();
-        QJsonArray kept;
-        int removedCount = 0;
-
-        for (const QJsonValue &v : entries) {
-            if (!v.isObject()) {
-                kept.append(v);
-                continue;
-            }
-            const QJsonObject o = v.toObject();
-            const QString emp = o.value("employee_id").toString().trimmed();
-            const QString module = o.value("module_code").toString().trimmed();
-            const bool target = (emp == idEmp && modules.contains(module));
-
-            if (target) {
-                ++removedCount;
-            } else {
-                kept.append(o);
-            }
-        }
-
-        saveTempAccessEntries(kept);
-        QMessageBox::information(
-            this,
-            "Permissions retirees",
-            removedCount > 0
-                ? QString("Suppression effectuee (%1 autorisation(s) retiree(s)).").arg(removedCount)
-                : QString("Aucune autorisation correspondante a retirer.")
-        );
-    }
-
-    configurerPermissions(true);
-}
-
-void MainWindow::refreshTemporaryAccessRealtime()
-{
-    configurerPermissions(true);
 }
 
 void MainWindow::updateTopTitle(int index)
@@ -2903,11 +2827,18 @@ void MainWindow::updateTopTitle(int index)
     }
 
     QString greeting = (QTime::currentTime().hour() < 18) ? "Bonjour" : "Bonsoir";
-    QString userName = Session::instance().getNom().split(" ").last(); // Extrait le prénom
+    QString userName = Session::instance().getNom().split(" ").last(); // Extrait le prÃ©nom
     if (userName.isEmpty()) userName = "Utilisateur";
 
     // Augmenter dynamiquement la largeur du label pour ne pas couper le texte
     ui->lblPageTitle->setMinimumWidth(400);
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    // On dÃ©place le label pour qu'il ait assez d'espace mÃªme s'il est alignÃ© Ã  droite
+    ui->lblPageTitle->setGeometry(QRect(180, 10, 400, 31));
+
+========
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
     ui->lblPageTitle->setText(pageName + QString::fromUtf8("  |  %1 %2")
                               .arg(greeting, userName));
 
@@ -2921,6 +2852,13 @@ void MainWindow::updateTopTitle(int index)
         fadeIn->setEasingCurve(QEasingCurve::OutCubic);
         fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
     }
+=======
+    // On dÃ©place le label pour qu'il ait assez d'espace mÃªme s'il est alignÃ© Ã  droite
+    ui->lblPageTitle->setGeometry(QRect(180, 10, 400, 31));
+
+    ui->lblPageTitle->setText(pageName + QString::fromUtf8("  |  %1 %2")
+                              .arg(greeting, userName));
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 }
 
 /* ===================== SLOTS DE NAVIGATION SIMPLES ===================== */
@@ -2953,7 +2891,7 @@ void MainWindow::on_btnExporter_emp_excel_3_clicked()
         );
 
     if (reply == QMessageBox::Yes) {
-        qDebug() << "YES cliqué";
+        qDebug() << "YES cliquÃ©";
     }
 }
 
@@ -2962,7 +2900,7 @@ void MainWindow::on_btnTrier_emp_clicked() {}
 
 /* ===================== SLOTS DE LABS ===================== */
 
-// ── Helper interne : cherche val dans combo de façon insensible à la casse ──
+// â”€â”€ Helper interne : cherche val dans combo de faÃ§on insensible Ã  la casse â”€â”€
 static void setComboValue(QComboBox *cb, const QString &val)
 {
     int idx = cb->findText(val, Qt::MatchFixedString | Qt::MatchCaseSensitive);
@@ -2970,22 +2908,22 @@ static void setComboValue(QComboBox *cb, const QString &val)
     cb->setCurrentIndex(idx >= 0 ? idx : 0);
 }
 
-// ── Export direct vers C:/GestionLabs/ ──
-// ── Export direct des données de la page d'affichage vers un fichier TXT ──
-// ── Export direct des données de la page d'affichage vers un fichier TXT ──
+// â”€â”€ Export direct vers C:/GestionLabs/ â”€â”€
+// â”€â”€ Export direct des donnÃ©es de la page d'affichage vers un fichier TXT â”€â”€
+// â”€â”€ Export direct des donnÃ©es de la page d'affichage vers un fichier TXT â”€â”€
 void MainWindow::on_BtnExportLabsDirect_clicked()
 {
-    // Vérifier que les champs de la page d'affichage contiennent des données
+    // VÃ©rifier que les champs de la page d'affichage contiennent des donnÃ©es
     if (ui->aff1->text().trimmed().isEmpty() &&
         ui->aff5->text().trimmed().isEmpty() &&
         ui->aff2->text().trimmed().isEmpty()) {
         QMessageBox::warning(this, "Exportation",
-                             "Aucune donnée de laboratoire à exporter.\n"
-                             "Veuillez d'abord sélectionner et afficher un laboratoire.");
+                             "Aucune donnÃ©e de laboratoire Ã  exporter.\n"
+                             "Veuillez d'abord sÃ©lectionner et afficher un laboratoire.");
         return;
     }
 
-    // Récupérer le nom du laboratoire pour nommer le fichier
+    // RÃ©cupÃ©rer le nom du laboratoire pour nommer le fichier
     QString nomLabo = ui->aff1->text().trimmed();
     if (nomLabo.isEmpty()) nomLabo = "Laboratoire_Inconnu";
 
@@ -2993,7 +2931,7 @@ void MainWindow::on_BtnExportLabsDirect_clicked()
     nomLabo = nomLabo.replace(QRegularExpression("[^a-zA-Z0-9_-]"), "_");
     if (nomLabo.length() > 30) nomLabo = nomLabo.left(30);
 
-    // Créer le nom du fichier avec date et heure
+    // CrÃ©er le nom du fichier avec date et heure
     const QString folderPath = "C:/GestionLabs";
     QDir dir(folderPath);
     if (!dir.exists()) dir.mkpath(".");
@@ -3004,15 +2942,15 @@ void MainWindow::on_BtnExportLabsDirect_clicked()
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QMessageBox::critical(this, "Erreur d'exportation",
-                              QString("Impossible de créer le fichier :\n%1\n\n"
-                                      "Vérifiez les droits d'écriture sur le dossier C:/GestionLabs")
+                              QString("Impossible de crÃ©er le fichier :\n%1\n\n"
+                                      "VÃ©rifiez les droits d'Ã©criture sur le dossier C:/GestionLabs")
                                   .arg(fileName));
         return;
     }
 
     QTextStream out(&file);
 
-    // ========== EN-TÊTE ==========
+    // ========== EN-TÃŠTE ==========
     out << "=====================================================================\n";
     out << "|                                                                   |\n";
     out << "|           FICHE D'INFORMATION - LABORATOIRE                       |\n";
@@ -3021,25 +2959,49 @@ void MainWindow::on_BtnExportLabsDirect_clicked()
 
     out << "Date d'exportation : " << QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss") << "\n\n";
 
-    // ========== INFORMATIONS GÉNÉRALES ==========
-    out << "┌─────────────────────────────────────────────────────────────────┐\n";
-    out << "│                    INFORMATIONS GÉNÉRALES                       │\n";
-    out << "├─────────────────────────────────────────────────────────────────┤\n";
+    // ========== INFORMATIONS GÃ‰NÃ‰RALES ==========
+    out << "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”\n";
+    out << "â”‚                    INFORMATIONS GÃ‰NÃ‰RALES                       â”‚\n";
+    out << "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤\n";
 
-    QString ligne1 = QString("│ %1 : %2").arg("Nom du Laboratoire", -40).arg(ui->aff1->text().trimmed());
-    out << ligne1.leftJustified(67, ' ') << "│\n";
+    QString ligne1 = QString("â”‚ %1 : %2").arg("Nom du Laboratoire", -40).arg(ui->aff1->text().trimmed());
+    out << ligne1.leftJustified(67, ' ') << "â”‚\n";
 
-    QString ligne2 = QString("│ %1 : %2").arg("Responsable", -40).arg(ui->aff5->text().trimmed());
-    out << ligne2.leftJustified(67, ' ') << "│\n";
+    QString ligne2 = QString("â”‚ %1 : %2").arg("Responsable", -40).arg(ui->aff5->text().trimmed());
+    out << ligne2.leftJustified(67, ' ') << "â”‚\n";
 
-    QString ligne3 = QString("│ %1 : %2").arg("Numéro de téléphone", -40).arg(ui->aff6->text().trimmed());
-    out << ligne3.leftJustified(67, ' ') << "│\n";
+    QString ligne3 = QString("â”‚ %1 : %2").arg("NumÃ©ro de tÃ©lÃ©phone", -40).arg(ui->aff6->text().trimmed());
+    out << ligne3.leftJustified(67, ' ') << "â”‚\n";
 
-    QString ligne4 = QString("│ %1 : %2").arg("Localisation", -40).arg(ui->aff2->text().trimmed());
-    out << ligne4.leftJustified(67, ' ') << "│\n";
+    QString ligne4 = QString("â”‚ %1 : %2").arg("Localisation", -40).arg(ui->aff2->text().trimmed());
+    out << ligne4.leftJustified(67, ' ') << "â”‚\n";
 
-    out << "└─────────────────────────────────────────────────────────────────┘\n\n";
+    out << "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜\n\n";
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    // ========== CARACTÃ‰RISTIQUES TECHNIQUES ==========
+    out << "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”\n";
+    out << "â”‚                 CARACTÃ‰RISTIQUES TECHNIQUES                     â”‚\n";
+    out << "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤\n";
+
+    QString ligne5 = QString("â”‚ %1 : %2").arg("SpÃ©cialitÃ©", -40).arg(ui->aff3->currentText());
+    out << ligne5.leftJustified(67, ' ') << "â”‚\n";
+
+    QString ligne6 = QString("â”‚ %1 : %2").arg("DisponibilitÃ©", -40).arg(ui->aff7->currentText());
+    out << ligne6.leftJustified(67, ' ') << "â”‚\n";
+
+    QString ligne7 = QString("â”‚ %1 : %2").arg("RÃ©sultat actuel", -40).arg(ui->aff3_2->currentText());
+    out << ligne7.leftJustified(67, ' ') << "â”‚\n";
+
+    QString ligne8 = QString("â”‚ %1 : %2").arg("Statut de paiement", -40).arg(ui->aff7_2->currentText());
+    out << ligne8.leftJustified(67, ' ') << "â”‚\n";
+
+    out << "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜\n\n";
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
     // ========== INFORMATIONS COMPLÉMENTAIRES ==========
 
 // PAR :
@@ -3059,37 +3021,40 @@ void MainWindow::on_BtnExportLabsDirect_clicked()
         out << ligneR.leftJustified(67, ' ') << "│\n";
     }
     out << "└─────────────────────────────────────────────────────────────────┘\n\n";
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
-    // ========== INFORMATIONS COMPLÉMENTAIRES ==========
-    out << "┌─────────────────────────────────────────────────────────────────┐\n";
-    out << "│                   INFORMATIONS COMPLÉMENTAIRES                  │"
+    // ========== INFORMATIONS COMPLÃ‰MENTAIRES ==========
+    out << "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”\n";
+    out << "â”‚                   INFORMATIONS COMPLÃ‰MENTAIRES                  â”‚"
            "|\n";
-    out << "├─────────────────────────────────────────────────────────────────┤\n";
-    out << "│                                                                 │\n";
+    out << "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤\n";
+    out << "â”‚                                                                 â”‚\n";
 
-    // Vérifier le statut de disponibilité pour un message personnalisé
+    // VÃ©rifier le statut de disponibilitÃ© pour un message personnalisÃ©
     QString disponibilite = ui->aff7->currentText().toLower();
     if (disponibilite.contains("disponible")) {
-        out << "│ ✔ Le laboratoire est actuellement DISPONIBLE pour toute demande.    │\n";
+        out << "â”‚ âœ” Le laboratoire est actuellement DISPONIBLE pour toute demande.    â”‚\n";
     } else if (disponibilite.contains("occupe")) {
-        out << "│ ⚠ Le laboratoire est actuellement OCCUPÉ.                            │\n";
+        out << "â”‚ âš  Le laboratoire est actuellement OCCUPÃ‰.                            â”‚\n";
     }
 
-    // Vérifier le statut de paiement
+    // VÃ©rifier le statut de paiement
     QString paiement = ui->aff7_2->currentText().toLower();
     if (paiement.contains("payer")) {
-        out << "│ ✓ Paiement effectué - Services opérationnels.                        │\n";
+        out << "â”‚ âœ“ Paiement effectuÃ© - Services opÃ©rationnels.                        â”‚\n";
     } else if (paiement.contains("non payer")) {
-        out << "│ ✗ Paiement en attente - Veuillez régulariser la situation.           │\n";
+        out << "â”‚ âœ— Paiement en attente - Veuillez rÃ©gulariser la situation.           â”‚\n";
     }
 
-    out << "│                                                                 │\n";
-    out << "└─────────────────────────────────────────────────────────────────┘\n\n";
+    out << "â”‚                                                                 â”‚\n";
+    out << "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜\n\n";
 
     // ========== FOOTER ==========
     out << "=====================================================================\n";
 
-    QString footer1 = QString("| %1").arg("Document généré automatiquement par SmartResearchLab");
+    QString footer1 = QString("| %1").arg("Document gÃ©nÃ©rÃ© automatiquement par SmartResearchLab");
     out << footer1.leftJustified(69, ' ') << "|\n";
 
     QString footer2 = QString("| %1").arg("En cas de question, veuillez contacter l'administrateur");
@@ -3099,29 +3064,40 @@ void MainWindow::on_BtnExportLabsDirect_clicked()
 
     file.close();
 
-    // ========== MESSAGE DE SUCCÈS ==========
-    QMessageBox::information(this, "Exportation Réussie",
-                             QString("Les données du laboratoire ont été exportées avec succès !\n\n"
+    // ========== MESSAGE DE SUCCÃˆS ==========
+    QMessageBox::information(this, "Exportation RÃ©ussie",
+                             QString("Les donnÃ©es du laboratoire ont Ã©tÃ© exportÃ©es avec succÃ¨s !\n\n"
                                      "Fichier : %1\n\n"
-                                     "Le fichier a été ouvert dans le bloc-notes.")
+                                     "Le fichier a Ã©tÃ© ouvert dans le bloc-notes.")
                                  .arg(fileName));
 
-    // Ouvrir le fichier avec l'application par défaut (Bloc-notes sur Windows)
+    // Ouvrir le fichier avec l'application par dÃ©faut (Bloc-notes sur Windows)
     QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
 }
 
 void MainWindow::on_btnOpenGoogleMaps_clicked()
 {
-    // Récupérer la localisation depuis le champ aff2
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    // RÃ©cupÃ©rer la localisation depuis le champ aff2
+========
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+    // RÃ©cupÃ©rer la localisation depuis le champ aff2
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     QString location = ui->aff2->text().trimmed();
 
     if (location.isEmpty()) {
         QMessageBox::warning(this, "Localisation vide",
                              "Aucune localisation n'est disponible pour ce laboratoire.\n"
-                             "Veuillez d'abord sélectionner et afficher un laboratoire.");
+                             "Veuillez d'abord sÃ©lectionner et afficher un laboratoire.");
         return;
     }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    MapDialog dlg(MapDialog::ViewMode, location, this);
+    dlg.exec();
+=======
     // Construire l'URL Google Maps
     QString encodedLocation = QUrl::toPercentEncoding(location);
     QString googleMapsUrl = QString("https://www.google.com/maps/search/%1").arg(encodedLocation);
@@ -3132,6 +3108,7 @@ void MainWindow::on_btnOpenGoogleMaps_clicked()
     if (!opened) {
         QMessageBox::warning(this, "Erreur", "Impossible d'ouvrir Google Maps.");
     }
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 }
 
 void MainWindow::on_btnVoirStatistiquesPub_2_clicked()
@@ -3139,11 +3116,16 @@ void MainWindow::on_btnVoirStatistiquesPub_2_clicked()
     showLabsPaymentStats();
 }
 
-// ── Statistiques paiement ──
+// â”€â”€ Statistiques paiement â”€â”€
 void MainWindow::showLabsPaymentStats()
 {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     // ─── Graphique Paiement (Payé / Non payé) ───────────────────────
     QSqlQuery queryPmt(R"(
+=======
+    // Valeurs exactes en BD : 'payer' / 'non payer' (minuscules)
+    QSqlQuery query(R"(
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
         SELECT NOMLABO,
                SUM(CASE WHEN LOWER(PAIEMENT) = 'payer'     THEN 1 ELSE 0 END) AS Paye,
                SUM(CASE WHEN LOWER(PAIEMENT) = 'non payer' THEN 1 ELSE 0 END) AS NonPaye,
@@ -3154,6 +3136,7 @@ void MainWindow::showLabsPaymentStats()
     )");
 
     QStringList categories;
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     QVector<double> payePercent, nonPayePercent;
     bool hasData = false;
 
@@ -3169,6 +3152,35 @@ void MainWindow::showLabsPaymentStats()
     }
 
     if (!hasData) {
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+    QVector<double> payePercent;
+    QVector<double> nonPayePercent;
+    bool hasData = false;
+
+    while (query.next()) {
+        hasData = true;
+        const QString nomLabo = query.value(0).toString();
+        const int paye        = query.value(1).toInt();
+        const int nonPaye     = query.value(2).toInt();
+        const int total       = query.value(3).toInt();
+        const double pPaye    = total > 0 ? (static_cast<double>(paye)    / total) * 100.0 : 0.0;
+        const double pNonPaye = total > 0 ? (static_cast<double>(nonPaye) / total) * 100.0 : 0.0;
+        categories     << nomLabo;
+        payePercent    << pPaye;
+        nonPayePercent << pNonPaye;
+    }
+
+    if (!hasData) {
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+        QMessageBox::warning(this, "Statistiques Laboratoires", "Aucune donnÃ©e de paiement trouvÃ©e.");
+        return;
+    }
+
+    QBarSet *setPaye    = new QBarSet("PayÃ© (%)");   setPaye->setColor(QColor(39, 174, 96)); 
+    QBarSet *setNonPaye = new QBarSet("Non PayÃ© (%)"); setNonPaye->setColor(QColor(231, 76, 60));
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
         QMessageBox::warning(this, "Statistiques Laboratoires", "Aucune donnée trouvée.");
         return;
     }
@@ -3180,6 +3192,7 @@ void MainWindow::showLabsPaymentStats()
         GROUP BY NOMLABO
         ORDER BY NOMLABO
     )");
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
 
     QBarSet *setMontant      = new QBarSet("Montant Total (DT)");
     QBarSet *setMontantPaye  = new QBarSet("Montant Payé (DT)");
@@ -3262,9 +3275,48 @@ void MainWindow::showLabsPaymentStats()
         cv2->setAttribute(Qt::WA_DeleteOnClose);
         cv2->show();
     }
+=======
+
+    for (int i = 0; i < payePercent.size(); ++i) {
+        *setPaye    << payePercent[i];
+        *setNonPaye << nonPayePercent[i];
+    }
+
+    QBarSeries *series = new QBarSeries();
+    series->append(setPaye);
+    series->append(setNonPaye);
+    series->setLabelsVisible(true);
+    series->setLabelsFormat("@value %");
+
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Pourcentage de Paiement par Laboratoire");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    axisX->append(categories);
+    chart->addAxis(axisX, Qt::AlignBottom);
+    series->attachAxis(axisX);
+
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setRange(0, 100);
+    axisY->setTitleText("Pourcentage (%)");
+    axisY->setLabelFormat("%.1f%%");
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    chartView->setMinimumSize(950, 620);
+    chartView->setWindowTitle("Statistiques Paiement (%) - Laboratoires");
+    chartView->setAttribute(Qt::WA_DeleteOnClose);
+    chartView->show();
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 }
 
-// ── Navigation ──
+// â”€â”€ Navigation â”€â”€
 void MainWindow::on_btnAjouterPub_2_clicked() { ui->stacked_L->setCurrentIndex(2); }
 void MainWindow::on_BtnPopupCancelLabs_5_clicked() { ui->stacked_L->setCurrentIndex(0); }
 void MainWindow::on_BtnPopupCancelLabs_3_clicked() { ui->stacked_L->setCurrentIndex(0); }
@@ -3273,7 +3325,7 @@ void MainWindow::on_retour_stat_3_clicked()        { ui->stacked_L->setCurrentIn
 void MainWindow::on_retour_stat_9_clicked()        { ui->stacked_L->setCurrentIndex(0); }
 void MainWindow::on_retour_stat_8_clicked()        { ui->stacked_L->setCurrentIndex(0); }
 
-// ── Maps ──
+// â”€â”€ Maps â”€â”€
 void MainWindow::on_btnPasteLocation_clicked()
 {
     QClipboard *clipboard = QApplication::clipboard();
@@ -3285,11 +3337,15 @@ void MainWindow::on_btnPasteLocation_clicked()
 }
 void MainWindow::on_btnAjouterPub_4_clicked()
 {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     QDesktopServices::openUrl(QUrl("https://www.google.com/maps/@36.8065,10.1815,12z"));
     QMessageBox::information(this, "Instructions Localisation",
                              "1. Cherchez le lieu sur Google Maps.\n"
                              "2. Faites un clic-droit sur le point exact.\n"
-                             "3. Cliquez sur les coordonnées pour les copier.\n"
+                             "3. Cliquez sur les coordonnÃ©es pour les copier.\n"
                              "4. Revenez ici et collez (Ctrl+V) dans le champ Localisation.");
 }
 void MainWindow::on_btnAjouterPub_5_clicked()
@@ -3298,7 +3354,7 @@ void MainWindow::on_btnAjouterPub_5_clicked()
     QMessageBox::information(this, "Instructions Localisation",
                              "1. Cherchez le lieu sur Google Maps.\n"
                              "2. Faites un clic-droit sur le point exact.\n"
-                             "3. Cliquez sur les coordonnées pour les copier.\n"
+                             "3. Cliquez sur les coordonnÃ©es pour les copier.\n"
                              "4. Revenez ici et collez (Ctrl+V) dans le champ Localisation.");
 }
 void MainWindow::on_btnmapl_3_clicked()
@@ -3307,15 +3363,50 @@ void MainWindow::on_btnmapl_3_clicked()
     QMessageBox::information(this, "Instructions Localisation",
                              "1. Cherchez le lieu sur Google Maps.\n"
                              "2. Faites un clic-droit sur le point exact.\n"
-                             "3. Cliquez sur les coordonnées pour les copier.\n"
+                             "3. Cliquez sur les coordonnÃ©es pour les copier.\n"
                              "4. Revenez ici et collez (Ctrl+V) dans le champ Localisation.");
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
+    MapDialog *dlg = new MapDialog(MapDialog::PickMode, QString(), this);
+    connect(dlg, &MapDialog::coordinatesSelected, this, &MainWindow::onMapLocationSelected);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->exec();
+}
+void MainWindow::on_btnAjouterPub_5_clicked()
+{
+    MapDialog *dlg = new MapDialog(MapDialog::PickMode, QString(), this);
+    connect(dlg, &MapDialog::coordinatesSelected, this, &MainWindow::onMapLocationSelected);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->exec();
+}
+void MainWindow::on_btnmapl_3_clicked()
+{
+    MapDialog *dlg = new MapDialog(MapDialog::PickMode, QString(), this);
+    connect(dlg, &MapDialog::coordinatesSelected, this, &MainWindow::onMapLocationSelected);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->exec();
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 }
 // Inventory - Navigation
 // ====================== AJOUT ======================
 void MainWindow::handleInventoryAdd()
 {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    qDebug() << "[INVENTORY] handleInventoryAdd: Navigating to Index 1 (ajouteri)";
+    ui->stacked_I->setCurrentIndex(1);
+    on_BtnPopupResetInventory_clicked(); // Clear fields
+========
     qDebug() << "[INVENTORY] handleInventoryAdd: Navigating to Choice Page";
     ui->stacked_I->setCurrentWidget(m_pageChoixAjoutInv);
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+    qDebug() << "[INVENTORY] handleInventoryAdd: Navigating to Index 1 (ajouteri)";
+    ui->stacked_I->setCurrentIndex(1);
+    on_BtnPopupResetInventory_clicked(); // Clear fields
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 }
 
 
@@ -3325,7 +3416,15 @@ void MainWindow::handleInventoryView()
     qDebug() << "[INVENTORY] handleInventoryView: Navigating to Index 4 (afficheri)";
     const int r = ui->TableInventory->currentRow();
     if (r < 0) {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+        QMessageBox::warning(this, "Afficher", "SÃ©lectionne un produit Ã  afficher.");
+========
         QMessageBox::warning(this, "Afficher", "Sélectionne un produit à afficher.");
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+        QMessageBox::warning(this, "Afficher", "SÃ©lectionne un produit Ã  afficher.");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
         return;
     }
 
@@ -3350,6 +3449,9 @@ void MainWindow::handleInventoryView()
 
     ui->stacked_I->setCurrentIndex(4); // "afficheri" page (Index 4)
 }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
 
 void MainWindow::on_BtnPopupCancelInventory_clicked()
 {
@@ -3571,8 +3673,38 @@ void MainWindow::showInventoryLabUsageStats()
 }
 
 
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
-// Finance “retour” existants
+void MainWindow::on_BtnPopupCancelInventory_clicked()
+{
+    ui->stacked_I->setCurrentIndex(0);
+}
+
+void MainWindow::on_BtnPopupCancelInventory_2_clicked()
+{
+    ui->stacked_I->setCurrentIndex(0);
+}
+
+void MainWindow::on_retour_stat_6_clicked()
+{
+    ui->stacked_I->setCurrentIndex(0);
+}
+
+void MainWindow::on_retour_stat_7_clicked()
+{
+    ui->stacked_I->setCurrentIndex(0);
+}
+
+void MainWindow::handleInventoryStats()
+{
+    ui->stacked_I->setCurrentIndex(3); // "stati" page (Index 3)
+}
+
+
+
+// Finance â€œretourâ€ existants
 void MainWindow::on_retour_stat_4_clicked() { ui->stacked_F->setCurrentIndex(0); }
 void MainWindow::on_retour_stat_5_clicked() { ui->stacked_F->setCurrentIndex(0); }
 
@@ -3588,6 +3720,7 @@ void MainWindow::on_BtnPopupCancelLabs_7_clicked() { ui->stack_emp->setCurrentIn
 // Projets - Navigation
 void MainWindow::on_retour_statn_clicked() { ui->stack_proj->setCurrentIndex(0); }
 void MainWindow::on_btnRetourEditProj_clicked() { ui->stack_proj->setCurrentIndex(0); }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 void MainWindow::on_btnRetourAddProj_clicked()
 {
     // clear add form on cancel
@@ -3949,6 +4082,12 @@ void MainWindow::on_btnFiltrerDateProj_clicked()
     ui->tableProjets->scrollToItem(ui->tableProjets->item(bestRow, 0));
 }
 
+=======
+void MainWindow::on_btnRetourAddProj_clicked() { ui->stack_proj->setCurrentIndex(0); }
+void MainWindow::on_btnAjouterProj_clicked() { ui->stack_proj->setCurrentIndex(1); }
+void MainWindow::on_btnModifierProj_clicked() { ui->stack_proj->setCurrentIndex(2); }
+void MainWindow::on_btnVoirStatistiquesProj_clicked() { ui->stack_proj->setCurrentIndex(3); }
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
 // ==================== FINANCE HELPERS ====================
 
@@ -3974,15 +4113,23 @@ Finance::Row MainWindow::selectedFinanceRowFromTable(bool *ok) const
     if (!item(0)) return {};
 
     Finance::Row row;
-    row.id = item(0)->data(Qt::UserRole).toString(); // caché (IDFINANCE)
+    row.id = item(0)->data(Qt::UserRole).toString(); // cachÃ© (IDFINANCE)
     row.code = item(0)->text();
     row.type = item(1) ? item(1)->text() : "";
     row.montant = item(2) ? item(2)->text() : "";
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     row.categorie = "";
     row.description = item(3) ? item(3)->text() : "";
     row.dateTransaction = item(4) ? item(4)->text() : "";
     row.modePaiement = item(5) ? item(5)->text() : "";
     row.dateCreation = item(6) ? item(6)->text() : "";
+=======
+    row.categorie = item(3) ? item(3)->text() : "";
+    row.description = item(4) ? item(4)->text() : "";
+    row.dateTransaction = item(5) ? item(5)->text() : "";
+    row.modePaiement = item(6) ? item(6)->text() : "";
+    row.dateCreation = item(7) ? item(7)->text() : "";
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     if (ok) *ok = true;
     return row;
@@ -3992,6 +4139,7 @@ Finance::Row MainWindow::selectedFinanceRowFromTable(bool *ok) const
 
 void MainWindow::initFinanceUi()
 {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     ui->FormCode->setReadOnly(true);
     ui->FormCode_2->setReadOnly(true);
     // Date de transaction verrouillée dans modifier (non modifiable après création)
@@ -4002,27 +4150,29 @@ void MainWindow::initFinanceUi()
     ui->FormCategory_2->setVisible(false);
     ui->LblCat2_2->setVisible(false);
 
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     // --- ComboBox (AJOUT) : valeurs DB via currentData() ---
     ui->FormType->clear();
-    ui->FormType->addItem("Dépense", "Depense");   // affichage accent, valeur DB sans accent
+    ui->FormType->addItem("DÃ©pense", "Depense");   // affichage accent, valeur DB sans accent
     ui->FormType->addItem("Revenu",  "Revenu");
 
     ui->FormPayMode->clear();
-    ui->FormPayMode->addItem("Espèces",        "especes");
-    ui->FormPayMode->addItem("Chèque",         "cheque");
+    ui->FormPayMode->addItem("EspÃ¨ces",        "especes");
+    ui->FormPayMode->addItem("ChÃ¨que",         "cheque");
     ui->FormPayMode->addItem("Virement",       "virement");
     ui->FormPayMode->addItem("Carte bancaire", "carte_bancaire");
     ui->FormPayMode->addItem("Facture",        "facture");
     ui->FormPayMode->addItem("Remboursement",  "remboursement");
 
-    // --- ComboBox (MODIF) : mêmes valeurs DB ---
+    // --- ComboBox (MODIF) : mÃªmes valeurs DB ---
     ui->FormType_2->clear();
-    ui->FormType_2->addItem("Dépense", "Depense");  // affichage accent, valeur DB sans accent
+    ui->FormType_2->addItem("DÃ©pense", "Depense");  // affichage accent, valeur DB sans accent
     ui->FormType_2->addItem("Revenu",  "Revenu");
 
     ui->FormPayMode_2->clear();
-    ui->FormPayMode_2->addItem("Espèces",        "especes");
-    ui->FormPayMode_2->addItem("Chèque",         "cheque");
+    ui->FormPayMode_2->addItem("EspÃ¨ces",        "especes");
+    ui->FormPayMode_2->addItem("ChÃ¨que",         "cheque");
     ui->FormPayMode_2->addItem("Virement",       "virement");
     ui->FormPayMode_2->addItem("Carte bancaire", "carte_bancaire");
     ui->FormPayMode_2->addItem("Facture",        "facture");
@@ -4033,14 +4183,26 @@ void MainWindow::initFinanceUi()
     ui->DateFrom->setDate(QDate(2000, 1, 1));
     ui->DateTo->setDate(QDate::currentDate());
 
-    // Utilise désormais le style global (QSS) défini dans style_light.qss / style.qss
+    // Utilise dÃ©sormais le style global (QSS) dÃ©fini dans style_light.qss / style.qss
     ui->BtnConvertCurrency->setStyleSheet("");
     ui->BtnConvertCurrency_2->setStyleSheet("");
 
     ui->BtnOcrReceipt->setStyleSheet("");
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    ui->BtnOcrReceipt_2->setStyleSheet("");
 
-    // ── LblOcrHint : badge hint stylé ────────────────────────────────────────
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    // â”€â”€ LblOcrHint : badge hint stylÃ© â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     ui->LblOcrHint->setStyleSheet(
+========
+    // ── LblOcrHint : badge hint stylé ────────────────────────────────────────
+    const QString ocrHintStyle =
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+
+    // â”€â”€ LblOcrHint : badge hint stylÃ© â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    ui->LblOcrHint->setStyleSheet(
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
         "QLabel {"
         "  color: #4a9fa5;"
         "  font-size: 9.5px;"
@@ -4049,7 +4211,10 @@ void MainWindow::initFinanceUi()
         "  background: rgba(31,142,149,0.07);"
         "  border-radius: 6px;"
         "  padding: 4px 10px;"
-        "}");
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+        "}";
+    ui->LblOcrHint->setStyleSheet(ocrHintStyle);
+    ui->LblOcrHint_2->setStyleSheet(ocrHintStyle);
 
     // Max 9 chiffres avant la décimale, 2 après — bloque ORA-01438
     auto *amountValidator = new QRegularExpressionValidator(
@@ -4082,15 +4247,18 @@ void MainWindow::initFinanceUi()
     connect(ui->FormPayMode, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=](int){ refreshCodeAdd(); });
     connect(ui->FormType_2, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=](int){ refreshCodeEdit(); });
     connect(ui->FormPayMode_2, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=](int){ refreshCodeEdit(); });
+=======
+        "}");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     ui->stacked_F->setCurrentIndex(0);
     loadFinance();
 
-    // Graphique stats : se met à jour quand le combo change
+    // Graphique stats : se met Ã  jour quand le combo change
     connect(ui->comboBox_3, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, [this](int){ updateFinanceStats(); });
 
-    // --- Connexions pour mise à jour automatique de la liste ---
+    // --- Connexions pour mise Ã  jour automatique de la liste ---
     connect(ui->CbType, &QComboBox::currentIndexChanged, this, &MainWindow::on_BtnApply_clicked);
     connect(ui->EdSearch, &QLineEdit::textChanged, this, &MainWindow::on_BtnApply_clicked);
     connect(ui->DateFrom, &QDateEdit::dateChanged, this, &MainWindow::on_BtnApply_clicked);
@@ -4105,14 +4273,29 @@ void MainWindow::setupTableFinance()
     ui->TableFinance->verticalHeader()->setVisible(false);
     ui->TableFinance->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    // 8 colonnes visibles (ID cachÃ© dans UserRole col 0)
+    ui->TableFinance->setColumnCount(8);
+    ui->TableFinance->setSortingEnabled(true);
+    ui->TableFinance->setHorizontalHeaderLabels({
+        "Code", "Type", "Montant", "CatÃ©gorie",
+        "Description", "Date", "Mode", "CrÃ©ation"
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
     ui->TableFinance->setColumnCount(7);
     ui->TableFinance->setSortingEnabled(true);
     ui->TableFinance->setHorizontalHeaderLabels({
         "Code", "Type", "Montant", "Description", "Date", "Mode", "Création"
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     });
 
     // Petite phrase pour guider l'utilisateur
-    QString tip = "Transactions <small><i>(Astuce : Cliquez sur les en-têtes pour trier)</i></small>";
+    QString tip = "Transactions <small><i>(Astuce : Cliquez sur les en-tÃªtes pour trier)</i></small>";
     ui->TableTitle->setText(tip);
 }
 
@@ -4133,26 +4316,41 @@ void MainWindow::loadFinance()
         ui->TableFinance->insertRow(row);
 
         auto *itCode = new QTableWidgetItem(r.code);
-        itCode->setData(Qt::UserRole, r.id); // ID caché
+        itCode->setData(Qt::UserRole, r.id); // ID cachÃ©
         ui->TableFinance->setItem(row, 0, itCode);
 
         // Affichage avec accent ; valeur DB (sans accent) en UserRole pour modifier/PDF
-        const QString typeDisplay = (r.type == "Depense") ? "Dépense" : r.type;
+        const QString typeDisplay = (r.type == "Depense") ? "DÃ©pense" : r.type;
         auto *itType = new QTableWidgetItem(typeDisplay);
         itType->setData(Qt::UserRole, r.type); // "Depense" ou "Revenu"
         ui->TableFinance->setItem(row, 1, itType);
 
         auto *itMontant = new QTableWidgetItem();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+        itMontant->setData(Qt::DisplayRole, r.montant.toDouble()); // tri numÃ©rique correct
+========
         const double montantNum = r.montant.toDouble();
         itMontant->setData(Qt::DisplayRole, QString::number(montantNum, 'f', 2)); // jamais notation scientifique
         itMontant->setData(Qt::UserRole, montantNum); // valeur numérique pour lecture modifier
         itMontant->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
         ui->TableFinance->setItem(row, 2, itMontant);
 
         ui->TableFinance->setItem(row, 3, new QTableWidgetItem(r.description));
         ui->TableFinance->setItem(row, 4, new QTableWidgetItem(r.dateTransaction));
         ui->TableFinance->setItem(row, 5, new QTableWidgetItem(r.modePaiement));
         ui->TableFinance->setItem(row, 6, new QTableWidgetItem(r.dateCreation));
+=======
+        itMontant->setData(Qt::DisplayRole, r.montant.toDouble()); // tri numÃ©rique correct
+        ui->TableFinance->setItem(row, 2, itMontant);
+
+        ui->TableFinance->setItem(row, 3, new QTableWidgetItem(r.categorie));
+        ui->TableFinance->setItem(row, 4, new QTableWidgetItem(r.description));
+        ui->TableFinance->setItem(row, 5, new QTableWidgetItem(r.dateTransaction));
+        ui->TableFinance->setItem(row, 6, new QTableWidgetItem(r.modePaiement));
+        ui->TableFinance->setItem(row, 7, new QTableWidgetItem(r.dateCreation));
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
         row++;
     }
@@ -4163,7 +4361,7 @@ void MainWindow::updateFinanceStats()
 {
     const int idx = ui->comboBox_3->currentIndex();
 
-    // Récupérer ou créer le QChartView dans la page statsF
+    // RÃ©cupÃ©rer ou crÃ©er le QChartView dans la page statsF
     QChartView *cv = ui->statsF->findChild<QChartView*>("finChartView");
     if (!cv) {
         cv = new QChartView(ui->statsF);
@@ -4174,7 +4372,7 @@ void MainWindow::updateFinanceStats()
         ui->stat_pub_3->hide();
     }
 
-    // ── Palette multicolore pour les barres ─────────────────────────────
+    // â”€â”€ Palette multicolore pour les barres â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     static const QVector<QColor> palette = {
         QColor(31, 142, 149), QColor(39, 174, 96), QColor(230, 126, 34),
         QColor(142, 68, 173), QColor(41, 128, 185), QColor(192, 57, 43),
@@ -4189,9 +4387,9 @@ void MainWindow::updateFinanceStats()
     chart->setTitleBrush(m_isDarkTheme ? QColor(241, 245, 249) : QColor(45, 55, 72));
 
     if (idx == 0) {
-        // ════════════════════════════════════════════════════════════════
-        //  DONUT : Dépenses vs Revenus
-        // ════════════════════════════════════════════════════════════════
+        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        //  DONUT : DÃ©penses vs Revenus
+        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
         double totalDep = 0, totalRev = 0;
         QSqlQuery q("SELECT TYPETRANSACTION, SUM(MONTANT) FROM FINANCE "
                     "GROUP BY TYPETRANSACTION");
@@ -4220,15 +4418,15 @@ void MainWindow::updateFinanceStats()
             if (val == qMax(totalDep, totalRev)) sl->setExploded(true);
         };
 
-        addSlice("Dépenses", totalDep, QColor(192, 57, 43));
+        addSlice("DÃ©penses", totalDep, QColor(192, 57, 43));
         addSlice("Revenus",  totalRev, QColor(39, 174, 96));
 
         if (pie->count() == 0) {
-            pie->append("Aucune donnée", 1)->setColor(QColor(189, 195, 199));
+            pie->append("Aucune donnÃ©e", 1)->setColor(QColor(189, 195, 199));
         }
 
         chart->addSeries(pie);
-        chart->setTitle(QString("Dépenses vs Revenus   |   Total : %1 DT")
+        chart->setTitle(QString("DÃ©penses vs Revenus   |   Total : %1 DT")
                             .arg(QLocale(QLocale::French).toString(total,'f',2)));
         chart->legend()->setVisible(true);
         chart->legend()->setLabelColor(m_isDarkTheme ? QColor(241, 245, 249) : QColor(45, 55, 72));
@@ -4236,14 +4434,14 @@ void MainWindow::updateFinanceStats()
         chart->legend()->setFont(QFont("Segoe UI", 10));
 
     } else {
-        // ════════════════════════════════════════════════════════════════
-        //  BARRES multicolores : par catégorie
-        // ════════════════════════════════════════════════════════════════
+        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        //  BARRES multicolores : par catÃ©gorie
+        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
         const QString typeFilter = (idx == 2) ? "Depense" : "Revenu";
-        const QString title      = (idx == 2) ? "Dépenses par catégorie"
-                                              : "Revenus par catégorie";
+        const QString title      = (idx == 2) ? "DÃ©penses par catÃ©gorie"
+                                              : "Revenus par catÃ©gorie";
         QSqlQuery q;
-        q.prepare("SELECT NVL(CATEGORIE,'Sans catégorie'), SUM(MONTANT) "
+        q.prepare("SELECT NVL(CATEGORIE,'Sans catÃ©gorie'), SUM(MONTANT) "
                   "FROM FINANCE WHERE TYPETRANSACTION=:t "
                   "GROUP BY CATEGORIE ORDER BY SUM(MONTANT) DESC");
         q.bindValue(":t", typeFilter);
@@ -4255,9 +4453,9 @@ void MainWindow::updateFinanceStats()
             cats << q.value(0).toString();
             vals << q.value(1).toDouble();
         }
-        if (cats.isEmpty()) { cats << "Aucune donnée"; vals << 0; }
+        if (cats.isEmpty()) { cats << "Aucune donnÃ©e"; vals << 0; }
 
-        // Un seul QBarSet avec toutes les valeurs → N barres alignées sur N catégories
+        // Un seul QBarSet avec toutes les valeurs â†’ N barres alignÃ©es sur N catÃ©gories
         const QColor barColor = (idx == 2) ? QColor(192, 57, 43) : QColor(39, 174, 96);
         auto *set = new QBarSet("Montant (DT)");
         set->setColor(barColor);
@@ -4322,7 +4520,7 @@ void MainWindow::on_BtnOcrReceipt_clicked()
         ui->FormDate->setDate(r.date);
 
     if (!r.type.isEmpty()) {
-        // FormType comboBox items : "Dépense"/"Revenu" — match by data
+        // FormType comboBox items : "DÃ©pense"/"Revenu" â€” match by data
         for (int i = 0; i < ui->FormType->count(); ++i) {
             if (ui->FormType->itemData(i).toString() == r.type) {
                 ui->FormType->setCurrentIndex(i);
@@ -4331,10 +4529,45 @@ void MainWindow::on_BtnOcrReceipt_clicked()
         }
     }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+    if (!r.category.isEmpty())
+        ui->FormCategory->setText(r.category);
+
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     if (!r.description.isEmpty() && ui->FormDesc->text().isEmpty())
         ui->FormDesc->setText(r.description);
 }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+void MainWindow::on_BtnOcrReceipt_2_clicked()
+{
+    OcrScannerDialog dlg(this);
+    if (dlg.exec() != QDialog::Accepted) return;
+
+    const OcrResult &r = dlg.result();
+
+    if (r.hasAmount && r.amount > 0.0)
+        ui->FormAmount_2->setText(QString::number(r.amount, 'f', 2));
+
+    if (r.hasDate && r.date.isValid())
+        ui->FormDate_2->setDate(r.date);
+
+    if (!r.type.isEmpty()) {
+        for (int i = 0; i < ui->FormType_2->count(); ++i) {
+            if (ui->FormType_2->itemData(i).toString() == r.type) {
+                ui->FormType_2->setCurrentIndex(i);
+                break;
+            }
+        }
+    }
+
+    if (!r.description.isEmpty() && ui->FormDesc_2->text().isEmpty())
+        ui->FormDesc_2->setText(r.description);
+}
+
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 void MainWindow::showFinanceList()
 {
     ui->stackedWidget->setCurrentIndex(3);  // page Finance
@@ -4352,9 +4585,15 @@ void MainWindow::on_BtnAdd_clicked()
 {
     ui->stacked_F->setCurrentIndex(1); // ajouterF
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     ui->FormCode->setText(generateTxCode(ui->FormType->currentData().toString(),
                                          ui->FormPayMode->currentData().toString()));
     ui->FormAmount->clear();
+=======
+    ui->FormCode->clear();
+    ui->FormAmount->clear();
+    ui->FormCategory->clear();
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     ui->FormDesc->clear();
 
     ui->FormType->setCurrentIndex(0);
@@ -4374,26 +4613,62 @@ void MainWindow::on_BtnPopupSaveFinance_clicked()
     const QString code = ui->FormCode->text().trimmed();
     const QString type = ui->FormType->currentData().toString();
     const QString mode = ui->FormPayMode->currentData().toString();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     const QString cat  = (type == "Revenu") ? "Revenu" : "Depense";
+=======
+    const QString cat  = ui->FormCategory->text().trimmed();
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     const QString desc = ui->FormDesc->text().trimmed();
     const QDate   dt   = ui->FormDate->date();
     const QDate   dc   = ui->FormCreatedAt->date();
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     if (code.isEmpty()) {
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+    // --- Validation CODE ---
+    if (code.isEmpty()) {
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+        QMessageBox::warning(this, "Ajout", "Le code transaction est obligatoire.");
+        ui->FormCode->setFocus();
+        return;
+    }
+    // Exemple de format conseillÃ©: TRX001 / FIN-2026-01 ...
+    static const QRegularExpression reCode(R"(^[A-Za-z0-9_-]{3,20}$)");
+    if (!reCode.match(code).hasMatch()) {
+        QMessageBox::warning(this, "Ajout",
+                             "Code invalide.\nUtilise 3 Ã  20 caractÃ¨res (lettres/chiffres/_/-).");
+        ui->FormCode->setFocus();
+        return;
+    }
+
+    // --- Validation CatÃ©gorie ---
+    if (cat.isEmpty()) {
+        QMessageBox::warning(this, "Ajout", "La catÃ©gorie est obligatoire.");
+        ui->FormCategory->setFocus();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
         QMessageBox::warning(this, "Ajout", "Code transaction introuvable.");
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
         return;
     }
 
     // --- Validation Montant ---
     bool okAmount = false;
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     const double montant = ui->FormAmount->text().trimmed().replace(',', '.').toDouble(&okAmount);
+=======
+    const double montant = ui->FormAmount->text().trimmed().toDouble(&okAmount);
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     if (!okAmount) {
         QMessageBox::warning(this, "Ajout", "Montant invalide (nombre attendu).");
         ui->FormAmount->setFocus();
         return;
     }
     if (montant <= 0.0) {
-        QMessageBox::warning(this, "Ajout", "Le montant doit être strictement positif.");
+        QMessageBox::warning(this, "Ajout", "Le montant doit Ãªtre strictement positif.");
         ui->FormAmount->setFocus();
         return;
     }
@@ -4405,7 +4680,7 @@ void MainWindow::on_BtnPopupSaveFinance_clicked()
     }
     if (dc < dt) {
         QMessageBox::warning(this, "Ajout",
-                             "La date de création ne doit pas être avant la date de transaction.");
+                             "La date de crÃ©ation ne doit pas Ãªtre avant la date de transaction.");
         return;
     }
 
@@ -4427,7 +4702,7 @@ void MainWindow::on_BtnEdit_clicked()
 {
     const int r = ui->TableFinance->currentRow();
     if (r < 0) {
-        QMessageBox::warning(this, "Modifier", "Sélectionne une transaction.");
+        QMessageBox::warning(this, "Modifier", "SÃ©lectionne une transaction.");
         return;
     }
 
@@ -4436,7 +4711,10 @@ void MainWindow::on_BtnEdit_clicked()
         QMessageBox::warning(this, "Modifier", "ID introuvable.");
         return;
     }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     if (!ui->TableFinance->item(r, 0)) return;
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     ui->FormCode_2->setText(ui->TableFinance->item(r,0)->text());
 
@@ -4445,8 +4723,14 @@ void MainWindow::on_BtnEdit_clicked()
     int idxType = ui->FormType_2->findData(typeDb);
     ui->FormType_2->setCurrentIndex(qMax(0, idxType));
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    // Montant : stockÃ© en DisplayRole (double), on rÃ©cupÃ¨re la chaÃ®ne formatÃ©e
+    const double montantVal = ui->TableFinance->item(r,2)->data(Qt::DisplayRole).toDouble();
+========
     // Montant : valeur numérique stockée en UserRole
     const double montantVal = ui->TableFinance->item(r,2)->data(Qt::UserRole).toDouble();
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
     ui->FormAmount_2->setText(QString::number(montantVal, 'f', 2));
     ui->FormDesc_2->setText(ui->TableFinance->item(r,3)->text());
 
@@ -4456,15 +4740,39 @@ void MainWindow::on_BtnEdit_clicked()
 
     // MODE : data == "especes/cheque/..."
     const QString modeDb = ui->TableFinance->item(r,5)->text();
+=======
+    // Montant : stockÃ© en DisplayRole (double), on rÃ©cupÃ¨re la chaÃ®ne formatÃ©e
+    const double montantVal = ui->TableFinance->item(r,2)->data(Qt::DisplayRole).toDouble();
+    ui->FormAmount_2->setText(QString::number(montantVal, 'f', 2));
+    ui->FormCategory_2->setText(ui->TableFinance->item(r,3)->text());
+    ui->FormDesc_2->setText(ui->TableFinance->item(r,4)->text());
+
+    // Date transaction safe
+    QDate dt = QDate::fromString(ui->TableFinance->item(r,5)->text(), "yyyy-MM-dd");
+    ui->FormDate_2->setDate(dt.isValid() ? dt : QDate::currentDate());
+
+    // MODE : data == "especes/cheque/..."
+    const QString modeDb = ui->TableFinance->item(r,6)->text();
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     int idxMode = ui->FormPayMode_2->findData(modeDb);
     if (idxMode < 0) idxMode = ui->FormPayMode_2->findText(modeDb);
     ui->FormPayMode_2->setCurrentIndex(qMax(0, idxMode));
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    // Date crÃ©ation safe
+    QDate dc = QDate::fromString(ui->TableFinance->item(r,7)->text(), "yyyy-MM-dd");
+========
     ui->FormCode_2->setText(generateTxCode(ui->FormType_2->currentData().toString(),
                                            ui->FormPayMode_2->currentData().toString()));
 
     // Date création safe
     QDate dc = QDate::fromString(ui->TableFinance->item(r,6)->text(), "yyyy-MM-dd");
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+    // Date crÃ©ation safe
+    QDate dc = QDate::fromString(ui->TableFinance->item(r,7)->text(), "yyyy-MM-dd");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     ui->FormCreatedAt_2->setDate(dc.isValid() ? dc : QDate::currentDate());
 
     ui->stacked_F->setCurrentIndex(2); // modifierF
@@ -4479,14 +4787,18 @@ void MainWindow::on_BtnPopupCancelFinance_2_clicked()
 void MainWindow::on_BtnPopupSaveFinance_2_clicked()
 {
     if (idFinanceToEdit.isEmpty()) {
-        QMessageBox::warning(this, "Modifier", "ID manquant. Re-sélectionne la transaction.");
+        QMessageBox::warning(this, "Modifier", "ID manquant. Re-sÃ©lectionne la transaction.");
         return;
     }
 
     const QString code = ui->FormCode_2->text().trimmed();
     const QString type = ui->FormType_2->currentData().toString();
     const QString mode = ui->FormPayMode_2->currentData().toString();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     const QString cat  = (type == "Revenu") ? "Revenu" : "Depense";
+=======
+    const QString cat  = ui->FormCategory_2->text().trimmed();
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     const QString desc = ui->FormDesc_2->text().trimmed();
     const QDate   dt   = ui->FormDate_2->date();
     const QDate   dc   = ui->FormCreatedAt_2->date();
@@ -4496,16 +4808,41 @@ void MainWindow::on_BtnPopupSaveFinance_2_clicked()
         ui->FormCode_2->setFocus();
         return;
     }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    static const QRegularExpression reCode(R"(^[A-Za-z0-9_-]{3,20}$)");
+    if (!reCode.match(code).hasMatch()) {
+        QMessageBox::warning(this, "Modifier",
+                             "Code invalide.\nUtilise 3 Ã  20 caractÃ¨res (lettres/chiffres/_/-).");
+        ui->FormCode_2->setFocus();
+        return;
+    }
+
+    if (cat.isEmpty()) {
+        QMessageBox::warning(this, "Modifier", "La catÃ©gorie est obligatoire.");
+        ui->FormCategory_2->setFocus();
+        return;
+    }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
 
     bool okAmount = false;
     const double montant = ui->FormAmount_2->text().trimmed().replace(',', '.').toDouble(&okAmount);
+=======
+
+    bool okAmount = false;
+    const double montant = ui->FormAmount_2->text().trimmed().toDouble(&okAmount);
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     if (!okAmount) {
         QMessageBox::warning(this, "Modifier", "Montant invalide (nombre attendu).");
         ui->FormAmount_2->setFocus();
         return;
     }
     if (montant <= 0.0) {
-        QMessageBox::warning(this, "Modifier", "Le montant doit être strictement positif.");
+        QMessageBox::warning(this, "Modifier", "Le montant doit Ãªtre strictement positif.");
         ui->FormAmount_2->setFocus();
         return;
     }
@@ -4516,7 +4853,7 @@ void MainWindow::on_BtnPopupSaveFinance_2_clicked()
     }
     if (dc < dt) {
         QMessageBox::warning(this, "Modifier",
-                             "La date de création ne doit pas être avant la date de transaction.");
+                             "La date de crÃ©ation ne doit pas Ãªtre avant la date de transaction.");
         return;
     }
 
@@ -4548,7 +4885,7 @@ void MainWindow::on_BtnDelete_clicked()
 {
     const QString id = selectedFinanceId();
     if (id.isEmpty()) {
-        QMessageBox::warning(this, "Supprimer", "Sélectionne une transaction.");
+        QMessageBox::warning(this, "Supprimer", "SÃ©lectionne une transaction.");
         return;
     }
 
@@ -4571,7 +4908,7 @@ bool MainWindow::exportInternalInvoicePdf_19(const QString& filePath, const Fina
     bool okAmt = false;
     const double totalHT = parseAmount(row.montant, &okAmt);
     if (!okAmt || totalHT <= 0.0) {
-        QMessageBox::warning(this, "Export", "Montant invalide pour la transaction sélectionnée.");
+        QMessageBox::warning(this, "Export", "Montant invalide pour la transaction sÃ©lectionnÃ©e.");
         return false;
     }
 
@@ -4580,10 +4917,22 @@ bool MainWindow::exportInternalInvoicePdf_19(const QString& filePath, const Fina
 
     const QString invoiceNo   = makeInvoiceNumber();
     const QString invoiceDate = QDate::currentDate().toString("dd/MM/yyyy");
-    const bool    isDepense   = (row.type == "Depense" || row.type == "Dépense");
-    const QString typeLabel   = isDepense ? "DÉPENSE" : "REVENU";
+    const bool    isDepense   = (row.type == "Depense" || row.type == "DÃ©pense");
+    const QString typeLabel   = isDepense ? "DÃ‰PENSE" : "REVENU";
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    QString designation = row.categorie.trimmed();
+    const QString desc = row.description.trimmed();
+    if (!desc.isEmpty() && desc != "(null)") designation += " â€” " + desc;
+========
     QString designation = row.description.trimmed();
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+    QString designation = row.categorie.trimmed();
+    const QString desc = row.description.trimmed();
+    if (!desc.isEmpty() && desc != "(null)") designation += " â€” " + desc;
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     if (designation.isEmpty()) designation = "Transaction interne";
 
     QPdfWriter pdf(filePath);
@@ -4599,7 +4948,7 @@ bool MainWindow::exportInternalInvoicePdf_19(const QString& filePath, const Fina
     const int H = pdf.height();
     const int M = 100;
 
-    // ── Palette ──────────────────────────────────────────────────────────
+    // â”€â”€ Palette â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const QColor cDarkTeal (13, 90, 95);
     const QColor cTeal     (31, 142, 149);
     const QColor cLightTeal(232, 248, 248);
@@ -4624,15 +4973,15 @@ bool MainWindow::exportInternalInvoicePdf_19(const QString& filePath, const Fina
         p.drawRoundedRect(r, radius, radius); p.restore();
     };
 
-    // ════════════════════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     //  BANDE HEADER
-    // ════════════════════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     const int hdrH = 190;
     fillR(QRect(0, 0, W, hdrH), cDarkTeal);
     // Bande accent verticale gauche
     fillR(QRect(0, 0, 16, hdrH), cAccent);
 
-    // Nom société
+    // Nom sociÃ©tÃ©
     sf(22, true); p.setPen(cWhite);
     p.drawText(QRect(M + 8, 28, W / 2, 52), Qt::AlignLeft | Qt::AlignVCenter, "SmartResearchLab");
 
@@ -4640,30 +4989,30 @@ bool MainWindow::exportInternalInvoicePdf_19(const QString& filePath, const Fina
     p.drawText(QRect(M + 8, 84, W / 2 + 100, 22), Qt::AlignLeft | Qt::AlignVCenter,
                "Urban Park, Ariana 1080, Tunisie");
     p.drawText(QRect(M + 8, 108, W / 2 + 100, 22), Qt::AlignLeft | Qt::AlignVCenter,
-               "+216 XX XXX XXX   ·   finance@smartresearchlab.tn");
+               "+216 XX XXX XXX   Â·   finance@smartresearchlab.tn");
 
     // Titre droite
     sf(30, true); p.setPen(cWhite);
     p.drawText(QRect(W / 2, 20, W / 2 - M - 8, 58), Qt::AlignRight | Qt::AlignVCenter, "FACTURE");
     sf(10, false); p.setPen(QColor(180, 230, 232));
     p.drawText(QRect(W / 2, 80, W / 2 - M - 8, 24), Qt::AlignRight | Qt::AlignVCenter,
-               "N°  " + invoiceNo);
+               "NÂ°  " + invoiceNo);
     p.drawText(QRect(W / 2, 106, W / 2 - M - 8, 24), Qt::AlignRight | Qt::AlignVCenter,
-               "Émise le : " + invoiceDate);
+               "Ã‰mise le : " + invoiceDate);
 
     y = hdrH + 30;
 
-    // ════════════════════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     //  BADGE TYPE
-    // ════════════════════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     fillRR(QRect(M, y, 250, 44), 10, cAccent);
     sf(13, true); p.setPen(cWhite);
     p.drawText(QRect(M, y, 250, 44), Qt::AlignCenter, typeLabel);
     y += 44 + 30;
 
-    // ════════════════════════════════════════════════════════════════════
-    //  CARDS INFO (Document | Référence)
-    // ════════════════════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    //  CARDS INFO (Document | RÃ©fÃ©rence)
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     const int cardH = 148;
     const int cGap  = 22;
     const int cardW = (tableW - cGap) / 2;
@@ -4698,18 +5047,18 @@ bool MainWindow::exportInternalInvoicePdf_19(const QString& filePath, const Fina
     drawCard(M, y, cardW, cardH,
              "DOCUMENT",
              {"Type :", "Usage :", "TVA :"},
-             {typeLabel, "Interne – Société", "19 %"});
+             {typeLabel, "Interne â€“ SociÃ©tÃ©", "19 %"});
 
     drawCard(M + cardW + cGap, y, cardW, cardH,
-             "RÉFÉRENCE",
+             "RÃ‰FÃ‰RENCE",
              {"Code :", "Date transaction :", "Mode paiement :"},
              {row.code, row.dateTransaction, row.modePaiement});
 
     y += cardH + 36;
 
-    // ════════════════════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     //  TABLEAU ARTICLES
-    // ════════════════════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     const int colDesc = int(tableW * 0.55);
     const int colQty  = int(tableW * 0.10);
     const int colPU   = int(tableW * 0.175);
@@ -4717,25 +5066,25 @@ bool MainWindow::exportInternalInvoicePdf_19(const QString& filePath, const Fina
     const int tHdrH   = 40;
     const int tRowH   = 66;
 
-    // En-tête tableau (fond teal)
+    // En-tÃªte tableau (fond teal)
     fillR(QRect(M, y, tableW, tHdrH), cTeal);
     // Coins bas plats
     p.fillRect(QRect(M, y + tHdrH / 2, tableW, tHdrH / 2), cTeal);
 
     sf(10, true); p.setPen(cWhite);
     int cx = M;
-    p.drawText(QRect(cx + 14, y, colDesc - 14, tHdrH), Qt::AlignVCenter | Qt::AlignLeft, "Désignation");
+    p.drawText(QRect(cx + 14, y, colDesc - 14, tHdrH), Qt::AlignVCenter | Qt::AlignLeft, "DÃ©signation");
     cx += colDesc;
-    p.drawText(QRect(cx, y, colQty, tHdrH), Qt::AlignCenter, "Qté");
+    p.drawText(QRect(cx, y, colQty, tHdrH), Qt::AlignCenter, "QtÃ©");
     cx += colQty;
     p.drawText(QRect(cx, y, colPU, tHdrH), Qt::AlignCenter, "P.U. HT");
     cx += colPU;
     p.drawText(QRect(cx, y, colTot, tHdrH), Qt::AlignCenter, "Total HT");
     y += tHdrH;
 
-    // Ligne article (fond teinté)
+    // Ligne article (fond teintÃ©)
     fillR(QRect(M, y, tableW, tRowH), cLightTeal);
-    // Séparateurs verticaux
+    // SÃ©parateurs verticaux
     p.save(); p.setPen(QPen(cBorder, 1)); p.setBrush(Qt::NoBrush);
     cx = M + colDesc; p.drawLine(cx, y, cx, y + tRowH);
     cx += colQty;     p.drawLine(cx, y, cx, y + tRowH);
@@ -4755,9 +5104,9 @@ bool MainWindow::exportInternalInvoicePdf_19(const QString& filePath, const Fina
     p.drawText(QRect(cx, y, colTot, tRowH), Qt::AlignCenter, fmtDT(totalHT));
     y += tRowH + 28;
 
-    // ════════════════════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     //  BLOC TOTAUX
-    // ════════════════════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     const int totW  = 560;
     const int totX  = W - M - totW;
     const int lineH = 38;
@@ -4781,22 +5130,22 @@ bool MainWindow::exportInternalInvoicePdf_19(const QString& filePath, const Fina
     totLine("TVA (19 %)",    fmtDT(tva),       false);
     totLine("TOTAL TTC",     fmtDT(totalTTC),  true);
 
-    // ════════════════════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     //  PIED DE PAGE
-    // ════════════════════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     const int footY = H - M - 68;
     fillR(QRect(M, footY, tableW, 3), cTeal);
 
     sf(8, false); p.setPen(cMid);
     p.drawText(QRect(M, footY + 12, tableW, 22),
                Qt::AlignLeft | Qt::AlignVCenter,
-               "Document confidentiel — usage interne uniquement.");
+               "Document confidentiel â€” usage interne uniquement.");
     p.drawText(QRect(M, footY + 12, tableW, 22),
                Qt::AlignRight | Qt::AlignVCenter,
-               "Généré par SmartResearchLab · Module Finance");
+               "GÃ©nÃ©rÃ© par SmartResearchLab Â· Module Finance");
     p.drawText(QRect(M, footY + 38, tableW, 22),
                Qt::AlignCenter,
-               "SmartResearchLab  ·  Urban Park, Ariana 1080  ·  finance@smartresearchlab.tn");
+               "SmartResearchLab  Â·  Urban Park, Ariana 1080  Â·  finance@smartresearchlab.tn");
 
     p.end();
     return true;
@@ -4811,10 +5160,10 @@ void MainWindow::on_BtnApply_clicked()
         return;
     }
 
-    // Lecture des critères
-    const int typeIdx = ui->CbType->currentIndex();           // 0=tous 1=Dépense 2=Revenu
+    // Lecture des critÃ¨res
+    const int typeIdx = ui->CbType->currentIndex();           // 0=tous 1=DÃ©pense 2=Revenu
     QString typeVal = (typeIdx == 0) ? "" : ui->CbType->currentText();
-    if (typeVal == "Dépense") typeVal = "Depense";            // normalisation accent → DB
+    if (typeVal == "DÃ©pense") typeVal = "Depense";            // normalisation accent â†’ DB
     const QDate   dateFrom = ui->DateFrom->date();
     const QDate   dateTo   = ui->DateTo->date();
     const QString search   = ui->EdSearch->text().trimmed().toLower();
@@ -4826,13 +5175,24 @@ void MainWindow::on_BtnApply_clicked()
         // Filtre type
         if (!typeVal.isEmpty() && r.type != typeVal) continue;
 
-        // Filtre période
+        // Filtre pÃ©riode
         const QDate dt = QDate::fromString(r.dateTransaction, "yyyy-MM-dd");
         if (dt.isValid() && (dt < dateFrom || dt > dateTo)) continue;
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+        // Filtre texte libre (code, catÃ©gorie, description)
+========
         // Filtre texte libre (code, description)
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
         if (!search.isEmpty()) {
             const bool match = r.code.toLower().contains(search)
+=======
+        // Filtre texte libre (code, catÃ©gorie, description)
+        if (!search.isEmpty()) {
+            const bool match = r.code.toLower().contains(search)
+                            || r.categorie.toLower().contains(search)
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
                             || r.description.toLower().contains(search);
             if (!match) continue;
         }
@@ -4842,12 +5202,13 @@ void MainWindow::on_BtnApply_clicked()
         itCode->setData(Qt::UserRole, r.id);
         ui->TableFinance->setItem(row, 0, itCode);
 
-        const QString typeDisplay = (r.type == "Depense") ? "Dépense" : r.type;
+        const QString typeDisplay = (r.type == "Depense") ? "DÃ©pense" : r.type;
         auto *itType = new QTableWidgetItem(typeDisplay);
         itType->setData(Qt::UserRole, r.type);
         ui->TableFinance->setItem(row, 1, itType);
 
         auto *itMontant = new QTableWidgetItem();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
         const double montantNum2 = r.montant.toDouble();
         itMontant->setData(Qt::DisplayRole, QString::number(montantNum2, 'f', 2));
         itMontant->setData(Qt::UserRole, montantNum2);
@@ -4858,6 +5219,16 @@ void MainWindow::on_BtnApply_clicked()
         ui->TableFinance->setItem(row, 4, new QTableWidgetItem(r.dateTransaction));
         ui->TableFinance->setItem(row, 5, new QTableWidgetItem(r.modePaiement));
         ui->TableFinance->setItem(row, 6, new QTableWidgetItem(r.dateCreation));
+=======
+        itMontant->setData(Qt::DisplayRole, r.montant.toDouble());
+        ui->TableFinance->setItem(row, 2, itMontant);
+
+        ui->TableFinance->setItem(row, 3, new QTableWidgetItem(r.categorie));
+        ui->TableFinance->setItem(row, 4, new QTableWidgetItem(r.description));
+        ui->TableFinance->setItem(row, 5, new QTableWidgetItem(r.dateTransaction));
+        ui->TableFinance->setItem(row, 6, new QTableWidgetItem(r.modePaiement));
+        ui->TableFinance->setItem(row, 7, new QTableWidgetItem(r.dateCreation));
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
         row++;
     }
     ui->TableFinance->setSortingEnabled(true);
@@ -4869,7 +5240,15 @@ void MainWindow::on_BtnReset_clicked()
     ui->DateFrom->setDate(QDate(2000, 1, 1));
     ui->DateTo->setDate(QDate::currentDate());
     ui->EdSearch->clear();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    on_BtnApply_clicked(); // RafraÃ®chir via la logique de filtrage
+========
     on_BtnApply_clicked();
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+    on_BtnApply_clicked(); // RafraÃ®chir via la logique de filtrage
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 }
 
 void MainWindow::on_BtnExport_clicked()
@@ -4877,7 +5256,7 @@ void MainWindow::on_BtnExport_clicked()
     bool ok = false;
     const Finance::Row row = selectedFinanceRowFromTable(&ok);
     if (!ok) {
-        QMessageBox::warning(this, "Export", "Sélectionne une transaction.");
+        QMessageBox::warning(this, "Export", "SÃ©lectionne une transaction.");
         return;
     }
 
@@ -4890,11 +5269,11 @@ void MainWindow::on_BtnExport_clicked()
     if (filePath.isEmpty()) return;
 
     if (!exportInternalInvoicePdf_19(filePath, row)) {
-        QMessageBox::critical(this, "Erreur", "Génération PDF échouée.");
+        QMessageBox::critical(this, "Erreur", "GÃ©nÃ©ration PDF Ã©chouÃ©e.");
         return;
     }
 
-    QMessageBox::information(this, "Export", "Facture générée ✅");
+    QMessageBox::information(this, "Export", "Facture gÃ©nÃ©rÃ©e âœ…");
 }
 
 // Autres boutons finance
@@ -4910,6 +5289,7 @@ void MainWindow::on_BtnAdd_4_clicked()
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++PUUUUUUUBLIIIICAAAAATTTIIIOOONNNNNN+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 static bool publicationNumeroExists(int numeroBrevet, const QString &excludeId = "")
 {
     if (numeroBrevet <= 0)
@@ -4980,6 +5360,8 @@ static bool publicationTitleExists(const QString &titre, const QString &excludeI
 
     return false;
 }
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 QString MainWindow::selectedPublicationId() const
 {
     int row = ui->tablePublication->currentRow();
@@ -5055,6 +5437,7 @@ void MainWindow::on_btnAjouterPub_clicked()
     ui->stack_pub->setCurrentIndex(1);
 }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 void MainWindow::on_btnModifierPub_clicked()
 {
     // Colonnes : 0=titre(+id UserRole), 1=inventeurs, 2=domaine, 3=type,
@@ -5084,6 +5467,8 @@ void MainWindow::on_btnModifierPub_clicked()
     ui->stack_pub->setCurrentIndex(2);
 }
 
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 void MainWindow::on_btnRetourAddPub_clicked()
 {
     ui->stack_pub->setCurrentIndex(0);
@@ -5106,7 +5491,11 @@ void MainWindow::on_btnVoirStatistiquesPub_clicked()
 void MainWindow::on_btnAddPub_clicked()
 {
     QString titre       = ui->lineTitreAdd->text().trimmed();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     QString inventeurs  = ui->lineInventeursAdd->currentText().trimmed(); // si QComboBox
+=======
+    QString inventeurs  = ui->lineInventeursAdd->text().trimmed();
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     QString resume      = ui->lineResumeAdd->text().trimmed();
     QString domaine     = ui->lineDomaineAdd->text().trimmed();
     QString typeBrevet  = ui->comboTypeBrevetAdd->currentText().trimmed();
@@ -5114,6 +5503,7 @@ void MainWindow::on_btnAddPub_clicked()
     QString numText     = ui->lineNumeroBrevetAdd->text().trimmed();
     QDate dateDepot     = ui->dateDepotAdd->date();
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     // Reset erreurs visuelles
     clearFieldError(ui->lineTitreAdd);
     clearFieldError(ui->lineInventeursAdd);
@@ -5183,10 +5573,32 @@ void MainWindow::on_btnAddPub_clicked()
             setFieldError(ui->lineNumeroBrevetAdd);
             QMessageBox::warning(this, "Ajout",
                                  "Erreur : ce numéro de brevet existe déjà, le numéro doit être unique.");
+=======
+    if (titre.isEmpty()) {
+        QMessageBox::warning(this, "Ajout", "Le titre est obligatoire.");
+        return;
+    }
+
+    if (inventeurs.isEmpty()) {
+        QMessageBox::warning(this, "Ajout", "Le champ inventeurs est obligatoire.");
+        return;
+    }
+
+    bool okNum = true;
+    int numeroBrevet = 0;
+    if (!numText.isEmpty()) {
+        numeroBrevet = numText.toInt(&okNum);
+        if (!okNum) {
+            QMessageBox::warning(this, "Ajout", "Le numero de brevet doit etre numerique.");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
             return;
         }
     }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    QString idEmp = "7"; // remplace par l'id de l'utilisateur connectÃ© si tu l'as
+========
     // ===== Validation date =====
     if (!dateDepot.isValid()) {
         setFieldError(ui->dateDepotAdd);
@@ -5199,6 +5611,10 @@ void MainWindow::on_btnAddPub_clicked()
     }
 
     QString idEmp = "7"; // à remplacer par l'id employé connecté si disponible
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+    QString idEmp = "7"; // remplace par l'id de l'utilisateur connectÃ© si tu l'as
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     Publication p(
         titre,
@@ -5210,7 +5626,11 @@ void MainWindow::on_btnAddPub_clicked()
         dateDepot,
         statut,
         idEmp
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     );
+=======
+        );
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     QString err;
     if (!p.ajouter(&err)) {
@@ -5218,30 +5638,96 @@ void MainWindow::on_btnAddPub_clicked()
         return;
     }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     QMessageBox::information(this, "Succès", "Publication ajoutée avec succès.");
 
     ui->lineTitreAdd->clear();
+=======
+    QMessageBox::information(this, "Succes", "Publication ajoutee avec succes.");
+
+    ui->lineTitreAdd->clear();
+    ui->lineInventeursAdd->clear();
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     ui->lineResumeAdd->clear();
     ui->lineDomaineAdd->clear();
     ui->lineNumeroBrevetAdd->clear();
     ui->dateDepotAdd->setDate(QDate::currentDate());
     ui->comboTypeBrevetAdd->setCurrentIndex(0);
     ui->comboStatusBrevetAdd->setCurrentIndex(0);
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     ui->lineInventeursAdd->setCurrentIndex(0); // si QComboBox
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     loadPublications();
     ui->stack_pub->setCurrentIndex(0);
 }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 void MainWindow::on_btnConfirmEditPub_clicked()
 {
     if (idPublicationToEdit.isEmpty()) {
         QMessageBox::warning(this, "Modification", "Aucune publication sélectionnée.");
+=======
+void MainWindow::on_btnModifierPub_clicked()
+{
+    int row = ui->tablePublication->currentRow();
+    if (row < 0) {
+        QMessageBox::warning(this, "Modification", "Veuillez selectionner une publication.");
+        return;
+    }
+
+    idPublicationToEdit = selectedPublicationId();
+    if (idPublicationToEdit.isEmpty()) {
+        QMessageBox::warning(this, "Modification", "ID publication introuvable.");
+        return;
+    }
+
+    ui->lineTitreEdit->setText(ui->tablePublication->item(row, 0)->text());
+    ui->lineInventeursEdit->setText(ui->tablePublication->item(row, 1)->text());
+    ui->lineDomaineEdit->setText(ui->tablePublication->item(row, 2)->text());
+
+    {
+        QString type = ui->tablePublication->item(row, 3)->text();
+        int idx = ui->comboTypeBrevetEdit->findText(type);
+        if (idx >= 0) ui->comboTypeBrevetEdit->setCurrentIndex(idx);
+    }
+
+    ui->lineNumeroBrevetEdit->setText(ui->tablePublication->item(row, 4)->text());
+
+    {
+        QDate d = QDate::fromString(ui->tablePublication->item(row, 5)->text(), "yyyy-MM-dd");
+        if (d.isValid())
+            ui->dateDepotEdit->setDate(d);
+        else
+            ui->dateDepotEdit->setDate(QDate::currentDate());
+    }
+
+    {
+        QString statut = ui->tablePublication->item(row, 6)->text();
+        int idx = ui->comboStatusBrevetEdit->findText(statut);
+        if (idx >= 0) ui->comboStatusBrevetEdit->setCurrentIndex(idx);
+    }
+
+    ui->lineResumeEdit->setText(ui->tablePublication->item(row, 7)->text());
+
+    ui->stack_pub->setCurrentIndex(2);
+}
+
+void MainWindow::on_btnConfirmEditPub_clicked()
+{
+    if (idPublicationToEdit.isEmpty()) {
+        QMessageBox::warning(this, "Modification", "Aucune publication selectionnee.");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
         return;
     }
 
     QString titre       = ui->lineTitreEdit->text().trimmed();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     QString inventeurs  = ui->lineInventeursEdit->currentText().trimmed(); // si QComboBox
+=======
+    QString inventeurs  = ui->lineInventeursEdit->text().trimmed();
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     QString resume      = ui->lineResumeEdit->text().trimmed();
     QString domaine     = ui->lineDomaineEdit->text().trimmed();
     QString typeBrevet  = ui->comboTypeBrevetEdit->currentText().trimmed();
@@ -5249,6 +5735,7 @@ void MainWindow::on_btnConfirmEditPub_clicked()
     QString numText     = ui->lineNumeroBrevetEdit->text().trimmed();
     QDate dateDepot     = ui->dateDepotEdit->date();
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     // Reset erreurs visuelles
     clearFieldError(ui->lineTitreEdit);
     clearFieldError(ui->lineInventeursEdit);
@@ -5318,10 +5805,29 @@ void MainWindow::on_btnConfirmEditPub_clicked()
             setFieldError(ui->lineNumeroBrevetEdit);
             QMessageBox::warning(this, "Modification",
                                  "Erreur : ce numéro de brevet existe déjà, le numéro doit être unique.");
+=======
+    if (titre.isEmpty()) {
+        QMessageBox::warning(this, "Modification", "Le titre est obligatoire.");
+        return;
+    }
+
+    if (inventeurs.isEmpty()) {
+        QMessageBox::warning(this, "Modification", "Le champ inventeurs est obligatoire.");
+        return;
+    }
+
+    bool okNum = true;
+    int numeroBrevet = 0;
+    if (!numText.isEmpty()) {
+        numeroBrevet = numText.toInt(&okNum);
+        if (!okNum) {
+            QMessageBox::warning(this, "Modification", "Le numero de brevet doit etre numerique.");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
             return;
         }
     }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     // ===== Validation date =====
     if (!dateDepot.isValid()) {
         setFieldError(ui->dateDepotEdit);
@@ -5334,6 +5840,9 @@ void MainWindow::on_btnConfirmEditPub_clicked()
     }
 
     QString idEmp = "7"; // à remplacer par l'id employé connecté si disponible
+=======
+    QString idEmp = "7"; // remplace par l'id session si disponible
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     Publication p(
         titre,
@@ -5345,7 +5854,11 @@ void MainWindow::on_btnConfirmEditPub_clicked()
         dateDepot,
         statut,
         idEmp
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     );
+=======
+        );
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     QString err;
     if (!p.modifier(idPublicationToEdit, &err)) {
@@ -5353,7 +5866,11 @@ void MainWindow::on_btnConfirmEditPub_clicked()
         return;
     }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     QMessageBox::information(this, "Succès", "Publication modifiée avec succès.");
+=======
+    QMessageBox::information(this, "Succes", "Publication modifiee avec succes.");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     idPublicationToEdit.clear();
     loadPublications();
@@ -5373,7 +5890,10 @@ void MainWindow::on_btnSupprimerPub_clicked()
         QMessageBox::warning(this, "Suppression", "ID publication introuvable.");
         return;
     }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     if (!ui->tablePublication->item(row, 0)) return;
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     QString titre = ui->tablePublication->item(row, 0)->text();
 
@@ -5401,7 +5921,7 @@ void MainWindow::on_btnSupprimerPub_clicked()
 void MainWindow::on_btnExporterPub_clicked()
 {
     if (ui->tablePublication->rowCount() == 0) {
-        QMessageBox::warning(this, "Export PDF", "Aucune publication à exporter.");
+        QMessageBox::warning(this, "Export PDF", "Aucune publication Ã  exporter.");
         return;
     }
 
@@ -5425,7 +5945,7 @@ void MainWindow::on_btnExporterPub_clicked()
 
     QPainter painter(&pdf);
     if (!painter.isActive()) {
-        QMessageBox::critical(this, "Erreur", "Impossible de créer le fichier PDF.");
+        QMessageBox::critical(this, "Erreur", "Impossible de crÃ©er le fichier PDF.");
         return;
     }
 
@@ -5473,7 +5993,7 @@ void MainWindow::on_btnExporterPub_clicked()
               << 120  // Statut brevet
               << 220; // Resume
 
-    // sécurité si le nombre de colonnes diffère
+    // sÃ©curitÃ© si le nombre de colonnes diffÃ¨re
     while (colWidths.size() < columnCount)
         colWidths << 120;
 
@@ -5526,7 +6046,11 @@ void MainWindow::on_btnExporterPub_clicked()
 
             painter.setFont(titleFont);
             painter.drawText(margin, y, "Liste des Publications");
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
             y += 40; // espace avant le titre "Suite"
+=======
+            y += 40;
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
             painter.setFont(QFont("Arial", 9));
             painter.drawText(margin, y, "Suite");
@@ -5559,7 +6083,7 @@ void MainWindow::on_btnExporterPub_clicked()
 
     painter.end();
 
-    QMessageBox::information(this, "Succès", "Le PDF des publications a été exporté avec succès.");
+    QMessageBox::information(this, "SuccÃ¨s", "Le PDF des publications a Ã©tÃ© exportÃ© avec succÃ¨s.");
     QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
 }
 //=====================recherche par titre et doi =====================
@@ -5567,7 +6091,7 @@ void MainWindow::on_lineSearchPub_textChanged(const QString &text)
 {
     QString search = text.trimmed().toLower();
 
-    // Bonus : si le champ est vide, on réaffiche toutes les lignes
+    // Bonus : si le champ est vide, on rÃ©affiche toutes les lignes
     if (search.isEmpty()) {
         for (int i = 0; i < ui->tablePublication->rowCount(); i++) {
             ui->tablePublication->setRowHidden(i, false);
@@ -5576,11 +6100,16 @@ void MainWindow::on_lineSearchPub_textChanged(const QString &text)
     }
 
     for (int i = 0; i < ui->tablePublication->rowCount(); i++) {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
         auto *it0 = ui->tablePublication->item(i, 0);
         auto *it4 = ui->tablePublication->item(i, 4);
         if (!it0 || !it4) continue;
         QString titre  = it0->text().toLower();
         QString numero = it4->text().toLower();
+=======
+        QString titre = ui->tablePublication->item(i, 0)->text().toLower();
+        QString numero = ui->tablePublication->item(i, 4)->text().toLower();
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
         bool match = titre.contains(search) || numero.contains(search);
 
@@ -5609,7 +6138,7 @@ void MainWindow::on_comboBox_currentIndexChanged(int /*index*/)
 
 void MainWindow::on_pointage_pressed()
 {
-    // géré par on_pointage_clicked
+    // gÃ©rÃ© par on_pointage_clicked
 }
 
 void MainWindow::on_btnAppliquerPub_clicked()
@@ -5819,7 +6348,7 @@ QString MainWindow::formaterResultatsPublication(QSqlQuery &query)
         QString date    = query.value("DATE_DEPOT").toDate().toString("yyyy-MM-dd");
         QString statut  = query.value("STATUT_BREVET").toString();
 
-        resultat += "• Titre: " + titre
+        resultat += "â€¢ Titre: " + titre
                     + " | Numero: " + numero
                     + " | Date: " + date
                     + " | Statut: " + statut
@@ -5839,7 +6368,7 @@ QString MainWindow::genererReponsePublication(const QString &question)
     QString q = question.trimmed().toLower();
 
     if (q.isEmpty())
-        return "Veuillez écrire une question.";
+        return "Veuillez Ã©crire une question.";
 
     QSqlQuery query;
 
@@ -5850,14 +6379,14 @@ QString MainWindow::genererReponsePublication(const QString &question)
         if (q.contains("accept")) {
             query.prepare("SELECT COUNT(*) FROM PUBLICATIONS WHERE LOWER(STATUT_BREVET) LIKE '%accept%'");
             if (query.exec() && query.next())
-                return "Il y a " + QString::number(query.value(0).toInt()) + " publications acceptées.";
+                return "Il y a " + QString::number(query.value(0).toInt()) + " publications acceptÃ©es.";
             return "Erreur lors de la lecture de la base.";
         }
 
         if (q.contains("refus")) {
             query.prepare("SELECT COUNT(*) FROM PUBLICATIONS WHERE LOWER(STATUT_BREVET) LIKE '%refus%'");
             if (query.exec() && query.next())
-                return "Il y a " + QString::number(query.value(0).toInt()) + " publications refusées.";
+                return "Il y a " + QString::number(query.value(0).toInt()) + " publications refusÃ©es.";
             return "Erreur lors de la lecture de la base.";
         }
 
@@ -5871,7 +6400,7 @@ QString MainWindow::genererReponsePublication(const QString &question)
         if (q.contains("publ")) {
             query.prepare("SELECT COUNT(*) FROM PUBLICATIONS WHERE LOWER(STATUT_BREVET) LIKE '%publ%'");
             if (query.exec() && query.next())
-                return "Il y a " + QString::number(query.value(0).toInt()) + " publications publiées.";
+                return "Il y a " + QString::number(query.value(0).toInt()) + " publications publiÃ©es.";
             return "Erreur lors de la lecture de la base.";
         }
 
@@ -5888,7 +6417,7 @@ QString MainWindow::genererReponsePublication(const QString &question)
     QRegularExpression regexNumero("(\\d{4,})");
     QRegularExpressionMatch matchNumero = regexNumero.match(q);
 
-    if (q.contains("numero") || q.contains("numéro") || matchNumero.hasMatch()) {
+    if (q.contains("numero") || q.contains("numÃ©ro") || matchNumero.hasMatch()) {
         QString numero = matchNumero.hasMatch() ? matchNumero.captured(1) : "";
 
         if (!numero.isEmpty()) {
@@ -5903,7 +6432,7 @@ QString MainWindow::genererReponsePublication(const QString &question)
                     return "Le statut de la publication \"" + query.value(0).toString()
                     + "\" est : " + query.value(1).toString() + ".";
                 }
-                return "Il n'y a pas de publication avec ce numéro.";
+                return "Il n'y a pas de publication avec ce numÃ©ro.";
             }
             else {
                 query.prepare(
@@ -5922,7 +6451,7 @@ QString MainWindow::genererReponsePublication(const QString &question)
 
     // =========================
     // 3) RECHERCHE PAR DATE
-    // formats supportés:
+    // formats supportÃ©s:
     // yyyy-MM-dd
     // dd/MM/yyyy
     // =========================
@@ -5958,7 +6487,7 @@ QString MainWindow::genererReponsePublication(const QString &question)
                 return "Le statut de la publication \"" + query.value(0).toString()
                 + "\" est : " + query.value(1).toString() + ".";
             }
-            return "Il n'y a pas de publication à cette date.";
+            return "Il n'y a pas de publication Ã  cette date.";
         }
         else {
             query.prepare(
@@ -6139,12 +6668,13 @@ void MainWindow::on_btnMailingPub_clicked()
         );
 
     if (success) {
-        QMessageBox::information(this, "Succès", "Mail envoyé avec succès.");
+        QMessageBox::information(this, "SuccÃ¨s", "Mail envoyÃ© avec succÃ¨s.");
     } else {
         QMessageBox::critical(this, "Erreur", erreur);
     }
 }
 // ==================== EMPLOYEE CRUD ====================
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 void MainWindow::lancerServeurIA() {
     QString scriptPath = QCoreApplication::applicationDirPath() + "/face_id_vortex.py";
     QFile file(scriptPath);
@@ -6157,9 +6687,6 @@ void MainWindow::lancerServeurIA() {
             << "import os\n\n"
             << "app = Flask(__name__)\n"
             << "face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')\n\n"
-            << "@app.route('/health', methods=['GET'])\n"
-            << "def health():\n"
-            << "    return jsonify({'ok': True})\n\n"
 
             << "@app.route('/enroll', methods=['POST'])\n"
             << "def enroll():\n"
@@ -6194,106 +6721,9 @@ void MainWindow::lancerServeurIA() {
             << "if __name__ == '__main__':\n"
             << "    app.run(host='127.0.0.1', port=5000)\n";
         file.close();
-    } else {
-        qWarning() << "Impossible d'écrire face_id_vortex.py dans" << scriptPath;
-        return;
     }
-
-    if (!processIA) {
-        processIA = new QProcess(this);
-        processIA->setProcessChannelMode(QProcess::MergedChannels);
-        connect(processIA, &QProcess::readyReadStandardOutput, this, [this]() {
-            const QByteArray logs = processIA->readAllStandardOutput();
-            if (!logs.trimmed().isEmpty()) {
-                qDebug().noquote() << "[FaceID IA]" << QString::fromUtf8(logs).trimmed();
-            }
-        });
-    }
-
-    if (processIA->state() != QProcess::NotRunning) {
-        return; // Déjà lancé, on évite un doublon
-    }
-
-    // Environnement Python "nettoyé" pour éviter l'erreur:
-    // "Fatal Python error: Failed to import encodings module".
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    env.remove("PYTHONHOME");
-    env.remove("PYTHONPATH");
-    env.insert("PYTHONUTF8", "1");
-    processIA->setProcessEnvironment(env);
-
-    const QString pythonExe = QStandardPaths::findExecutable("python");
-    const QString pyLauncherExe = QStandardPaths::findExecutable("py");
-
-    QString selectedExe;
-    QStringList selectedArgs;
-    if (!pythonExe.isEmpty()) {
-        selectedExe = pythonExe;
-        selectedArgs = QStringList() << scriptPath;
-    } else if (!pyLauncherExe.isEmpty()) {
-        selectedExe = pyLauncherExe;
-        selectedArgs = QStringList() << "-3" << scriptPath;
-    }
-
-    if (selectedExe.isEmpty()) {
-        qWarning() << "Serveur FaceID non démarré automatiquement (python/py introuvable).";
-        return;
-    }
-
-    // Pré-check dépendances : si elles manquent, le script Flask se ferme immédiatement.
-    {
-        QProcess depCheck(this);
-        depCheck.setProcessEnvironment(env);
-        depCheck.setWorkingDirectory(QCoreApplication::applicationDirPath());
-        QStringList checkArgs;
-        if (selectedExe.endsWith("/py") || selectedExe.endsWith("\\py.exe")) {
-            checkArgs << "-3";
-        }
-        checkArgs << "-c" << "import flask, cv2, numpy; print('deps_ok')";
-        depCheck.start(selectedExe, checkArgs);
-        if (depCheck.waitForFinished(8000)) {
-            const QString out = QString::fromUtf8(depCheck.readAllStandardOutput()).trimmed();
-            const QString err = QString::fromUtf8(depCheck.readAllStandardError()).trimmed();
-            if (depCheck.exitStatus() != QProcess::NormalExit || depCheck.exitCode() != 0 || !out.contains("deps_ok")) {
-                qWarning() << "Dépendances Python manquantes (flask/cv2/numpy)."
-                           << "stdout:" << out << "stderr:" << err;
-                return;
-            }
-        } else {
-            depCheck.kill();
-            qWarning() << "Vérification Python expirée avant démarrage FaceID.";
-            return;
-        }
-    }
-
-    bool started = false;
-    processIA->setWorkingDirectory(QCoreApplication::applicationDirPath());
-    processIA->start(selectedExe, selectedArgs);
-    started = processIA->waitForStarted(6000);
-    if (!started) {
-        qWarning() << "Serveur FaceID non démarré automatiquement (échec lancement process).";
-        return;
-    }
-
-    // Vérifie que le port Flask est vraiment prêt avant d'utiliser FaceID.
-    bool serverReady = false;
-    for (int i = 0; i < 12; ++i) {
-        QTcpSocket socket;
-        socket.connectToHost("127.0.0.1", 5000);
-        if (socket.waitForConnected(500)) {
-            serverReady = true;
-            socket.disconnectFromHost();
-            break;
-        }
-        QThread::msleep(250);
-    }
-
-    if (!serverReady) {
-        const QString logs = QString::fromUtf8(processIA->readAllStandardOutput()).trimmed();
-        qWarning() << "Serveur FaceID lancé mais port 5000 non prêt."
-                   << "state:" << processIA->state()
-                   << "logs:" << logs;
-    }
+    if (!processIA) processIA = new QProcess(this);
+    processIA->start("python", QStringList() << scriptPath);
 }
 static void updatePasswordStrengthUiAddEmp(const QString &password, QProgressBar *bar, QLabel *label)
 {
@@ -6421,17 +6851,19 @@ static bool verifierEmailEmployeParCode(const QString &email, QWidget *parent)
 
     return true;
 }
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
 void MainWindow::loadEmployees()
 {
-    ui->TableEmp->setSortingEnabled(false); // Désactiver le tri pendant le remplissage
+    ui->TableEmp->setSortingEnabled(false); // DÃ©sactiver le tri pendant le remplissage
     ui->TableEmp->clearContents();
     ui->TableEmp->setRowCount(0);
 
     QVector<Employe::Row> rows;
     QString errMsg;
     if (!Employe::chargerTout(rows, &errMsg)) {
-        QMessageBox::critical(this, "Erreur", "Impossible de charger les données :\n" + errMsg);
+        QMessageBox::critical(this, "Erreur", "Impossible de charger les donnÃ©es :\n" + errMsg);
         return;
     }
 
@@ -6439,7 +6871,7 @@ void MainWindow::loadEmployees()
         int row = ui->TableEmp->rowCount();
         ui->TableEmp->insertRow(row);
 
-        // Colonne 0 : CIN + ID SQL caché dans le UserRole
+        // Colonne 0 : CIN + ID SQL cachÃ© dans le UserRole
         auto *itemCin = new QTableWidgetItem(r.cin);
         itemCin->setData(Qt::UserRole, r.idEmploye);
         ui->TableEmp->setItem(row, 0, itemCin);
@@ -6456,7 +6888,7 @@ void MainWindow::loadEmployees()
         itemDate->setData(Qt::EditRole, QDate::fromString(r.dateEmbauche, "yyyy-MM-dd"));
         ui->TableEmp->setItem(row, 7, itemDate);
 
-        // Salaire (Numérique)
+        // Salaire (NumÃ©rique)
         auto *itemSal = new QTableWidgetItem(QString::number(r.salaire, 'f', 2));
         itemSal->setData(Qt::EditRole, r.salaire);
         ui->TableEmp->setItem(row, 8, itemSal);
@@ -6467,7 +6899,12 @@ void MainWindow::loadEmployees()
 }
 void MainWindow::on_btnSaveEmployee_clicked()
 {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    // 1. RÃ©cupÃ©ration des donnÃ©es
+========
     // --- 1. RÉCUPÉRATION DES DONNÉES ---
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
     QString cin         = ui->lineCINAdd->text().trimmed();
     QString username    = ui->lineUsernameAdd->text().trimmed();
     QString password    = ui->linePasswordAdd->text();
@@ -6478,10 +6915,39 @@ void MainWindow::on_btnSaveEmployee_clicked()
     QString departement = ui->comboDepartementAdd->currentText().trimmed();
     QString poste       = ui->comboPosteAdd->currentText().trimmed();
     QDate dateEmb       = ui->dateEmbaucheAdd->date();
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+    // 1. RÃ©cupÃ©ration des donnÃ©es
+    QString cin         = ui->lineCINAdd->text().trimmed();
+    QString nom         = ui->lineNomAdd->text().trimmed();
+    QString prenom      = ui->linePrenomAdd->text().trimmed();
+    QString username    = ui->lineUsernameAdd->text().trimmed();
+    QString email       = ui->lineEmailAdd->text().trimmed();
+    QString password    = ui->linePasswordAdd->text(); // On ne trim pas un mot de passe
+    QString poste       = ui->linePosteAdd->text().trimmed();
+    QString departement = ui->lineDepartementAdd->text().trimmed();
+    QString salaireStr  = ui->lineSalaireAdd->text().trimmed();
+    QString role        = ui->comboRoleAdd->currentText();
+    QDate dateEmb       = ui->dateEmbaucheAdd->date();
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    int index = ui->comboRoleAdd->currentIndex();
+    // 2. CONTRAINTE : Tous les champs obligatoires
+    if (cin.isEmpty() || nom.isEmpty() || prenom.isEmpty() || username.isEmpty() ||
+        email.isEmpty() || password.isEmpty() || poste.isEmpty() ||
+        departement.isEmpty() || salaireStr.isEmpty()) {
+        QMessageBox::warning(this, "Champs vides", "Veuillez remplir tous les champs du formulaire.");
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
     QString salaireStr  = ui->lineSalaireAdd->text().trimmed();
 
     // --- 2. CONTRÔLES DE SÉCURITÉ & SAISIE ---
 
+    // A. Vérification des champs vides obligatoires
+    if (cin.isEmpty() || username.isEmpty() || password.isEmpty() || nom.isEmpty() || prenom.isEmpty() || email.isEmpty()) {
+        QMessageBox::warning(this, "Champs manquants", "Tous les champs obligatoires doivent être remplis.");
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+        return;
+    }
 
     // B. Contrôle CIN (8 chiffres exactement)
     QRegularExpression rxCin("^[0-9]{8}$");
@@ -6495,32 +6961,6 @@ void MainWindow::on_btnSaveEmployee_clicked()
         ui->lineCINAdd->setFocus();
         return;
     }
-    if (Employe::usernameExiste(username)) {
-        QMessageBox::critical(this, "Erreur Doublon", "Ce username est déjà enregistré dans le système.");
-        ui->lineUsernameAdd->setFocus();
-        return;
-    }
-    // B. CONTRÔLE STRICT DU MOT DE PASSE (Vortex-Shield)
-        int scorePassword = Employe::motDePasseForcePourcent(password);
-        QRegularExpression rxLower("[a-z]");
-        QRegularExpression rxUpper("[A-Z]");
-        QRegularExpression rxDigit("[0-9]");
-        QRegularExpression rxSpec("[^a-zA-Z0-9]");
-
-        QStringList erreursMdp;
-        if (password.length() < 10)      erreursMdp << "- Au moins 10 caractères";
-        if (!password.contains(rxLower)) erreursMdp << "- Au moins une minuscule";
-        if (!password.contains(rxUpper)) erreursMdp << "- Au moins une majuscule";
-        if (!password.contains(rxDigit)) erreursMdp << "- Au moins un chiffre";
-        if (!password.contains(rxSpec))  erreursMdp << "- Au moins un caractère spécial";
-        if (scorePassword < 50)          erreursMdp << "- Score de force global insuffisant (min 50%)";
-
-        if (!erreursMdp.isEmpty()) {
-            QMessageBox::warning(this, "Sécurité Insuffisante",
-                "Le mot de passe ne respecte pas les critères requis :\n\n" + erreursMdp.join("\n"));
-            ui->linePasswordAdd->setFocus();
-            return;
-        }
 
     // C. Contrôle Nom et Prénom (Lettres uniquement)
     QRegularExpression rxAlpha("^[A-Za-zÀ-ÿ\\s-]+$");
@@ -6529,6 +6969,37 @@ void MainWindow::on_btnSaveEmployee_clicked()
         return;
     }
 
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+        return;
+    }
+
+    // 3. CONTRAINTE : CIN (Exactement 8 chiffres)
+    QRegularExpression cinRegex("^[0-9]{8}$");
+    if (!cinRegex.match(cin).hasMatch()) {
+        QMessageBox::warning(this, "Format CIN", "Le CIN doit contenir exactement 8 chiffres.");
+        return;
+    }
+
+    // 4. CONTRAINTE : Format EMAIL (Regex standard)
+    QRegularExpression emailRegex("^[\\w\\.-]+@[\\w\\.-]+\\.[a-z]{2,4}$", QRegularExpression::CaseInsensitiveOption);
+    if (!emailRegex.match(email).hasMatch()) {
+        QMessageBox::warning(this, "Format Email", "L'adresse email saisie est invalide (ex: exemple@mail.com).");
+        return;
+    }
+
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    // 5. CONTRAINTE : UnicitÃ© (VÃ©rification SQL)
+    if (Employe::usernameExiste(username)) {
+        QMessageBox::warning(this, "Doublon", "Ce nom d'utilisateur est dÃ©jÃ  utilisÃ©.");
+        return;
+    }
+    if (index == 0) {
+        // Afficher un message d'alerte
+        QMessageBox::warning(this, "Erreur de saisie", "Veuillez sÃ©lectionner un rÃ´le avant de continuer.");
+        return; // On arrÃªte la fonction ici
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
     // D. Contrôle Email (Format standard)
     QRegularExpression rxEmail("^[\\w\\.-]+@[\\w\\.-]+\\.[a-z]{2,4}$");
     if (!rxEmail.match(email).hasMatch()) {
@@ -6562,6 +7033,7 @@ void MainWindow::on_btnSaveEmployee_clicked()
         QMessageBox::warning(this, "Sélection requise", "Veuillez sélectionner un département.");
         ui->comboDepartementAdd->setFocus();
         return;
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
     }
 
     if (ui->comboPosteAdd->currentIndex() <= 0) {
@@ -6575,11 +7047,7 @@ void MainWindow::on_btnSaveEmployee_clicked()
         QMessageBox::warning(this, "Biométrie manquante", "Veuillez scanner le visage de l'employé avant l'enregistrement.");
         return;
     }
-    // A. Vérification des champs vides obligatoires
-    if (cin.isEmpty() || username.isEmpty() || password.isEmpty() || nom.isEmpty() || prenom.isEmpty() || email.isEmpty()) {
-        QMessageBox::warning(this, "Champs manquants", "Tous les champs obligatoires doivent être remplis.");
-        return;
-    }
+
     // --- 3. SYSTÈME DE VÉRIFICATION PAR MAIL (OTP) ---
 
     int codeGenere = QRandomGenerator::global()->bounded(100000, 999999);
@@ -6608,8 +7076,6 @@ void MainWindow::on_btnSaveEmployee_clicked()
         return;
     }
 
-
-
     // --- 4. TRAITEMENT ET ENREGISTREMENT FINAL ---
 
     // Hachage du mot de passe
@@ -6620,6 +7086,27 @@ void MainWindow::on_btnSaveEmployee_clicked()
 
     QString errMsg;
     if (e.ajouter(&errMsg)) {
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+    }
+
+    // 6. Hachage et Enregistrement
+    QString passHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256).toHex();
+    double salaire = salaireStr.toDouble();
+
+    Employe e(cin, nom, prenom, username, passHash, email, poste, departement, dateEmb, salaire, role);
+
+    QString errMsg;
+    if (e.ajouter(&errMsg)) {
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+        QMessageBox::information(this, "SuccÃ¨s", "L'employÃ© a Ã©tÃ© ajoutÃ© avec succÃ¨s.");
+        loadEmployees();
+        ui->stack_emp->setCurrentIndex(0);
+        // Optionnel : Vider les champs aprÃ¨s succÃ¨s
+    } else {
+        QMessageBox::critical(this, "Erreur SQL", "L'ajout a Ã©chouÃ© :\n" + errMsg);
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
         QMessageBox::information(this, "Succès", "L'employé " + nom + " a été ajouté avec succès !");
 
         // RESET
@@ -6642,25 +7129,35 @@ void MainWindow::on_btnSaveEmployee_clicked()
         ui->stack_emp->setCurrentIndex(0); // Retour à la liste
     } else {
         QMessageBox::critical(this, "Erreur Base de Données", "L'ajout a échoué :\n" + errMsg);
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
     }
 }
+=======
+    }
+}
+
+
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 void MainWindow::on_btnSupprimer_emp_clicked()
 {
     int row = ui->TableEmp->currentRow();
     if (row < 0) {
-        QMessageBox::warning(this, "Aucune sélection",
-                             "Veuillez sélectionner une ligne.");
+        QMessageBox::warning(this, "Aucune sÃ©lection",
+                             "Veuillez sÃ©lectionner une ligne.");
         return;
     }
 
     QTableWidgetItem *item = ui->TableEmp->item(row, 0);
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     if (!item) return;
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
-    QString idEmploye = item->data(Qt::UserRole).toString(); // ✅ ID caché
+    QString idEmploye = item->data(Qt::UserRole).toString(); // âœ… ID cachÃ©
 
     if (idEmploye.isEmpty()) {
         QMessageBox::critical(this, "Erreur",
-                              "ID employé introuvable.");
+                              "ID employÃ© introuvable.");
         return;
     }
 
@@ -6679,17 +7176,31 @@ void MainWindow::on_btnSupprimer_emp_clicked()
     QString err;
     if (Employe::supprimer(idEmploye, &err))
     {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+        QMessageBox::information(this, "SuccÃ¨s",
+                                 "EmployÃ© supprimÃ©.");
+        loadEmployees(); // âœ… Recharge tableau
+    }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
         QMessageBox::information(this, "Succès",
                                  "Employé supprimé.");
         loadEmployees(); // ✅ Recharge tableau
         ajouterNotification("SUPPRESSION", "CIN: " + idEmploye);    }
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     else
     {
         QMessageBox::critical(this, "Erreur",
-                              "Suppression échouée :\n" + err);
+                              "Suppression Ã©chouÃ©e :\n" + err);
     }
 }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 void MainWindow::on_btnScanFace_clicked()
 {
     QString username = ui->lineUsernameAdd->text().trimmed();
@@ -6748,14 +7259,22 @@ void MainWindow::on_btnScanFace_clicked()
         });
     });
 }
+=======
+
+
+
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 void MainWindow::on_btnModifier_emp_clicked()
 {
     int row = ui->TableEmp->currentRow();
     if (row < 0) {
-        QMessageBox::warning(this, "Sélection", "Veuillez sélectionner un employé.");
+        QMessageBox::warning(this, "SÃ©lection", "Veuillez sÃ©lectionner un employÃ©.");
         return;
     }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     if (!ui->TableEmp->item(row, 0)) return;
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     // Remplissage des champs de l'interface de modification
     ui->lineCIN_emp->setText(ui->TableEmp->item(row, 0)->text());
@@ -6763,23 +7282,37 @@ void MainWindow::on_btnModifier_emp_clicked()
     ui->linePrenomEmp->setText(ui->TableEmp->item(row, 2)->text());
     ui->lineUsernameEmp->setText(ui->TableEmp->item(row, 3)->text());
     ui->lineEmailEmp->setText(ui->TableEmp->item(row, 4)->text());
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     setEmployeComboValue(ui->comboPosteEmp, ui->TableEmp->item(row, 5)->text());
     setEmployeComboValue(ui->comboDepartementEmp, ui->TableEmp->item(row, 6)->text());
     ui->dateEmbaucheEmp->setDate(QDate::fromString(ui->TableEmp->item(row, 7)->text(), "yyyy-MM-dd"));
     ui->lineSalaireEmp->setText(ui->TableEmp->item(row, 8)->text());
     ui->comboRoleAdd_2->setCurrentText(ui->TableEmp->item(row, 9)->text());
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
     m_emailEmployeEditOriginal = ui->TableEmp->item(row, 4)->text().trimmed();
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+    ui->linePostemp->setText(ui->TableEmp->item(row, 5)->text());
+    ui->lineDepartementEmp->setText(ui->TableEmp->item(row, 6)->text());
+    ui->dateEmbaucheEmp->setDate(QDate::fromString(ui->TableEmp->item(row, 7)->text(), "yyyy-MM-dd"));
+    ui->lineSalaireEmp->setText(ui->TableEmp->item(row, 8)->text());
+    ui->comboRoleAdd_2->setCurrentText(ui->TableEmp->item(row, 9)->text());
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     ui->stack_emp->setCurrentIndex(2); // Aller vers la page de modif
 }
 void MainWindow::on_btnSaveEditEmployee_clicked()
 {
     int row = ui->TableEmp->currentRow();
     if (row < 0) return;
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     if (!ui->TableEmp->item(row, 0)) return;
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     QString idEmploye = ui->TableEmp->item(row, 0)->data(Qt::UserRole).toString();
 
-    // Récupération des saisies
+    // RÃ©cupÃ©ration des saisies
     QString cin      = ui->lineCIN_emp->text().trimmed();
     QString nom      = ui->lineNomEmp->text().trimmed();
     QString prenom   = ui->linePrenomEmp->text().trimmed();
@@ -6794,37 +7327,57 @@ void MainWindow::on_btnSaveEditEmployee_clicked()
         return;
     }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     // 2. Validation : Format CIN (8 chiffres)
     if (!QRegularExpression("^[0-9]{8}$").match(cin).hasMatch()) {
         QMessageBox::warning(this, "Format CIN", "Le CIN doit comporter exactement 8 chiffres.");
         return;
     }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     // 3. Validation : Format Email
     QRegularExpression emailRegex("^[\\w\\.-]+@[\\w\\.-]+\\.[a-z]{2,4}$", QRegularExpression::CaseInsensitiveOption);
     if (!emailRegex.match(email).hasMatch()) {
         QMessageBox::warning(this, "Format Email", "L'adresse email est invalide.");
         return;
     }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     if (Employe::emailExiste(email, idEmploye)) {
         QMessageBox::warning(this, "Doublon", "Cet e-mail est déjà utilisé par un autre employé.");
         return;
     }
 
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    // 4. Validation : UnicitÃ© (Sauf pour la ligne en cours de modification)
+========
     // 4. Validation : Unicité CIN / username (table affichée)
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+
+    // 4. Validation : UnicitÃ© (Sauf pour la ligne en cours de modification)
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     for (int i = 0; i < ui->TableEmp->rowCount(); ++i) {
         if (i == row) continue; // On ignore la ligne actuelle
 
         if (ui->TableEmp->item(i, 0)->text() == cin) {
-            QMessageBox::warning(this, "Doublon", "Ce CIN est déjà attribué à un autre employé.");
+            QMessageBox::warning(this, "Doublon", "Ce CIN est dÃ©jÃ  attribuÃ© Ã  un autre employÃ©.");
             return;
         }
         if (ui->TableEmp->item(i, 3)->text() == username) {
-            QMessageBox::warning(this, "Doublon", "Ce nom d'utilisateur est déjà pris.");
+            QMessageBox::warning(this, "Doublon", "Ce nom d'utilisateur est dÃ©jÃ  pris.");
             return;
         }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+        if (ui->TableEmp->item(i, 4)->text() == email) { // Colonne 4 = Email
+            QMessageBox::warning(this, "Doublon", "Cet email est dÃ©jÃ  utilisÃ© par un autre employÃ©.");
+========
     }
     if (index == 0) {
         // Afficher un message d'alerte
@@ -6849,22 +7402,42 @@ void MainWindow::on_btnSaveEditEmployee_clicked()
 
     if (email.compare(m_emailEmployeEditOriginal, Qt::CaseInsensitive) != 0) {
         if (!verifierEmailEmployeParCode(email, this))
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
             return;
+=======
+        if (ui->TableEmp->item(i, 4)->text() == email) { // Colonne 4 = Email
+            QMessageBox::warning(this, "Doublon", "Cet email est dÃ©jÃ  utilisÃ© par un autre employÃ©.");
+            return;
+        }
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    }
+    if (index == 0) {
+        // Afficher un message d'alerte
+        QMessageBox::warning(this, "Erreur de saisie", "Veuillez sÃ©lectionner un rÃ´le avant de continuer.");
+        return; // On arrÃªte la fonction ici
     }
 
-    // 5. Exécution de l'Update
+    // 5. ExÃ©cution de l'Update
     Employe e(cin, nom, prenom, username, "", email,
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
               posteEdit,
               deptEdit,
+=======
+              ui->linePostemp->text().trimmed(),
+              ui->lineDepartementEmp->text().trimmed(),
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
               ui->dateEmbaucheEmp->date(),
               salaireS.toDouble(),
               ui->comboRoleAdd_2->currentText());
 
     QString errMsg;
     if (e.modifier(idEmploye, &errMsg)) {
-        QMessageBox::information(this, "Succès", "L'employé a été mis à jour.");
+        QMessageBox::information(this, "SuccÃ¨s", "L'employÃ© a Ã©tÃ© mis Ã  jour.");
         loadEmployees();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
         ajouterNotification("MODIFICATION", "Employé: " + nom);
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
         ui->stack_emp->setCurrentIndex(0);
     } else {
         QMessageBox::critical(this, "Erreur", "Erreur SQL :\n" + errMsg);
@@ -6881,7 +7454,7 @@ void MainWindow::filterEmployees(const QString &searchText)
 {
     QString search = searchText.trimmed().toLower();
 
-    // Si le champ est vide → montrer toutes les lignes
+    // Si le champ est vide â†’ montrer toutes les lignes
     if (search.isEmpty()) {
         for (int row = 0; row < ui->TableEmp->rowCount(); ++row) {
             ui->TableEmp->setRowHidden(row, false);
@@ -6889,8 +7462,23 @@ void MainWindow::filterEmployees(const QString &searchText)
         return;
     }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     // Sinon : filtrer sur toutes les colonnes affichées (CIN, noms, identifiant, e-mail, etc.)
     for (int row = 0; row < ui->TableEmp->rowCount(); ++row) {
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+    // Sinon : filtrer
+    for (int row = 0; row < ui->TableEmp->rowCount(); ++row) {
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+        // Colonne 0 = CIN
+        QString cin = ui->TableEmp->item(row, 0) ? ui->TableEmp->item(row, 0)->text().toLower() : "";
+        // Colonne 9 = RÃ´le (dans ta version Ã  10 colonnes)
+        QString role = ui->TableEmp->item(row, 3) ? ui->TableEmp->item(row, 3)->text().toLower() : "";
+
+        bool match = cin.contains(search) || role.contains(search);
+
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
         bool match = false;
         for (int col = 0; col < ui->TableEmp->columnCount(); ++col) {
             const QTableWidgetItem *item = ui->TableEmp->item(row, col);
@@ -6899,6 +7487,9 @@ void MainWindow::filterEmployees(const QString &searchText)
                 break;
             }
         }
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
         ui->TableEmp->setRowHidden(row, !match);
     }
 }
@@ -6908,7 +7499,7 @@ void MainWindow::sortByEmbaucheDate()
 {
     if (ui->TableEmp->rowCount() == 0) return;
 
-    const int dateColumn = 7;  // Colonne "Date embauche" (vérifie bien que c'est 7 chez toi)
+    const int dateColumn = 7;  // Colonne "Date embauche" (vÃ©rifie bien que c'est 7 chez toi)
 
     // Structure temporaire pour trier : date + index de ligne original
     struct RowInfo {
@@ -6942,17 +7533,17 @@ void MainWindow::sortByEmbaucheDate()
                          }
                      });
 
-    // Créer le nouvel ordre des lignes
+    // CrÃ©er le nouvel ordre des lignes
     QVector<int> newOrder;
     newOrder.reserve(rowsInfo.size());
     for (const auto &info : rowsInfo) {
         newOrder.append(info.originalRow);
     }
 
-    // Réorganiser les lignes dans le tableau (méthode sûre)
+    // RÃ©organiser les lignes dans le tableau (mÃ©thode sÃ»re)
     QVector<QVector<QTableWidgetItem*>> backup(ui->TableEmp->rowCount());
 
-    // Sauvegarder tous les items avant de déplacer
+    // Sauvegarder tous les items avant de dÃ©placer
     for (int row = 0; row < ui->TableEmp->rowCount(); ++row) {
         backup[row].resize(ui->TableEmp->columnCount());
         for (int col = 0; col < ui->TableEmp->columnCount(); ++col) {
@@ -6968,20 +7559,21 @@ void MainWindow::sortByEmbaucheDate()
         }
     }
 
-    // Nettoyage (pas vraiment nécessaire ici car les items sont repris)
-    // backup.clear(); inutile car les pointeurs ont été repris par setItem
+    // Nettoyage (pas vraiment nÃ©cessaire ici car les items sont repris)
+    // backup.clear(); inutile car les pointeurs ont Ã©tÃ© repris par setItem
 
     // Inverser pour le prochain clic
     embaucheAscending = !embaucheAscending;
 
-    // Mettre à jour le texte du bouton avec flèche
-    QString arrow = embaucheAscending ? "▲ (plus ancien en haut)" : "▼ (plus récent en haut)";
+    // Mettre Ã  jour le texte du bouton avec flÃ¨che
+    QString arrow = embaucheAscending ? "â–² (plus ancien en haut)" : "â–¼ (plus rÃ©cent en haut)";
     ui->btnTrier_emp->setText("Trier par Date d'embauche " + arrow);
 }
 void MainWindow::on_btnForm_emp_clicked()
 {
     ui->stack_emp->setCurrentIndex(5);
 }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 void MainWindow::ajouterNotification(const QString &actionType, const QString &cible)
 {
     NotifEntry entry;
@@ -7308,6 +7900,13 @@ void MainWindow::notifierConnexion()
     // Format : [HEURE] 👤 Nom (Role) a effectué : CONNEXION sur Session Active
     ajouterNotification("CONNEXION", "Session de travail ouverte");
 }
+=======
+
+
+
+
+
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
 
 
@@ -7319,7 +7918,7 @@ void MainWindow::notifierConnexion()
 
 // ==================== LABS CRUD ====================
 
-// ── Verrouiller champs affichage (page 4) ──
+// â”€â”€ Verrouiller champs affichage (page 4) â”€â”€
 void MainWindow::verrouillerChampsAffichage() {
     ui->aff1->setReadOnly(true);
     ui->aff5->setReadOnly(true);
@@ -7329,12 +7928,15 @@ void MainWindow::verrouillerChampsAffichage() {
     ui->aff7->setEnabled(false);
     ui->aff7_2->setEnabled(false);
     ui->aff3_2->setEnabled(false);
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     ui->aff_montant->setReadOnly(true);
     ui->aff_montant_paye->setReadOnly(true);
     ui->aff_reste->setReadOnly(true);
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 }
 
-/// ── Export PDF avec dialogue ──
+/// â”€â”€ Export PDF avec dialogue â”€â”€
 void MainWindow::on_BtnExportLabs_clicked()
 {
     const QString fileName = QFileDialog::getSaveFileName(
@@ -7344,12 +7946,12 @@ void MainWindow::on_BtnExportLabs_clicked()
     try {
         QPdfWriter pdfWriter(fileName);
         pdfWriter.setPageSize(QPageSize(QPageSize::A4));
-        pdfWriter.setPageOrientation(QPageLayout::Portrait); // Mode portrait pour mieux afficher les détails
+        pdfWriter.setPageOrientation(QPageLayout::Portrait); // Mode portrait pour mieux afficher les dÃ©tails
         pdfWriter.setResolution(300);
 
         QPainter painter(&pdfWriter);
         if (!painter.isActive())
-            throw std::runtime_error("Impossible d'écrire dans le fichier.");
+            throw std::runtime_error("Impossible d'Ã©crire dans le fichier.");
 
         // Variables de positionnement
         int x = 100;
@@ -7359,16 +7961,16 @@ void MainWindow::on_BtnExportLabs_clicked()
         int valueWidth = 500;
 
         painter.setFont(QFont("Arial", 18, QFont::Bold));
-        painter.drawText(x, y, "FICHE DÉTAILLÉE DU LABORATOIRE");
+        painter.drawText(x, y, "FICHE DÃ‰TAILLÃ‰E DU LABORATOIRE");
         y += 80;
 
         painter.setFont(QFont("Arial", 12, QFont::Bold));
-        painter.drawText(x, y, "INFORMATIONS GÉNÉRALES");
+        painter.drawText(x, y, "INFORMATIONS GÃ‰NÃ‰RALES");
         y += 30;
 
         painter.setFont(QFont("Arial", 10));
 
-        // Récupération des valeurs depuis les champs de la page d'affichage
+        // RÃ©cupÃ©ration des valeurs depuis les champs de la page d'affichage
         // Nom du laboratoire
         painter.drawText(x, y, "Nom du laboratoire :");
         painter.setFont(QFont("Arial", 10, QFont::Bold));
@@ -7382,9 +7984,9 @@ void MainWindow::on_BtnExportLabs_clicked()
         painter.drawText(x + labelWidth, y, ui->aff5->text());
         y += lineHeight;
 
-        // Numéro de téléphone
+        // NumÃ©ro de tÃ©lÃ©phone
         painter.setFont(QFont("Arial", 10));
-        painter.drawText(x, y, "Numéro de téléphone :");
+        painter.drawText(x, y, "NumÃ©ro de tÃ©lÃ©phone :");
         painter.setFont(QFont("Arial", 10, QFont::Bold));
         painter.drawText(x + labelWidth, y, ui->aff6->text());
         y += lineHeight;
@@ -7396,29 +7998,29 @@ void MainWindow::on_BtnExportLabs_clicked()
         painter.drawText(x + labelWidth, y, ui->aff2->text());
         y += lineHeight;
 
-        // Séparateur
+        // SÃ©parateur
         y += 20;
         painter.setFont(QFont("Arial", 12, QFont::Bold));
-        painter.drawText(x, y, "CARACTÉRISTIQUES TECHNIQUES");
+        painter.drawText(x, y, "CARACTÃ‰RISTIQUES TECHNIQUES");
         y += 30;
         painter.setFont(QFont("Arial", 10));
 
-        // Spécialité
-        painter.drawText(x, y, "Spécialité :");
+        // SpÃ©cialitÃ©
+        painter.drawText(x, y, "SpÃ©cialitÃ© :");
         painter.setFont(QFont("Arial", 10, QFont::Bold));
         painter.drawText(x + labelWidth, y, ui->aff3->currentText());
         y += lineHeight;
 
-        // Disponibilité
+        // DisponibilitÃ©
         painter.setFont(QFont("Arial", 10));
-        painter.drawText(x, y, "Disponibilité :");
+        painter.drawText(x, y, "DisponibilitÃ© :");
         painter.setFont(QFont("Arial", 10, QFont::Bold));
         painter.drawText(x + labelWidth, y, ui->aff7->currentText());
         y += lineHeight;
 
-        // Résultat
+        // RÃ©sultat
         painter.setFont(QFont("Arial", 10));
-        painter.drawText(x, y, "Résultat / Statut :");
+        painter.drawText(x, y, "RÃ©sultat / Statut :");
         painter.setFont(QFont("Arial", 10, QFont::Bold));
         painter.drawText(x + labelWidth, y, ui->aff3_2->currentText());
         y += lineHeight;
@@ -7430,9 +8032,9 @@ void MainWindow::on_BtnExportLabs_clicked()
         painter.drawText(x + labelWidth, y, ui->aff7_2->currentText());
         y += lineHeight + 30;
 
-        // Ajout d'une section d'informations supplémentaires
+        // Ajout d'une section d'informations supplÃ©mentaires
         painter.setFont(QFont("Arial", 12, QFont::Bold));
-        painter.drawText(x, y, "INFORMATIONS COMPLÉMENTAIRES");
+        painter.drawText(x, y, "INFORMATIONS COMPLÃ‰MENTAIRES");
         y += 30;
         painter.setFont(QFont("Arial", 10));
 
@@ -7450,17 +8052,17 @@ void MainWindow::on_BtnExportLabs_clicked()
 
         painter.end();
 
-        QMessageBox::information(this, "Succès", "L'exportation PDF de la fiche détaillée a été réalisée avec succès !");
+        QMessageBox::information(this, "SuccÃ¨s", "L'exportation PDF de la fiche dÃ©taillÃ©e a Ã©tÃ© rÃ©alisÃ©e avec succÃ¨s !");
         QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
 
     } catch (const std::exception &e) {
         QMessageBox::critical(this, "Erreur d'exportation",
-                              QString("L'exportation a échoué : %1").arg(e.what()));
+                              QString("L'exportation a Ã©chouÃ© : %1").arg(e.what()));
     } catch (...) {
         QMessageBox::critical(this, "Erreur", "Une erreur inconnue est survenue.");
     }
 }
-// ── ID sélectionné ──
+// â”€â”€ ID sÃ©lectionnÃ© â”€â”€
 QString MainWindow::selectedLabsId() const
 {
     const int r = ui->TableLabs_2->currentRow();
@@ -7469,7 +8071,7 @@ QString MainWindow::selectedLabsId() const
     return it ? it->text().trimmed() : QString();
 }
 
-// ── Configuration tableau ──
+// â”€â”€ Configuration tableau â”€â”€
 void MainWindow::setupTableLabs()
 {
     ui->TableLabs_2->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -7481,6 +8083,20 @@ void MainWindow::setupTableLabs()
     // IMPORTANT: Activer le tri
     ui->TableLabs_2->setSortingEnabled(true);
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    ui->TableLabs_2->setColumnCount(9);
+    ui->TableLabs_2->setHorizontalHeaderLabels({
+        "IDLABO", "Nom Laboratoire", "Responsable", "NumÃ©ro",
+        "Localisation", "DisponibilitÃ©", "SpÃ©cialitÃ©", "RÃ©sultat", "Paiement"
+    });
+
+    // Masquer la colonne ID si vous voulez (optionnel)
+    // ui->TableLabs_2->hideColumn(0);
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
     ui->TableLabs_2->setColumnCount(12);
         ui->TableLabs_2->setHorizontalHeaderLabels({
             "IDLABO", "Nom Laboratoire", "Responsable", "Numéro",
@@ -7489,11 +8105,14 @@ void MainWindow::setupTableLabs()
         });
     // Masquer IDLABO dans l'interface (l'ID reste exploitable en interne).
     ui->TableLabs_2->hideColumn(0);
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 }
-// ── Chargement ──
+// â”€â”€ Chargement â”€â”€
 void MainWindow::loadLabs()
 {
-    // Désactiver temporairement les signaux de filtrage pendant le chargement
+    // DÃ©sactiver temporairement les signaux de filtrage pendant le chargement
     ui->LabsSearch_2->blockSignals(true);
     ui->LabsSpec_2->blockSignals(true);
     ui->LabsCap_2->blockSignals(true);
@@ -7507,7 +8126,7 @@ void MainWindow::loadLabs()
         QMessageBox::critical(this, "Erreur - Laboratoires", err);
         ui->TableLabs_2->setSortingEnabled(true);
 
-        // Réactiver les signaux
+        // RÃ©activer les signaux
         ui->LabsSearch_2->blockSignals(false);
         ui->LabsSpec_2->blockSignals(false);
         ui->LabsCap_2->blockSignals(false);
@@ -7530,6 +8149,7 @@ void MainWindow::loadLabs()
         ui->TableLabs_2->setItem(i, 6, new QTableWidgetItem(r.specialite));
         ui->TableLabs_2->setItem(i, 7, new QTableWidgetItem(r.resultat));
         ui->TableLabs_2->setItem(i, 8, new QTableWidgetItem(r.paiement));
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 
         // Colonnes financières — tri numérique correct
         auto *itMontant = new QTableWidgetItem();
@@ -7548,11 +8168,13 @@ void MainWindow::loadLabs()
         else
             itReste->setForeground(QBrush(QColor(39, 174, 96)));
         ui->TableLabs_2->setItem(i, 11, itReste);
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     }
 
     ui->TableLabs_2->setSortingEnabled(true);
 
-    // Réactiver les signaux et appliquer le filtrage
+    // RÃ©activer les signaux et appliquer le filtrage
     ui->LabsSearch_2->blockSignals(false);
     ui->LabsSpec_2->blockSignals(false);
     ui->LabsCap_2->blockSignals(false);
@@ -7566,13 +8188,13 @@ void MainWindow::filterLabsDynamic()
     const QString spec = ui->LabsSpec_2->currentText().trimmed().toLower();
     const QString disp = ui->LabsCap_2->currentText().trimmed().toLower();
 
-    // Désactiver le tri TEMPORAIREMENT pendant le filtrage
+    // DÃ©sactiver le tri TEMPORAIREMENT pendant le filtrage
     ui->TableLabs_2->setSortingEnabled(false);
 
     int visibleCount = 0;
 
     for (int r = 0; r < ui->TableLabs_2->rowCount(); ++r) {
-        // Récupérer les valeurs des colonnes
+        // RÃ©cupÃ©rer les valeurs des colonnes
         QString nom = "";
         QString responsable = "";
         QString numero = "";
@@ -7595,12 +8217,12 @@ void MainWindow::filterLabsDynamic()
                   numero.contains(key) || localisation.contains(key));
         }
 
-        // Filtre par spécialité (si différent de "toutes les spécialités")
+        // Filtre par spÃ©cialitÃ© (si diffÃ©rent de "toutes les spÃ©cialitÃ©s")
         if (ok && !spec.isEmpty() && !spec.startsWith("toutes")) {
             ok = (specialite == spec);
         }
 
-        // Filtre par disponibilité (si différent de "toutes les disponibilités")
+        // Filtre par disponibilitÃ© (si diffÃ©rent de "toutes les disponibilitÃ©s")
         if (ok && !disp.isEmpty() && !disp.startsWith("toutes")) {
             ok = (disponibilite == disp);
         }
@@ -7609,12 +8231,12 @@ void MainWindow::filterLabsDynamic()
         if (ok) visibleCount++;
     }
 
-    // RÉACTIVER le tri APRÈS le filtrage
+    // RÃ‰ACTIVER le tri APRÃˆS le filtrage
     ui->TableLabs_2->setSortingEnabled(true);
 
-    // Optionnel: Afficher le nombre de résultats dans le placeholder
+    // Optionnel: Afficher le nombre de rÃ©sultats dans le placeholder
     if (visibleCount == 0 && (!key.isEmpty() || !spec.startsWith("toutes") || !disp.startsWith("toutes"))) {
-        ui->LabsSearch_2->setPlaceholderText("Aucun résultat - Modifiez vos critères");
+        ui->LabsSearch_2->setPlaceholderText("Aucun rÃ©sultat - Modifiez vos critÃ¨res");
     } else {
         ui->LabsSearch_2->setPlaceholderText(QString("Rechercher (%1 laboratoires)").arg(visibleCount));
     }
@@ -7622,32 +8244,33 @@ void MainWindow::filterLabsDynamic()
 
 void MainWindow::resetLabsFilters()
 {
-    // Bloquer les signaux pour éviter de déclencher le filtrage plusieurs fois
+    // Bloquer les signaux pour Ã©viter de dÃ©clencher le filtrage plusieurs fois
     ui->LabsSearch_2->blockSignals(true);
     ui->LabsSpec_2->blockSignals(true);
     ui->LabsCap_2->blockSignals(true);
 
-    // Réinitialiser les champs
+    // RÃ©initialiser les champs
     ui->LabsSearch_2->clear();
-    ui->LabsSpec_2->setCurrentIndex(0);  // "Toutes les spécialités"
-    ui->LabsCap_2->setCurrentIndex(0);   // "Toutes les disponibilités"
+    ui->LabsSpec_2->setCurrentIndex(0);  // "Toutes les spÃ©cialitÃ©s"
+    ui->LabsCap_2->setCurrentIndex(0);   // "Toutes les disponibilitÃ©s"
 
-    // Réactiver les signaux
+    // RÃ©activer les signaux
     ui->LabsSearch_2->blockSignals(false);
     ui->LabsSpec_2->blockSignals(false);
     ui->LabsCap_2->blockSignals(false);
 
-    // Rafraîchir l'affichage
+    // RafraÃ®chir l'affichage
     filterLabsDynamic();
 
-    qDebug() << "Filtres réinitialisés";
+    qDebug() << "Filtres rÃ©initialisÃ©s";
 }
 
-// ── Init ──
+// â”€â”€ Init â”€â”€
 void MainWindow::initLabsUi()
 {
     setupTableLabs();
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     // Responsables autorisés: Admin / Responsable_Labos.
     auto loadLabsResponsables = [this]() {
         ui->LabResponsible_3->clear();
@@ -7677,31 +8300,33 @@ void MainWindow::initLabsUi()
     };
     loadLabsResponsables();
 
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     // Configurer les combobox de filtrage avec les bonnes valeurs
     ui->LabsSpec_2->clear();
-    ui->LabsSpec_2->addItem("Toutes les spécialités");
+    ui->LabsSpec_2->addItem("Toutes les spÃ©cialitÃ©s");
     ui->LabsSpec_2->addItem("interieur");
     ui->LabsSpec_2->addItem("exterieur");
 
     ui->LabsCap_2->clear();
-    ui->LabsCap_2->addItem("Toutes les disponibilités");
+    ui->LabsCap_2->addItem("Toutes les disponibilitÃ©s");
     ui->LabsCap_2->addItem("Disponible");
     ui->LabsCap_2->addItem("Occupe");
 
-    // S'assurer que le tri est activé
+    // S'assurer que le tri est activÃ©
     ui->TableLabs_2->setSortingEnabled(true);
 
     loadLabs();
 
     // ========== CONNEXIONS POUR RECHERCHE DYNAMIQUE ==========
-    // Recherche en temps réel quand l'utilisateur tape
+    // Recherche en temps rÃ©el quand l'utilisateur tape
     connect(ui->LabsSearch_2, &QLineEdit::textChanged, this, &MainWindow::filterLabsDynamic);
 
-    // Filtrage quand la spécialité change
+    // Filtrage quand la spÃ©cialitÃ© change
     connect(ui->LabsSpec_2, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::filterLabsDynamic);
 
-    // Filtrage quand la disponibilité change
+    // Filtrage quand la disponibilitÃ© change
     connect(ui->LabsCap_2, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::filterLabsDynamic);
 
@@ -7715,6 +8340,7 @@ void MainWindow::initLabsUi()
     connect(ui->BtnPopupResetLabs_5, &QPushButton::clicked, this, &MainWindow::on_BtnPopupResetLabs_5_clicked);
     connect(ui->btnSupprimerPub_2,   &QPushButton::clicked, this, &MainWindow::on_btnSupprimerPub_2_clicked);
     connect(ui->BtnExportLabsDirect, &QPushButton::clicked, this, &MainWindow::on_BtnExportLabsDirect_clicked);
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     connect(ui->btnLabReserveProduct, &QPushButton::clicked, this, &MainWindow::on_btnLabReserveProduct_clicked);
     connect(ui->btnLabReserveValidate, &QPushButton::clicked, this, &MainWindow::on_btnLabReserveValidate_clicked);
     connect(ui->btnLabReserveBack, &QPushButton::clicked, this, &MainWindow::on_btnLabReserveBack_clicked);
@@ -7914,25 +8540,36 @@ void MainWindow::on_btnLabReserveBack_clicked()
     ui->stacked_L->setCurrentIndex(0);
 }
 
+=======
+
+    connect(ui->BtnPopupCancelLabs_3, &QPushButton::clicked, this, [this](){ ui->stacked_L->setCurrentIndex(0); });
+    connect(ui->BtnPopupCancelLabs_5, &QPushButton::clicked, this, [this](){ ui->stacked_L->setCurrentIndex(0); });
+}
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 void MainWindow::onMapLocationSelected(const QString& title)
 {
     if (title.contains(",") && title.contains(QRegularExpression("\\d"))) {
         ui->LabLocation_3->setText(title);
         ui->LabLocation_5->setText(title);
-        QMessageBox::information(this, "Localisation", "Position capturée : " + title);
+        QMessageBox::information(this, "Localisation", "Position capturÃ©e : " + title);
     }
 }
-// ====================== PAGE 2 – AJOUT ======================
+// ====================== PAGE 2 â€“ AJOUT ======================
 void MainWindow::on_BtnPopupResetLabs_3_clicked()
 {
     ui->LabName_3->clear();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     ui->LabResponsible_3->setCurrentIndex(0);
+=======
+    ui->LabResponsible_3->clear();
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     ui->LabNumber_3->clear();
     ui->LabLocation_3->clear();
     ui->LabSpec_3->setCurrentIndex(0);
     ui->LabCap_3->setCurrentIndex(0);
     ui->LabSpec_4->setCurrentIndex(0);
     ui->LabCap_4->setCurrentIndex(0);
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     ui->LabMontant_3->setValue(0.0);
     ui->LabMontantPaye_3->setValue(0.0);
     ui->LabReste_3->setText("0.000");
@@ -7941,12 +8578,21 @@ void MainWindow::on_BtnPopupSaveLabs_3_clicked()
 {
     const QString nomLabo       = ui->LabName_3->text().trimmed();
     const QString responsable   = ui->LabResponsible_3->currentText().trimmed();
+=======
+}
+
+void MainWindow::on_BtnPopupSaveLabs_3_clicked()
+{
+    const QString nomLabo       = ui->LabName_3->text().trimmed();
+    const QString responsable   = ui->LabResponsible_3->text().trimmed();
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     const QString numero        = ui->LabNumber_3->text().trimmed();
     const QString localisation  = ui->LabLocation_3->text().trimmed();
     const QString specialite    = ui->LabSpec_3->currentText();
     const QString disponibilite = ui->LabCap_3->currentText();
     const QString resultat      = ui->LabSpec_4->currentText();
     const QString paiement      = ui->LabCap_4->currentText();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     const double montant     = ui->LabMontant_3->value();
     const double montantPaye = ui->LabMontantPaye_3->value();
 
@@ -7954,6 +8600,11 @@ void MainWindow::on_BtnPopupSaveLabs_3_clicked()
         QMessageBox::warning(this, "Validation", "Le nom du laboratoire est obligatoire.");
         return;
     }
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    if (specialite.toLower().contains("choisir") || disponibilite.toLower().contains("choisir")
+        || resultat.toLower().contains("choisir") || paiement.toLower().contains("choisir")) {
+        QMessageBox::warning(this, "Validation", "Veuillez faire un choix valide dans toutes les listes dÃ©roulantes !");
+========
     if (responsable.isEmpty() || responsable.toLower().contains("choisir")) {
         QMessageBox::warning(this, "Validation", "Veuillez choisir un responsable valide.");
         return;
@@ -7998,28 +8649,61 @@ void MainWindow::on_BtnPopupSaveLabs_3_clicked()
         QMessageBox::warning(this, "Validation",
                              QString("Le montant payé (%1 DT) ne peut pas dépasser le montant total (%2 DT).")
                                  .arg(montantPaye, 0, 'f', 3).arg(montant, 0, 'f', 3));
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
         return;
     }
 
     Labs lab(nomLabo, responsable, numero, localisation, specialite, disponibilite,
              resultat, paiement, montant, montantPaye, "1");
-    QString err;
-    if (!lab.ajouter(&err)) {
-        QMessageBox::critical(this, "Échec de l'ajout", "Impossible d'ajouter le laboratoire :\n" + err);
+=======
+
+    if (nomLabo.isEmpty() || localisation.isEmpty() || responsable.isEmpty() || numero.isEmpty()) {
+        QMessageBox::warning(this, "Validation", "Veuillez remplir tous les champs texte !");
+        return;
+    }
+    if (specialite.toLower().contains("choisir") || disponibilite.toLower().contains("choisir")
+        || resultat.toLower().contains("choisir") || paiement.toLower().contains("choisir")) {
+        QMessageBox::warning(this, "Validation", "Veuillez faire un choix valide dans toutes les listes dÃ©roulantes !");
         return;
     }
 
+    Labs lab(nomLabo, responsable, numero, localisation, specialite, disponibilite, resultat, paiement, "1");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    QString err;
+    if (!lab.ajouter(&err)) {
+        QMessageBox::critical(this, "Ã‰chec de l'ajout", "Impossible d'ajouter le laboratoire :\n" + err);
+        return;
+    }
+
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    QMessageBox::information(this, "SuccÃ¨s", "Laboratoire ajoutÃ© avec succÃ¨s !");
+========
     QMessageBox::information(this, "Succès",
                              QString("Laboratoire ajouté avec succès !\n"
                                      "Montant : %1 DT | Payé : %2 DT | Reste : %3 DT")
                                  .arg(montant, 0, 'f', 3)
                                  .arg(montantPaye, 0, 'f', 3)
                                  .arg(montant - montantPaye, 0, 'f', 3));
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+    QMessageBox::information(this, "SuccÃ¨s", "Laboratoire ajoutÃ© avec succÃ¨s !");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     ui->stacked_L->setCurrentIndex(0);
     loadLabs();
     on_BtnPopupResetLabs_3_clicked();
 }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+
+// ====================== PAGE 1 â€“ MODIFICATION ======================
+========
 // ====================== PAGE 1 – MODIFICATION ======================
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+
+// ====================== PAGE 1 â€“ MODIFICATION ======================
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 void MainWindow::on_BtnPopupResetLabs_5_clicked()
 {
     if (idLabsToEdit.isEmpty()) return;
@@ -8030,32 +8714,46 @@ void MainWindow::on_BtnPopupResetLabs_5_clicked()
         return;
     }
     ui->LabName_5->setText(r.nomlabo);
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     setComboValue(ui->LabResponsible_5, r.responsable);
+=======
+    ui->LabResponsible_5->setText(r.responsable);
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     ui->LabNumber_5->setText(r.numero);
     ui->LabLocation_5->setText(r.localisation);
     setComboValue(ui->LabCap_5,  r.disponibilite);
     setComboValue(ui->LabSpec_5, r.specialite);
     setComboValue(ui->LabSpec_6, r.resultat);
     setComboValue(ui->LabCap_6,  r.paiement);
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     ui->LabMontant_5->setValue(r.montant);
     ui->LabMontantPaye_5->setValue(r.montantPaye);
     ui->LabReste_5->setText(QString::number(r.reste, 'f', 3));
 }
+=======
+}
+
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 void MainWindow::on_BtnPopupSaveLabs_5_clicked()
 {
     if (idLabsToEdit.isEmpty()) {
-        QMessageBox::warning(this, "Erreur", "Aucun laboratoire sélectionné pour modification.");
+        QMessageBox::warning(this, "Erreur", "Aucun laboratoire sÃ©lectionnÃ© pour modification.");
         return;
     }
 
     const QString nomLabo       = ui->LabName_5->text().trimmed();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     const QString responsable   = ui->LabResponsible_5->currentText().trimmed();
+=======
+    const QString responsable   = ui->LabResponsible_5->text().trimmed();
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     const QString numero        = ui->LabNumber_5->text().trimmed();
     const QString localisation  = ui->LabLocation_5->text().trimmed();
     const QString specialite    = ui->LabSpec_5->currentText();
     const QString disponibilite = ui->LabCap_5->currentText();
     const QString resultat      = ui->LabSpec_6->currentText();
     const QString paiement      = ui->LabCap_6->currentText();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     const double montant     = ui->LabMontant_5->value();
     const double montantPaye = ui->LabMontantPaye_5->value();
 
@@ -8063,6 +8761,11 @@ void MainWindow::on_BtnPopupSaveLabs_5_clicked()
         QMessageBox::warning(this, "Validation", "Le nom du laboratoire est obligatoire.");
         return;
     }
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    if (specialite.toLower().contains("modifier") || disponibilite.toLower().contains("choisir")
+        || resultat.toLower().contains("modifier") || paiement.toLower().contains("choisir")) {
+        QMessageBox::warning(this, "Validation", "Veuillez faire un choix valide dans toutes les listes dÃ©roulantes !");
+========
     if (responsable.isEmpty() || responsable.toLower().contains("choisir")) {
         QMessageBox::warning(this, "Validation", "Veuillez choisir un responsable valide.");
         return;
@@ -8107,36 +8810,72 @@ void MainWindow::on_BtnPopupSaveLabs_5_clicked()
         QMessageBox::warning(this, "Validation",
                              QString("Le montant payé (%1 DT) ne peut pas dépasser le montant total (%2 DT).")
                                  .arg(montantPaye, 0, 'f', 3).arg(montant, 0, 'f', 3));
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+
+    if (nomLabo.isEmpty() || localisation.isEmpty() || responsable.isEmpty() || numero.isEmpty()) {
+        QMessageBox::warning(this, "Validation", "Tous les champs textes sont obligatoires !");
+        return;
+    }
+    if (specialite.toLower().contains("modifier") || disponibilite.toLower().contains("choisir")
+        || resultat.toLower().contains("modifier") || paiement.toLower().contains("choisir")) {
+        QMessageBox::warning(this, "Validation", "Veuillez faire un choix valide dans toutes les listes dÃ©roulantes !");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
         return;
     }
 
     QString err;
     if (!Labs::modifier(idLabsToEdit, nomLabo, responsable, numero, localisation,
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
                         specialite, disponibilite, resultat, paiement,
                         montant, montantPaye, &err)) {
+=======
+                        specialite, disponibilite, resultat, paiement, &err)) {
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
         QMessageBox::critical(this, "Erreur de modification", err);
         return;
     }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    QMessageBox::information(this, "SuccÃ¨s", "Laboratoire modifiÃ© avec succÃ¨s !");
+========
     QMessageBox::information(this, "Succès",
                              QString("Laboratoire modifié avec succès !\n"
                                      "Montant : %1 DT | Payé : %2 DT | Reste : %3 DT")
                                  .arg(montant, 0, 'f', 3)
                                  .arg(montantPaye, 0, 'f', 3)
                                  .arg(montant - montantPaye, 0, 'f', 3));
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+    QMessageBox::information(this, "SuccÃ¨s", "Laboratoire modifiÃ© avec succÃ¨s !");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     idLabsToEdit.clear();
     ui->stacked_L->setCurrentIndex(0);
     loadLabs();
 }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+
+// ====================== PAGE 0 â€“ SUPPRESSION ======================
+========
 // ====================== PAGE 0 – SUPPRESSION ======================
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+
+// ====================== PAGE 0 â€“ SUPPRESSION ======================
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 void MainWindow::on_btnSupprimerPub_2_clicked()
 {
     const int row = ui->TableLabs_2->currentRow();
     if (row < 0) {
-        QMessageBox::warning(this, "Supprimer", "Veuillez sélectionner un laboratoire.");
+        QMessageBox::warning(this, "Supprimer", "Veuillez sÃ©lectionner un laboratoire.");
         return;
     }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     if (!ui->TableLabs_2->item(row, 0)) return;
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     const QString id  = ui->TableLabs_2->item(row, 0)->text();
     const QString nom = ui->TableLabs_2->item(row, 1)->text();
@@ -8152,24 +8891,24 @@ void MainWindow::on_btnSupprimerPub_2_clicked()
         return;
     }
 
-    QMessageBox::information(this, "Succès", "Laboratoire supprimé avec succès.");
+    QMessageBox::information(this, "SuccÃ¨s", "Laboratoire supprimÃ© avec succÃ¨s.");
     loadLabs();
 }
 
-// ====================== PAGE 0 – FILTRE / RECHERCHE ======================
+// ====================== PAGE 0 â€“ FILTRE / RECHERCHE ======================
 void MainWindow::on_btnAppliquerPub_3_clicked()
 {
     const QString key = ui->LabsSearch_2->text().trimmed().toLower();
     const QString spec = ui->LabsSpec_2->currentText().trimmed().toLower();
     const QString disp = ui->LabsCap_2->currentText().trimmed().toLower();
 
-    // Désactiver le tri TEMPORAIREMENT pendant le filtrage
+    // DÃ©sactiver le tri TEMPORAIREMENT pendant le filtrage
     ui->TableLabs_2->setSortingEnabled(false);
 
     int visibleCount = 0;
 
     for (int r = 0; r < ui->TableLabs_2->rowCount(); ++r) {
-        // Récupérer les valeurs des colonnes
+        // RÃ©cupÃ©rer les valeurs des colonnes
         QString id = "";
         QString nom = "";
         QString responsable = "";
@@ -8198,12 +8937,12 @@ void MainWindow::on_btnAppliquerPub_3_clicked()
                   numero.contains(key) || localisation.contains(key));
         }
 
-        // Filtre par spécialité (si différent de "choisir un specialite" ou "choisir un specialite")
+        // Filtre par spÃ©cialitÃ© (si diffÃ©rent de "choisir un specialite" ou "choisir un specialite")
         if (ok && !spec.isEmpty() && !spec.startsWith("choisir")) {
             ok = (specialite == spec);
         }
 
-        // Filtre par disponibilité (si différent de "choisir disponibilite" ou "choisir le Disponabilite")
+        // Filtre par disponibilitÃ© (si diffÃ©rent de "choisir disponibilite" ou "choisir le Disponabilite")
         if (ok && !disp.isEmpty() && !disp.startsWith("choisir")) {
             ok = (disponibilite == disp);
         }
@@ -8212,24 +8951,24 @@ void MainWindow::on_btnAppliquerPub_3_clicked()
         if (ok) visibleCount++;
         // Ajoutez ces qDebug() pour voir les valeurs
         qDebug() << "Recherche texte:" << key;
-        qDebug() << "Spécialité sélectionnée:" << spec;
-        qDebug() << "Disponibilité sélectionnée:" << disp;
+        qDebug() << "SpÃ©cialitÃ© sÃ©lectionnÃ©e:" << spec;
+        qDebug() << "DisponibilitÃ© sÃ©lectionnÃ©e:" << disp;
 
         for (int r = 0; r < ui->TableLabs_2->rowCount(); ++r) {
             if (ui->TableLabs_2->item(r, 1)) {
                 qDebug() << "Ligne" << r << "- Nom:" << ui->TableLabs_2->item(r, 1)->text();
-                qDebug() << "Ligne" << r << "- Spécialité:" << (ui->TableLabs_2->item(r, 6) ? ui->TableLabs_2->item(r, 6)->text() : "vide");
-                qDebug() << "Ligne" << r << "- Disponibilité:" << (ui->TableLabs_2->item(r, 5) ? ui->TableLabs_2->item(r, 5)->text() : "vide");
+                qDebug() << "Ligne" << r << "- SpÃ©cialitÃ©:" << (ui->TableLabs_2->item(r, 6) ? ui->TableLabs_2->item(r, 6)->text() : "vide");
+                qDebug() << "Ligne" << r << "- DisponibilitÃ©:" << (ui->TableLabs_2->item(r, 5) ? ui->TableLabs_2->item(r, 5)->text() : "vide");
             }
         }
     }
 
-    // RÉACTIVER le tri APRÈS le filtrage
+    // RÃ‰ACTIVER le tri APRÃˆS le filtrage
     ui->TableLabs_2->setSortingEnabled(true);
 
-    // Afficher un message si aucun résultat
+    // Afficher un message si aucun rÃ©sultat
     if (visibleCount == 0 && (!key.isEmpty() || !spec.startsWith("choisir") || !disp.startsWith("choisir"))) {
-        QMessageBox::information(this, "Recherche", "Aucun laboratoire ne correspond à vos critères de recherche.");
+        QMessageBox::information(this, "Recherche", "Aucun laboratoire ne correspond Ã  vos critÃ¨res de recherche.");
     }
 }
 void MainWindow::on_btnReinitialiserPub_3_clicked()
@@ -8239,7 +8978,7 @@ void MainWindow::on_btnReinitialiserPub_3_clicked()
     ui->LabsSpec_2->setCurrentIndex(0);  // "choisir un specialite"
     ui->LabsCap_2->setCurrentIndex(0);   // "Choisir disponibilite"
 
-    // Désactiver le tri TEMPORAIREMENT
+    // DÃ©sactiver le tri TEMPORAIREMENT
     ui->TableLabs_2->setSortingEnabled(false);
 
     // Afficher toutes les lignes
@@ -8247,17 +8986,17 @@ void MainWindow::on_btnReinitialiserPub_3_clicked()
         ui->TableLabs_2->setRowHidden(r, false);
     }
 
-    // RÉACTIVER le tri
+    // RÃ‰ACTIVER le tri
     ui->TableLabs_2->setSortingEnabled(true);
 
-    qDebug() << "Filtres réinitialisés, toutes les lignes sont visibles";
+    qDebug() << "Filtres rÃ©initialisÃ©s, toutes les lignes sont visibles";
 }
-// ====================== PAGE 1 – OUVRIR MODIFIER ======================
+// ====================== PAGE 1 â€“ OUVRIR MODIFIER ======================
 void MainWindow::on_btnModifierPub_2_clicked()
 {
     const int r = ui->TableLabs_2->currentRow();
     if (r < 0) {
-        QMessageBox::warning(this, "Modifier", "Sélectionne un laboratoire.");
+        QMessageBox::warning(this, "Modifier", "SÃ©lectionne un laboratoire.");
         return;
     }
 
@@ -8266,6 +9005,7 @@ void MainWindow::on_btnModifierPub_2_clicked()
         QMessageBox::warning(this, "Modifier", "ID introuvable.");
         return;
     }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     if (!ui->TableLabs_2->item(r, 0)) return;
 
     ui->LabName_5->setText(ui->TableLabs_2->item(r, 1)->text());
@@ -8273,10 +9013,26 @@ void MainWindow::on_btnModifierPub_2_clicked()
     ui->LabNumber_5->setText(ui->TableLabs_2->item(r, 3)->text());
     ui->LabLocation_5->setText(ui->TableLabs_2->item(r, 4)->text());
 
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+
+    ui->LabName_5->setText(ui->TableLabs_2->item(r, 1)->text());
+    ui->LabResponsible_5->setText(ui->TableLabs_2->item(r, 2)->text());
+    ui->LabNumber_5->setText(ui->TableLabs_2->item(r, 3)->text());
+    ui->LabLocation_5->setText(ui->TableLabs_2->item(r, 4)->text());
+
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    setComboValue(ui->LabCap_5,  ui->TableLabs_2->item(r, 5)->text()); // DisponibilitÃ©
+    setComboValue(ui->LabSpec_5, ui->TableLabs_2->item(r, 6)->text()); // SpÃ©cialitÃ©
+    setComboValue(ui->LabSpec_6, ui->TableLabs_2->item(r, 7)->text()); // RÃ©sultat
+    setComboValue(ui->LabCap_6,  ui->TableLabs_2->item(r, 8)->text()); // Paiement
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
     setComboValue(ui->LabCap_5,  ui->TableLabs_2->item(r, 5)->text()); // Disponibilité
         setComboValue(ui->LabSpec_5, ui->TableLabs_2->item(r, 6)->text()); // Spécialité
         setComboValue(ui->LabSpec_6, ui->TableLabs_2->item(r, 7)->text()); // Résultat
         setComboValue(ui->LabCap_6,  ui->TableLabs_2->item(r, 8)->text()); // Paiement
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
 
         // Montants financiers depuis le tableau (colonnes 9, 10, 11)
         if (ui->TableLabs_2->item(r, 9))
@@ -8290,19 +9046,39 @@ void MainWindow::on_btnModifierPub_2_clicked()
                 ui->TableLabs_2->item(r, 11)->data(Qt::DisplayRole).toDouble(), 'f', 3));
 
         ui->stacked_L->setCurrentIndex(1);
+=======
+
+    ui->stacked_L->setCurrentIndex(1);
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 }
 
-// ====================== PAGE 4 – AFFICHER DÉTAIL ======================
+// ====================== PAGE 4 â€“ AFFICHER DÃ‰TAIL ======================
 void MainWindow::on_btnAjouterPub_3_clicked()
 {
     const int r = ui->TableLabs_2->currentRow();
     if (r < 0) {
-        QMessageBox::warning(this, "Afficher", "Sélectionne un laboratoire à afficher.");
+        QMessageBox::warning(this, "Afficher", "SÃ©lectionne un laboratoire Ã  afficher.");
         return;
     }
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     if (!ui->TableLabs_2->item(r, 0)) return;
 
     ui->aff1->setText(ui->TableLabs_2->item(r, 1)->text()); // Nom
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+
+    ui->aff1->setText(ui->TableLabs_2->item(r, 1)->text()); // Nom
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    ui->aff5->setText(ui->TableLabs_2->item(r, 2)->text()); // Responsable
+    ui->aff6->setText(ui->TableLabs_2->item(r, 3)->text()); // NumÃ©ro
+    ui->aff2->setText(ui->TableLabs_2->item(r, 4)->text()); // Localisation
+
+    setComboValue(ui->aff7,   ui->TableLabs_2->item(r, 5)->text()); // DisponibilitÃ©
+    setComboValue(ui->aff3,   ui->TableLabs_2->item(r, 6)->text()); // SpÃ©cialitÃ©
+    setComboValue(ui->aff3_2, ui->TableLabs_2->item(r, 7)->text()); // RÃ©sultat
+    setComboValue(ui->aff7_2, ui->TableLabs_2->item(r, 8)->text()); // Paiement
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
         ui->aff5->setText(ui->TableLabs_2->item(r, 2)->text()); // Responsable
         ui->aff6->setText(ui->TableLabs_2->item(r, 3)->text()); // Numéro
         ui->aff2->setText(ui->TableLabs_2->item(r, 4)->text()); // Localisation
@@ -8311,6 +9087,7 @@ void MainWindow::on_btnAjouterPub_3_clicked()
         setComboValue(ui->aff3,   ui->TableLabs_2->item(r, 6)->text()); // Spécialité
         setComboValue(ui->aff3_2, ui->TableLabs_2->item(r, 7)->text()); // Résultat
         setComboValue(ui->aff7_2, ui->TableLabs_2->item(r, 8)->text()); // Paiement
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
 
         // Montants financiers en lecture seule sur la page d'affichage
         if (ui->TableLabs_2->item(r, 9))
@@ -8329,6 +9106,10 @@ void MainWindow::on_btnAjouterPub_3_clicked()
         }
 
         ui->stacked_L->setCurrentIndex(4);
+=======
+
+    ui->stacked_L->setCurrentIndex(4);
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 }
 //start inventory crud
 // ==================== INVENTORY HELPERS ====================
@@ -8349,12 +9130,15 @@ QString MainWindow::selectedInventorySku() const
     return it ? it->text() : QString();
 }
 
-// ── Init ─────────────────────────────────────────────────────────────────────
+// â”€â”€ Init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 void MainWindow::initInventoryUi()
 {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     setupInventoryChoicePage();
     
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     // Populate Status combo (add form)
     ui->Status->clear();
     ui->Status->addItem("on hand",   "on hand");
@@ -8369,84 +9153,150 @@ void MainWindow::initInventoryUi()
 
     // Filter Status combo
     ui->InventoryStatus->clear();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     ui->InventoryStatus->addItem(QStringLiteral("-- Tous les statuts --"), QString());
+=======
+    ui->InventoryStatus->addItem("-- Tous --", "");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     ui->InventoryStatus->addItem("on hand",   "on hand");
     ui->InventoryStatus->addItem("limited",   "limited");
     ui->InventoryStatus->addItem("stock out", "stock out");
 
-    // Zone combo (Add form) – Zones A B C D
+    // Zone combo (Add form) â€“ Zones A B C D
     ui->Zone->clear();
     ui->Zone->addItem("Zone A", "A");
     ui->Zone->addItem("Zone B", "B");
     ui->Zone->addItem("Zone C", "C");
     ui->Zone->addItem("Zone D", "D");
 
-    // Zone combo (Edit form) – Zones A B C D
+    // Zone combo (Edit form) â€“ Zones A B C D
     ui->Zone_2->clear();
     ui->Zone_2->addItem("Zone A", "A");
     ui->Zone_2->addItem("Zone B", "B");
     ui->Zone_2->addItem("Zone C", "C");
     ui->Zone_2->addItem("Zone D", "D");
 
-    // Zone filter combo – Zones A B C D
+    // Zone filter combo â€“ Zones A B C D
     ui->InventoryZone->clear();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     ui->InventoryZone->addItem(QStringLiteral("-- Toutes les zones --"), QString());
+=======
+    ui->InventoryZone->addItem("-- Toutes zones --", "");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     ui->InventoryZone->addItem("Zone A", "A");
     ui->InventoryZone->addItem("Zone B", "B");
     ui->InventoryZone->addItem("Zone C", "C");
     ui->InventoryZone->addItem("Zone D", "D");
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    // Shelf combo (Add form) â€“ RDC / 1st / 2nd / 3rd floor
+========
     // Type filter : types distincts en base (liste prédéfinie en secours)
     refreshInventoryTypeFilter();
 
     // Shelf combo (Add form) – RDC / 1st / 2nd / 3rd floor
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+    // Shelf combo (Add form) â€“ RDC / 1st / 2nd / 3rd floor
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     ui->Shelf->clear();
     ui->Shelf->addItem("RDC",       "RDC");
     ui->Shelf->addItem("1st floor", "1st floor");
     ui->Shelf->addItem("2nd floor", "2nd floor");
     ui->Shelf->addItem("3rd floor", "3rd floor");
 
-    // Shelf combo (Edit form) – RDC / 1st / 2nd / 3rd floor
+    // Shelf combo (Edit form) â€“ RDC / 1st / 2nd / 3rd floor
     ui->Shelf_2->clear();
     ui->Shelf_2->addItem("RDC",       "RDC");
     ui->Shelf_2->addItem("1st floor", "1st floor");
     ui->Shelf_2->addItem("2nd floor", "2nd floor");
     ui->Shelf_2->addItem("3rd floor", "3rd floor");
 
-    // Unit combo (Add form) – KG / L / M
+    // Unit combo (Add form) â€“ KG / L / M
     ui->Unit->clear();
     ui->Unit->addItem("kg", "kg");
     ui->Unit->addItem("L",  "L");
     ui->Unit->addItem("m",  "m");
 
-    // Unit combo (Edit form) – KG / L / M
+    // Unit combo (Edit form) â€“ KG / L / M
     ui->Unit_2->clear();
     ui->Unit_2->addItem("kg", "kg");
     ui->Unit_2->addItem("L",  "L");
     ui->Unit_2->addItem("m",  "m");
 
+    void MainWindow::fillTableInventoryRow(int r, const Inventory::Row &row)
+{
+    // col 0 - ID_PRODUCT (hidden PK stored in UserRole)
+    auto *itId = new QTableWidgetItem(row.idProduct);
+    itId->setData(Qt::UserRole,     row.idProduct);
+    itId->setData(Qt::UserRole + 1, row.zone);        // store zone for edit pre-fill
+    itId->setData(Qt::UserRole + 2, row.shelf);       // store shelf for edit pre-fill
+    itId->setData(Qt::UserRole + 3, row.unit);        // store unit for edit pre-fill
+    itId->setData(Qt::UserRole + 4, row.type);        // store type for edit pre-fill
+    itId->setData(Qt::UserRole + 5, row.description); // store description
+    itId->setData(Qt::UserRole + 6, row.qtRs);        // store qtRs
+    itId->setData(Qt::UserRole + 7, row.threshold);   // store threshold
+    ui->TableInventory->setItem(r, 0, itId);
+
+    ui->TableInventory->setItem(r, 1, new QTableWidgetItem(row.sku));
+    ui->TableInventory->setItem(r, 2, new QTableWidgetItem(row.name));
+    ui->TableInventory->setItem(r, 3, new QTableWidgetItem(QString::number(row.price, 'f', 2)));
+    ui->TableInventory->setItem(r, 4, new QTableWidgetItem(QString::number(row.qtAv)));
+    ui->TableInventory->setItem(r, 5, new QTableWidgetItem(row.status));
+}
+
+void MainWindow::loadInventory()
+{
+    ui->TableInventory->setSortingEnabled(false);
+    ui->TableInventory->setRowCount(0);
+
+    QVector<Inventory::Row> rows;
+    QString err;
+    const int sortIdx = ui->InventorySort->currentIndex();
+    QString orderBy = "SKU";
+    if (sortIdx == 1)      orderBy = "NAME ASC";
+    else if (sortIdx == 2) orderBy = "PRICE ASC";
+    else if (sortIdx == 3) orderBy = "PRICE DESC";
+
+    if (!Inventory::chargerTout(rows, orderBy, &err)) {
+        QMessageBox::critical(this, "Erreur SQL - Inventaire", err);
+        ui->TableInventory->setSortingEnabled(true);
+        return;
+    }
+
+    int r = 0;
+    for (const auto &row : std::as_const(rows)) {
+        ui->TableInventory->insertRow(r);
+        fillTableInventoryRow(r, row);
+        ++r;
+    }
+    ui->TableInventory->setSortingEnabled(true);
+}
+
     // Type combo (Add form)
     ui->Type->clear();
-    ui->Type->addItem("Matière première",  "Matière première");
+    ui->Type->addItem("MatiÃ¨re premiÃ¨re",  "MatiÃ¨re premiÃ¨re");
     ui->Type->addItem("Composant",          "Composant");
     ui->Type->addItem("Produit fini",       "Produit fini");
     ui->Type->addItem("Produit semi-fini",  "Produit semi-fini");
     ui->Type->addItem("Outil",              "Outil");
-    ui->Type->addItem("Équipement",         "Équipement");
+    ui->Type->addItem("Ã‰quipement",         "Ã‰quipement");
     ui->Type->addItem("Consommable",        "Consommable");
-    ui->Type->addItem("Pièce de rechange",  "Pièce de rechange");
+    ui->Type->addItem("PiÃ¨ce de rechange",  "PiÃ¨ce de rechange");
 
     // Type combo (Edit form)
     ui->Type_2->clear();
-    ui->Type_2->addItem("Matière première",  "Matière première");
+    ui->Type_2->addItem("MatiÃ¨re premiÃ¨re",  "MatiÃ¨re premiÃ¨re");
     ui->Type_2->addItem("Composant",          "Composant");
     ui->Type_2->addItem("Produit fini",       "Produit fini");
     ui->Type_2->addItem("Produit semi-fini",  "Produit semi-fini");
     ui->Type_2->addItem("Outil",              "Outil");
-    ui->Type_2->addItem("Équipement",         "Équipement");
+    ui->Type_2->addItem("Ã‰quipement",         "Ã‰quipement");
     ui->Type_2->addItem("Consommable",        "Consommable");
-    ui->Type_2->addItem("Pièce de rechange",  "Pièce de rechange");
+    ui->Type_2->addItem("PiÃ¨ce de rechange",  "PiÃ¨ce de rechange");
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     // SKU hint visible for users when opening add/edit forms
     ui->Sku->setInputMask(QString());
     ui->Sku_2->setInputMask(QString());
@@ -8467,6 +9317,12 @@ void MainWindow::initInventoryUi()
             ui->Sku_2->setText(normalized);
         }
     });
+=======
+    // SKU Input Mask: 3 Letters - 3 Numbers (case insensitive input, forces upper)
+    // Format: AAA-999
+    ui->Sku->setInputMask(">AAA-999; ");
+    ui->Sku_2->setInputMask(">AAA-999; ");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     // Name Validation: Uppercase Letters, Numbers and Spaces only
     QRegularExpression nameRegex("^[A-Z0-9 ]*$");
@@ -8482,11 +9338,21 @@ void MainWindow::initInventoryUi()
     connect(ui->BtnInventoryEdit,   &QPushButton::clicked, this, &MainWindow::handleInventoryEdit);
     connect(ui->BtnInventoryAdd_5,  &QPushButton::clicked, this, &MainWindow::handleInventoryStats);
     connect(ui->BtnInventoryDelete, &QPushButton::clicked, this, &MainWindow::handleInventoryDelete);
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+
+    // Form buttons (manual connections for reliability)
+========
     connect(ui->BtnInventoryExport, &QPushButton::clicked, this, &MainWindow::handleInventoryExportPdf);
     connect(ui->BtnInventoryDetailExportPdf, &QPushButton::clicked, this, &MainWindow::handleInventoryDetailExportPdf);
 
     // Form buttons (manual connections for reliability)
     connect(ui->BtnPopupAutoSaveInventory, &QPushButton::clicked, this, &MainWindow::on_BtnPopupAutoSaveInventory_clicked);
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+
+    // Form buttons (manual connections for reliability)
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     connect(ui->BtnPopupSaveInventory,   &QPushButton::clicked, this, &MainWindow::on_BtnPopupSaveInventory_clicked);
     connect(ui->BtnPopupResetInventory,  &QPushButton::clicked, this, &MainWindow::on_BtnPopupResetInventory_clicked);
     connect(ui->BtnPopupCancelInventory, &QToolButton::clicked,   this, &MainWindow::on_BtnPopupCancelInventory_clicked);
@@ -8495,10 +9361,16 @@ void MainWindow::initInventoryUi()
     connect(ui->BtnPopupResetInventory_2, &QPushButton::clicked, this, &MainWindow::on_BtnPopupResetInventory_2_clicked);
     connect(ui->BtnPopupCancelInventory_2,&QToolButton::clicked,   this, &MainWindow::on_BtnPopupCancelInventory_2_clicked);
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
     // Apply/filter button — explicit connect (auto-connect fails for nested widgets)
     connect(ui->BtnInventoryApply, &QPushButton::clicked, this, &MainWindow::applyInventoryFilter);
     connect(ui->BtnInventoryReset, &QPushButton::clicked, this, &MainWindow::resetInventoryFilters);
 
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     ui->stacked_I->setCurrentIndex(0);
     loadInventory();
 }
@@ -8514,9 +9386,10 @@ void MainWindow::setupTableInventory()
     // Columns: ID | SKU | Nom | Prix | Qt_AV | STATUS
     ui->TableInventory->setColumnCount(6);
     ui->TableInventory->setHorizontalHeaderLabels({
-        "ID", "SKU", "Nom", "Prix", "Qté disp.", "Statut"
+        "ID", "SKU", "Nom", "Prix", "QtÃ© disp.", "Statut"
     });
     ui->TableInventory->hideColumn(0); // Hide physical PK from Admin
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     ui->TableInventory->setSortingEnabled(false); // Rely on SQL order
 
     // Keep placeholder visible instead of masking input
@@ -8525,6 +9398,21 @@ void MainWindow::setupTableInventory()
     ui->Sku->setPlaceholderText("ABC-123");
     ui->Sku_2->setPlaceholderText("ABC-123");
 
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+    ui->TableInventory->setSortingEnabled(true);
+
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    // SKU Input Mask: Let's use a more flexible mask to avoid blocking the user
+    // Format: 3 letters, hyphen, 3 digits (e.g., ABC-123)
+    ui->Sku->setInputMask(">AAA-999; ");
+    ui->Sku_2->setInputMask(">AAA-999; ");
+
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     // Hide ID input fields from Admin (automated)
     ui->IdProduct->setVisible(false);
@@ -8533,6 +9421,10 @@ void MainWindow::setupTableInventory()
     ui->LblIdProduct_2->setVisible(false);
 }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+// â”€â”€ READ (load) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+========
 void MainWindow::fillTableInventoryRow(int r, const Inventory::Row &row)
 {
     // col 0 - ID_PRODUCT (hidden PK stored in UserRole)
@@ -8555,6 +9447,7 @@ void MainWindow::fillTableInventoryRow(int r, const Inventory::Row &row)
     ui->TableInventory->setItem(r, 4, new QTableWidgetItem(QString::number(row.qtAv)));
     ui->TableInventory->setItem(r, 5, new QTableWidgetItem(row.status));
 }
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
 
 void MainWindow::loadInventory()
 {
@@ -8562,25 +9455,68 @@ void MainWindow::loadInventory()
     QString syncErr;
     syncInventoryStatsFromProduct(&syncErr);
     ui->TableInventory->setSortingEnabled(false);
+=======
+// â”€â”€ READ (load) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+void MainWindow::loadInventory()
+{
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     ui->TableInventory->setRowCount(0);
 
     QVector<Inventory::Row> rows;
     QString err;
     const int sortIdx = ui->InventorySort->currentIndex();
     QString orderBy = "SKU";
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     if (sortIdx == 1)      orderBy = "NAME ASC";
+=======
+    if (sortIdx == 1) orderBy = "NAME ASC";
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     else if (sortIdx == 2) orderBy = "PRICE ASC";
     else if (sortIdx == 3) orderBy = "PRICE DESC";
 
     if (!Inventory::chargerTout(rows, orderBy, &err)) {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+        QMessageBox::critical(this, "Erreur SQL â€“ Inventaire", err);
+========
         QMessageBox::critical(this, "Erreur SQL - Inventaire", err);
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+        QMessageBox::critical(this, "Erreur SQL â€“ Inventaire", err);
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
         return;
     }
 
     int r = 0;
     for (const auto &row : std::as_const(rows)) {
         ui->TableInventory->insertRow(r);
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+
+        // col 0 â€“ ID_PRODUCT (hidden PK stored in UserRole)
+        auto *itId = new QTableWidgetItem(row.idProduct);
+        itId->setData(Qt::UserRole,     row.idProduct);
+        itId->setData(Qt::UserRole + 1, row.zone);        // store zone for edit pre-fill
+        itId->setData(Qt::UserRole + 2, row.shelf);       // store shelf for edit pre-fill
+        itId->setData(Qt::UserRole + 3, row.unit);        // store unit for edit pre-fill
+        itId->setData(Qt::UserRole + 4, row.type);        // store type for edit pre-fill
+        itId->setData(Qt::UserRole + 5, row.description); // store description
+        itId->setData(Qt::UserRole + 6, row.qtRs);        // store qtRs
+        itId->setData(Qt::UserRole + 7, row.threshold);   // store threshold
+        ui->TableInventory->setItem(r, 0, itId);
+
+        ui->TableInventory->setItem(r, 1, new QTableWidgetItem(row.sku));
+        ui->TableInventory->setItem(r, 2, new QTableWidgetItem(row.name));
+        ui->TableInventory->setItem(r, 3, new QTableWidgetItem(QString::number(row.price, 'f', 2)));
+        ui->TableInventory->setItem(r, 4, new QTableWidgetItem(QString::number(row.qtAv)));
+        ui->TableInventory->setItem(r, 5, new QTableWidgetItem(row.status));
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
         fillTableInventoryRow(r, row);
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
         ++r;
     }
     // Keep sorting disabled so SQL ORDER BY is preserved
@@ -8674,10 +9610,15 @@ void MainWindow::goInventoryAddAuto() {
     ui->BtnPopupAutoSaveInventory->setVisible(true);
     
     ui->stacked_I->setCurrentIndex(1); // Page d'ajout
+=======
+        ++r;
+    }
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 }
 
-// ── CREATE ────────────────────────────────────────────────────────────────────
+// â”€â”€ CREATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 void MainWindow::on_BtnPopupAutoSaveInventory_clicked()
 {
     // Auto-calculate missing fields
@@ -8725,11 +9666,17 @@ void MainWindow::on_BtnPopupAutoSaveInventory_clicked()
     on_BtnPopupSaveInventory_clicked();
 }
 
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 void MainWindow::on_BtnPopupSaveInventory_clicked()
 {
     // Auto-uppercase for consistency
     const QString name      = ui->Name->text().trimmed().toUpper();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     const QString sku       = normalizeSkuInput(ui->Sku->text().trimmed());
+=======
+    const QString sku       = ui->Sku->text().trimmed().toUpper();
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     // UI update to reflect uppercase
     ui->Name->setText(name);
@@ -8748,6 +9695,19 @@ void MainWindow::on_BtnPopupSaveInventory_clicked()
 
     // Validation: Name
     if (name.isEmpty()) {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+        QMessageBox::warning(this, "Validation", "Le nom du produit ne peut pas Ãªtre vide.");
+        return;
+    }
+
+    // Validation: SKU (Min 3 chars)
+    if (sku.length() < 3) {
+        QMessageBox::warning(this, "Validation", "Le SKU doit contenir au moins 3 caractÃ¨res.");
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
         QMessageBox::warning(this, "Validation", "Le nom du produit ne peut pas être vide.");
         return;
     }
@@ -8764,11 +9724,14 @@ void MainWindow::on_BtnPopupSaveInventory_clicked()
         QMessageBox::warning(this, "Validation", "Ce SKU existe deja. Veuillez saisir un SKU unique.");
         ui->Sku->setFocus();
         ui->Sku->selectAll();
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
         return;
     }
 
     if (status.isEmpty()) {
-        QMessageBox::warning(this, "Validation", "Veuillez sélectionner un statut.");
+        QMessageBox::warning(this, "Validation", "Veuillez sÃ©lectionner un statut.");
         return;
     }
 
@@ -8777,22 +9740,44 @@ void MainWindow::on_BtnPopupSaveInventory_clicked()
     if (!inv.ajouter(&err)) {
         QMessageBox::critical(this, "Erreur de Sauvegarde",
                               "Impossible d'ajouter le produit.\n\n"
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+                              "DÃ©tail technique : " + err + "\n\n"
+                              "VÃ©rifiez que vous avez au moins un employÃ© enregistrÃ©.");
+========
                               "Détail technique : " + err + "\n\n"
                               "Vérifiez que vous avez au moins un employé enregistré.");
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+                              "DÃ©tail technique : " + err + "\n\n"
+                              "VÃ©rifiez que vous avez au moins un employÃ© enregistrÃ©.");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
         return;
     }
 
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    QMessageBox::information(this, "Inventaire", "Produit ajoutÃ© avec succÃ¨s.");
+========
     QMessageBox::information(this, "Inventaire", "Produit ajouté avec succès.");
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
     ui->stacked_I->setCurrentIndex(0);
     refreshInventoryTypeFilter();
+=======
+    QMessageBox::information(this, "Inventaire", "Produit ajoutÃ© avec succÃ¨s.");
+    ui->stacked_I->setCurrentIndex(0);
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     loadInventory();
 }
 
 void MainWindow::on_BtnPopupResetInventory_clicked()
 {
     ui->IdProduct->clear();
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     ui->Name->clear();
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     ui->Sku->clear();
     ui->QtAv->setValue(0);
     ui->QtRs->setValue(0);
@@ -8806,10 +9791,18 @@ void MainWindow::on_BtnPopupResetInventory_clicked()
     ui->Description->clear();
 }
 
-// ── UPDATE ────────────────────────────────────────────────────────────────────
+// â”€â”€ UPDATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // ====================== MODIFICATION ======================
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+// â”€â”€ UPDATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+========
 // ── UPDATE ────────────────────────────────────────────────────────────────────
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+// â”€â”€ UPDATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
 // ====================== MODIFICATION ======================
 
@@ -8818,12 +9811,56 @@ void MainWindow::handleInventoryEdit()
     qDebug() << "[INVENTORY] handleInventoryEdit: Navigating to Index 2 (modifieri)";
     const int r = ui->TableInventory->currentRow();
     if (r < 0) {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+        QMessageBox::warning(this, "Modifier", "Veuillez sÃ©lectionner un produit dans le tableau.");
+========
         QMessageBox::warning(this, "Modifier", "Veuillez sélectionner un produit dans le tableau.");
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
         return;
     }
     QTableWidgetItem *itId = ui->TableInventory->item(r, 0);
     if (!itId) return;
 
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+        QMessageBox::warning(this, "Modifier", "Veuillez sÃ©lectionner un produit dans le tableau.");
+        return;
+    }
+
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+    QTabvoid MainWindow::on_BtnInventoryApply_clicked()
+{
+    const QString kw     = ui->InventorySearch->text().trimmed();
+    const QString status = ui->InventoryStatus->currentData().toString();
+    const int     sortIdx = ui->InventorySort->currentIndex();
+
+    QString orderBy = "SKU";
+    if (sortIdx == 1)      orderBy = "NAME ASC";
+    else if (sortIdx == 2) orderBy = "PRICE ASC";
+    else if (sortIdx == 3) orderBy = "PRICE DESC";
+
+    QVector<Inventory::Row> rows;
+    QString err;
+    if (!Inventory::chercher(rows, kw, status, orderBy, &err)) {
+        QMessageBox::critical(this, "Erreur SQL - Recherche", err);
+        return;
+    }
+
+    ui->TableInventory->setSortingEnabled(false);
+    ui->TableInventory->setRowCount(0);
+
+    int r = 0;
+    for (const auto &row : std::as_const(rows)) {
+        ui->TableInventory->insertRow(r);
+        fillTableInventoryRow(r, row);
+        ++r;
+    }
+    ui->TableInventory->setSortingEnabled(true);
+}
+id MainWindow::on_BtnPopupSaveInventory_2_clicked()
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
     idProductToEdit = itId->data(Qt::UserRole).toString();
 
     // Fill the Edit form (index 2)
@@ -9418,10 +10455,17 @@ void MainWindow::handleInventoryDetailExportPdf()
 }
 
 void MainWindow::on_BtnPopupSaveInventory_2_clicked()
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
 {
     // Auto-uppercase for consistency
     const QString name      = ui->Name_2->text().trimmed().toUpper();
     const QString sku       = normalizeSkuInput(ui->Sku_2->text().trimmed());
+=======
+{
+    // Auto-uppercase for consistency
+    const QString name      = ui->Name_2->text().trimmed().toUpper();
+    const QString sku       = ui->Sku_2->text().trimmed().toUpper();
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     // UI update to reflect uppercase
     ui->Name_2->setText(name);
@@ -9439,12 +10483,25 @@ void MainWindow::on_BtnPopupSaveInventory_2_clicked()
     const QString desc      = ui->Description_2->toPlainText().trimmed();
 
     if (idProductToEdit.isEmpty()) {
-        QMessageBox::warning(this, "Modifier", "Aucun produit sélectionné.");
+        QMessageBox::warning(this, "Modifier", "Aucun produit sÃ©lectionnÃ©.");
         return;
     }
 
     // Validation: Name
     if (name.isEmpty()) {
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+        QMessageBox::warning(this, "Validation", "Le nom du produit ne peut pas Ãªtre vide.");
+        return;
+    }
+
+    // Validation: SKU (Min 3 chars)
+    if (sku.length() < 3) {
+        QMessageBox::warning(this, "Validation", "Le SKU doit contenir au moins 3 caractÃ¨res.");
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
         QMessageBox::warning(this, "Validation", "Le nom du produit ne peut pas être vide.");
         return;
     }
@@ -9461,25 +10518,31 @@ void MainWindow::on_BtnPopupSaveInventory_2_clicked()
         QMessageBox::warning(this, "Validation", "Ce SKU existe deja. Veuillez saisir un SKU unique.");
         ui->Sku_2->setFocus();
         ui->Sku_2->selectAll();
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
         return;
     }
 
     if (status.isEmpty()) {
-        QMessageBox::warning(this, "Validation", "Veuillez sélectionner un statut.");
+        QMessageBox::warning(this, "Validation", "Veuillez sÃ©lectionner un statut.");
         return;
     }
 
     QString err;
     if (!Inventory::modifier(idProductToEdit, name, sku, type, qtAv, qtRs, threshold, unit, price, status, zone, shelf, desc, &err)) {
-        QMessageBox::critical(this, "Erreur SQL – Modification", err);
+        QMessageBox::critical(this, "Erreur SQL â€“ Modification", err);
         return;
     }
 
-    QMessageBox::information(this, "Inventaire", "Produit modifié avec succès.");
+    QMessageBox::information(this, "Inventaire", "Produit modifiÃ© avec succÃ¨s.");
     idProductToEdit.clear();
     skuToEdit.clear();
     ui->stacked_I->setCurrentIndex(0);
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     refreshInventoryTypeFilter();
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     loadInventory();
 }
 
@@ -9487,7 +10550,10 @@ void MainWindow::on_BtnPopupResetInventory_2_clicked()
 {
     const int r = ui->TableInventory->currentRow();
     if (r < 0) return;
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
     if (!ui->TableInventory->item(r, 0)) return;
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
     ui->IdProduct_2->setText(ui->TableInventory->item(r, 0)->text());
     ui->Sku_2->setText(ui->TableInventory->item(r, 1)->text());
@@ -9499,7 +10565,7 @@ void MainWindow::on_BtnPopupResetInventory_2_clicked()
     ui->Status_2->setCurrentIndex(idx >= 0 ? idx : 0);
 }
 
-// ── DELETE ────────────────────────────────────────────────────────────────────
+// â”€â”€ DELETE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 void MainWindow::handleInventoryDelete()
 {
@@ -9507,31 +10573,81 @@ void MainWindow::handleInventoryDelete()
     const QString sku = selectedInventorySku();
 
     if (id.isEmpty() || sku.isEmpty()) {
-        QMessageBox::warning(this, "Supprimer", "Sélectionnez un produit à supprimer.");
+        QMessageBox::warning(this, "Supprimer", "SÃ©lectionnez un produit Ã  supprimer.");
         return;
     }
 
     auto reply = QMessageBox::question(
         this,
         "Confirmation",
-        QString("Supprimer le produit « %1 / %2 » ?").arg(id, sku),
+        QString("Supprimer le produit Â« %1 / %2 Â» ?").arg(id, sku),
         QMessageBox::Yes | QMessageBox::No
         );
     if (reply != QMessageBox::Yes) return;
 
     QString err;
     if (!Inventory::supprimer(id, sku, &err)) {
-        QMessageBox::critical(this, "Erreur SQL – Suppression", err);
+        QMessageBox::critical(this, "Erreur SQL â€“ Suppression", err);
         return;
     }
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+    QMessageBox::information(this, "Inventaire", "Produit supprimÃ©.");
+========
     QMessageBox::information(this, "Inventaire", "Produit supprimé.");
     refreshInventoryTypeFilter();
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+    QMessageBox::information(this, "Inventaire", "Produit supprimÃ©.");
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
     loadInventory();
 }
 
-// ── SEARCH / FILTER ───────────────────────────────────────────────────────────
+// â”€â”€ SEARCH / FILTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+<<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
+void MainWindow::on_BtnInventoryApply_clicked()
+{
+    const QString kw     = ui->InventorySearch->text().trimmed();
+    const QString status = ui->InventoryStatus->currentData().toString();
+    const int     sortIdx = ui->InventorySort->currentIndex();
+
+    QString orderBy = "SKU";
+    if (sortIdx == 1) orderBy = "NAME ASC";
+    else if (sortIdx == 2) orderBy = "PRICE ASC";
+    else if (sortIdx == 3) orderBy = "PRICE DESC";
+
+    QVector<Inventory::Row> rows;
+    QString err;
+    if (!Inventory::chercher(rows, kw, status, orderBy, &err)) {
+        QMessageBox::critical(this, "Erreur SQL â€“ Recherche", err);
+        return;
+    }
+
+    ui->TableInventory->setRowCount(0);
+    int r = 0;
+    for (const auto &row : std::as_const(rows)) {
+        ui->TableInventory->insertRow(r);
+        auto *itId = new QTableWidgetItem(row.idProduct);
+        itId->setData(Qt::UserRole, row.idProduct);
+        ui->TableInventory->setItem(r, 0, itId);
+        ui->TableInventory->setItem(r, 1, new QTableWidgetItem(row.sku));
+        ui->TableInventory->setItem(r, 2, new QTableWidgetItem(row.name));
+        ui->TableInventory->setItem(r, 3, new QTableWidgetItem(QString::number(row.price, 'f', 2)));
+        ui->TableInventory->setItem(r, 4, new QTableWidgetItem(QString::number(row.qtAv)));
+        ui->TableInventory->setItem(r, 5, new QTableWidgetItem(row.status));
+        ++r;
+    }
+}
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
+========
+>>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow.cpp
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp
 
 //end
 
@@ -9543,9 +10659,12 @@ void MainWindow::handleInventoryDelete()
 
 
 
+<<<<<<< HEAD:SPM/mainwindow_backup.cpp
 
 
 
 
 
 
+=======
+>>>>>>> 9a10c999ab5f4c212cf0f5bd865d9b0be17c739e:SmartResearchPublicationManagementt/mainwindow_backup.cpp

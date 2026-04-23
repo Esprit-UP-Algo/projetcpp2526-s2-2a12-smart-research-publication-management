@@ -6,6 +6,21 @@
 #include <QAbstractSocket>
 
 namespace {
+QString prepareSmtpDataBody(const QString &contenu)
+{
+    QString normalized = contenu;
+    normalized.replace(QStringLiteral("\r\n"), QStringLiteral("\n"));
+    normalized.replace(QStringLiteral("\r"), QStringLiteral("\n"));
+    const QStringList lines = normalized.split(QLatin1Char('\n'));
+    QString out;
+    for (const QString &line : lines) {
+        if (line.startsWith(QLatin1Char('.')))
+            out += QLatin1Char('.');
+        out += line + QStringLiteral("\r\n");
+    }
+    return out;
+}
+
 bool envoyerViaSmtp(QSslSocket &socket,
                     const QString &smtpUser,
                     const QString &smtpPass,
@@ -15,7 +30,8 @@ bool envoyerViaSmtp(QSslSocket &socket,
                     QString &erreur,
                     const QString &nomExpediteurAffiche,
                     const QString &adresseExpediteurAffiche,
-                    bool startTlsMode)
+                    bool startTlsMode,
+                    bool contenuHtml)
 {
     auto lireReponse = [&](const QString &codeAttendu) -> bool {
         if (!socket.waitForReadyRead(12000)) {
@@ -76,9 +92,14 @@ bool envoyerViaSmtp(QSslSocket &socket,
     message += "To: <" + destinataire + ">\r\n";
     message += "Subject: " + sujet + "\r\n";
     message += "MIME-Version: 1.0\r\n";
-    message += "Content-Type: text/plain; charset=UTF-8\r\n";
+    if (contenuHtml) {
+        message += "Content-Type: text/html; charset=UTF-8\r\n";
+    } else {
+        message += "Content-Type: text/plain; charset=UTF-8\r\n";
+    }
     message += "Content-Transfer-Encoding: 8bit\r\n\r\n";
-    message += contenu + "\r\n.\r\n";
+    message += prepareSmtpDataBody(contenu);
+    message += ".\r\n";
 
     if (!envoyerCommande(message, "250")) return false;
     if (!envoyerCommande("QUIT\r\n", "221")) return false;
@@ -98,7 +119,8 @@ bool MailSender::envoyerMail(const QString &smtpUser,
                              const QString &contenu,
                              QString &erreur,
                              const QString &nomExpediteurAffiche,
-                             const QString &adresseExpediteurAffiche)
+                             const QString &adresseExpediteurAffiche,
+                             bool contenuHtml)
 {
     // 1) SSL direct (465)
     {
@@ -106,7 +128,7 @@ bool MailSender::envoyerMail(const QString &smtpUser,
         socket.connectToHostEncrypted("smtp.gmail.com", 465);
         if (socket.waitForEncrypted(10000)) {
             if (envoyerViaSmtp(socket, smtpUser, smtpPass, destinataire, sujet, contenu,
-                               erreur, nomExpediteurAffiche, adresseExpediteurAffiche, false)) {
+                               erreur, nomExpediteurAffiche, adresseExpediteurAffiche, false, contenuHtml)) {
                 return true;
             }
         } else {
@@ -123,7 +145,7 @@ bool MailSender::envoyerMail(const QString &smtpUser,
             return false;
         }
         if (envoyerViaSmtp(socket, smtpUser, smtpPass, destinataire, sujet, contenu,
-                           erreur, nomExpediteurAffiche, adresseExpediteurAffiche, true)) {
+                           erreur, nomExpediteurAffiche, adresseExpediteurAffiche, true, contenuHtml)) {
             return true;
         }
     }

@@ -154,10 +154,9 @@ bool Labs::chargerTout(QVector<Row> &out, QString *err)
 {
     out.clear();
     QSqlQuery q;
-    // RESTE est une colonne virtuelle Oracle (MONTANT - MONTANT_PAYE), on peut la sélectionner directement
     q.prepare("SELECT IDLABO, NOMLABO, RESPONSABLE, NUMERO, LOCALISATION, "
               "DISPONIBILITE, SPECIALITE, RESULTAT, PAIEMENT, "
-              "MONTANT, MONTANT_PAYE, RESTE "
+              "MONTANT, MONTANT_PAYE "
               "FROM LABS ORDER BY IDLABO DESC");
 
     if (!q.exec()) {
@@ -176,9 +175,9 @@ bool Labs::chargerTout(QVector<Row> &out, QString *err)
         r.specialite    = q.value(6).toString();
         r.resultat      = q.value(7).toString();
         r.paiement      = q.value(8).toString();
-        r.montant       = q.value(9).toDouble();
-        r.montantPaye   = q.value(10).toDouble();
-        r.reste         = q.value(11).toDouble();
+        r.montant       = QString(q.value(9).toString()).replace(',', '.').toDouble();
+        r.montantPaye   = QString(q.value(10).toString()).replace(',', '.').toDouble();
+        r.reste         = r.montant - r.montantPaye;
         out.append(r);
     }
     return true;
@@ -189,7 +188,7 @@ bool Labs::getById(const QString& idLabo, Row &outRow, QString *err)
     QSqlQuery q;
     q.prepare("SELECT IDLABO, NOMLABO, RESPONSABLE, NUMERO, LOCALISATION, "
               "DISPONIBILITE, SPECIALITE, RESULTAT, PAIEMENT, "
-              "MONTANT, MONTANT_PAYE, RESTE "
+              "MONTANT, MONTANT_PAYE "
               "FROM LABS WHERE IDLABO = :id");
     q.bindValue(":id", idLabo);
 
@@ -211,9 +210,9 @@ bool Labs::getById(const QString& idLabo, Row &outRow, QString *err)
     outRow.specialite    = q.value(6).toString();
     outRow.resultat      = q.value(7).toString();
     outRow.paiement      = q.value(8).toString();
-    outRow.montant       = q.value(9).toDouble();
-    outRow.montantPaye   = q.value(10).toDouble();
-    outRow.reste         = q.value(11).toDouble();
+    outRow.montant       = QString(q.value(9).toString()).replace(',', '.').toDouble();
+    outRow.montantPaye   = QString(q.value(10).toString()).replace(',', '.').toDouble();
+    outRow.reste         = outRow.montant - outRow.montantPaye;
 
     return true;
 }

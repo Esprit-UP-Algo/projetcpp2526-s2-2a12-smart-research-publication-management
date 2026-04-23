@@ -12,8 +12,9 @@ public:
     FaceAuth();
     bool identifierUtilisateur(const QString& username);
     bool identifierUtilisateurParListe(const QStringList& usernames, QString *matchedUsername);
+    bool enregistrerUtilisateur(const QString& username);
 private:
-    QByteArray capturerImageVisage() const;
+    QByteArray capturerImageVisage();
     bool verifierAvecImage(const QByteArray& imageData, const QString& username) const;
     cv::CascadeClassifier faceCascade;
 };
