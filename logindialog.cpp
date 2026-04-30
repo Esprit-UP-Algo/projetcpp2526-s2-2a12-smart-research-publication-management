@@ -8,6 +8,231 @@
 #include <QSqlError>
 #include "faceauth.h"
 #include <QInputDialog>
+#include <QDateTime>
+#include <QRandomGenerator>
+#include <QSet>
+#include "mailsender.h"
+#include <QCoreApplication>
+#include <QFile>
+#include <QTextStream>
+#include <QProcess>
+#include <QProcessEnvironment>
+#include <QStandardPaths>
+#include <QTcpSocket>
+#include <QThread>
+
+namespace {
+QProcess *g_faceServerProcess = nullptr;
+
+bool isFaceServerReachable()
+{
+    QTcpSocket socket;
+    socket.connectToHost("127.0.0.1", 5000);
+    const bool ok = socket.waitForConnected(400);
+    if (ok) socket.disconnectFromHost();
+    return ok;
+}
+
+QString ensureFaceScript()
+{
+    const QString scriptPath = QCoreApplication::applicationDirPath() + "/face_id_vortex.py";
+    QFile file(scriptPath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        return QString();
+    }
+
+    QTextStream out(&file);
+    out << "from flask import Flask, request, jsonify\n"
+        << "import cv2\n"
+        << "import numpy as np\n"
+        << "import os\n\n"
+        << "app = Flask(__name__)\n"
+        << "face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')\n\n"
+        << "@app.route('/health', methods=['GET'])\n"
+        << "def health():\n"
+        << "    return jsonify({'ok': True})\n\n"
+        << "@app.route('/enroll', methods=['POST'])\n"
+        << "def enroll():\n"
+        << "    if 'face' in request.files:\n"
+        << "        username = request.form.get('username', 'user')\n"
+        << "        img = cv2.imdecode(np.frombuffer(request.files['face'].read(), np.uint8), cv2.IMREAD_COLOR)\n"
+        << "        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)\n"
+        << "        faces = face_cascade.detectMultiScale(gray, 1.1, 4)\n"
+        << "        if len(faces) > 0:\n"
+        << "            x, y, w, h = faces[0]\n"
+        << "            face_crop = img[y:y+h, x:x+w]\n"
+        << "            cv2.imwrite(f'{username}_ref.jpg', face_crop)\n"
+        << "            return jsonify({'success': True})\n"
+        << "    return jsonify({'success': False})\n\n"
+        << "@app.route('/verify', methods=['POST'])\n"
+        << "def verify():\n"
+        << "    if 'face' in request.files:\n"
+        << "        username = request.form.get('username', 'user')\n"
+        << "        ref_path = f'{username}_ref.jpg'\n"
+        << "        if not os.path.exists(ref_path): return jsonify({'verified': False})\n"
+        << "        img_ref = cv2.imread(ref_path, 0)\n"
+        << "        img_new = cv2.imdecode(np.frombuffer(request.files['face'].read(), np.uint8), cv2.IMREAD_GRAYSCALE)\n"
+        << "        faces = face_cascade.detectMultiScale(img_new, 1.1, 4)\n"
+        << "        if len(faces) > 0:\n"
+        << "            x, y, w, h = faces[0]\n"
+        << "            curr = cv2.resize(img_new[y:y+h, x:x+w], (img_ref.shape[1], img_ref.shape[0]))\n"
+        << "            score = cv2.matchTemplate(curr, img_ref, cv2.TM_CCOEFF_NORMED).max()\n"
+        << "            return jsonify({'verified': bool(score > 0.7)})\n"
+        << "    return jsonify({'verified': False})\n\n"
+        << "if __name__ == '__main__':\n"
+        << "    app.run(host='127.0.0.1', port=5000)\n";
+    file.close();
+    return scriptPath;
+}
+
+bool ensureFaceServerRunning()
+{
+    if (isFaceServerReachable()) return true;
+
+    const QString scriptPath = ensureFaceScript();
+    if (scriptPath.isEmpty()) return false;
+
+    if (!g_faceServerProcess) {
+        g_faceServerProcess = new QProcess();
+        g_faceServerProcess->setProcessChannelMode(QProcess::MergedChannels);
+    }
+    if (g_faceServerProcess->state() != QProcess::NotRunning) {
+        g_faceServerProcess->terminate();
+        g_faceServerProcess->waitForFinished(1500);
+    }
+
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.remove("PYTHONHOME");
+    env.remove("PYTHONPATH");
+    env.insert("PYTHONUTF8", "1");
+    g_faceServerProcess->setProcessEnvironment(env);
+    g_faceServerProcess->setWorkingDirectory(QCoreApplication::applicationDirPath());
+
+    const QString pythonExe = QStandardPaths::findExecutable("python");
+    const QString pyExe = QStandardPaths::findExecutable("py");
+    bool started = false;
+    if (!pythonExe.isEmpty()) {
+        g_faceServerProcess->start(pythonExe, QStringList() << scriptPath);
+        started = g_faceServerProcess->waitForStarted(5000);
+    }
+    if (!started && !pyExe.isEmpty()) {
+        g_faceServerProcess->start(pyExe, QStringList() << "-3" << scriptPath);
+        started = g_faceServerProcess->waitForStarted(5000);
+    }
+    if (!started) return false;
+
+    for (int i = 0; i < 12; ++i) {
+        if (isFaceServerReachable()) return true;
+        QThread::msleep(250);
+    }
+    return false;
+}
+
+bool envoyerMailServiceRh(const QString &destinataire,
+                          const QString &sujet,
+                          const QString &corps,
+                          QString &erreur)
+{
+    MailSender sender;
+    const QString smtpUser = QStringLiteral("rrayyyrrayyy@gmail.com");
+    const QString smtpPass = QStringLiteral("qxel rihn nrrl fgtq");
+    const QString expediteurService = QStringLiteral("Service RH - SmartResearchLab");
+    const QString expediteurAdresseRh = QStringLiteral("rh@smartresearchlab.tn");
+    return sender.envoyerMail(smtpUser, smtpPass, destinataire, sujet, corps, erreur,
+                              expediteurService, expediteurAdresseRh);
+}
+
+bool verifierEmailParCode(const QString &email, QWidget *parent)
+{
+    const QString code = QString::number(QRandomGenerator::global()->bounded(100000, 1000000));
+    QString err;
+    const QString sujet = QStringLiteral("Code de verification - Recuperation mot de passe");
+    const QString corps = QStringLiteral(
+        "Bonjour,\n\n"
+        "Une demande de reinitialisation de mot de passe a ete initiee pour votre compte employe.\n\n"
+        "Code de verification : %1\n\n"
+        "Si vous n'etes pas a l'origine de cette demande, contactez immediatement le service RH.\n"
+    ).arg(code);
+
+    if (!envoyerMailServiceRh(email, sujet, corps, err)) {
+        QMessageBox::critical(parent, "Envoi impossible",
+                              "Impossible d'envoyer le code de verification:\n" + err);
+        return false;
+    }
+
+    for (int tentative = 1; tentative <= 3; ++tentative) {
+        bool ok = false;
+        const QString saisi = QInputDialog::getText(
+                                  parent,
+                                  "Verification email",
+                                  QString("Entrez le code recu par email (tentative %1/3) :").arg(tentative),
+                                  QLineEdit::Normal, "", &ok).trimmed();
+        if (!ok) return false;
+        if (saisi == code) return true;
+    }
+
+    QMessageBox::warning(parent, "Code incorrect",
+                         "Verification email echouee apres 3 tentatives.");
+    return false;
+}
+
+void notifierAdminsChangementMdp(const QString &username,
+                                 const QString &nomComplet,
+                                 const QString &emailEmploye,
+                                 QWidget *parent)
+{
+    QSqlQuery adminsQuery;
+    adminsQuery.prepare(
+        "SELECT DISTINCT TRIM(EMAIL) "
+        "FROM EMPLOYES "
+        "WHERE EMAIL IS NOT NULL "
+        "AND TRIM(EMAIL) <> '' "
+        "AND UPPER(ROLE) IN ('ADMIN', 'RH', 'RESPONSABLE_LABOS')"
+    );
+
+    if (!adminsQuery.exec()) {
+        qWarning() << "Notification admin impossible:" << adminsQuery.lastError().text();
+        return;
+    }
+
+    QSet<QString> adminEmails;
+    while (adminsQuery.next()) {
+        const QString mail = adminsQuery.value(0).toString().trimmed();
+        if (!mail.isEmpty()) adminEmails.insert(mail);
+    }
+
+    if (adminEmails.isEmpty()) {
+        return;
+    }
+
+    const QString sujet = QStringLiteral("Alerte securite - Mot de passe employe modifie");
+    const QString horodatage = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    const QString corps = QStringLiteral(
+        "Notification automatique SmartResearch.\n\n"
+        "Un employe a modifie son mot de passe via le parcours \"Mot de passe oublie\".\n\n"
+        "Username : %1\n"
+        "Nom      : %2\n"
+        "Email    : %3\n"
+        "Date/Heure : %4\n\n"
+        "Si cette action est suspecte, veuillez verifier le compte immediatement."
+    ).arg(username, nomComplet, emailEmploye, horodatage);
+
+    QString err;
+    bool atLeastOneSent = false;
+    for (const QString &dest : std::as_const(adminEmails)) {
+        if (envoyerMailServiceRh(dest, sujet, corps, err)) {
+            atLeastOneSent = true;
+        } else {
+            qWarning() << "Echec notification admin" << dest << ":" << err;
+        }
+    }
+
+    if (!atLeastOneSent) {
+        QMessageBox::warning(parent, "Notification admin",
+                             "Mot de passe mis a jour, mais l'alerte admin n'a pas pu etre envoyee.");
+    }
+}
+} // namespace
 
 LoginDialog::LoginDialog(QWidget *parent) :
     QDialog(parent),
@@ -136,6 +361,11 @@ LoginDialog::LoginDialog(QWidget *parent) :
 
     // Fenêtre propre
     this->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
+
+    // Le serveur FaceID doit être prêt dès l'écran de login (avant MainWindow).
+    if (!ensureFaceServerRunning()) {
+        qWarning() << "FaceID: serveur IA non disponible au démarrage du login.";
+    }
 }
 
 LoginDialog::~LoginDialog()
@@ -170,34 +400,66 @@ void LoginDialog::on_btnLogin_clicked()
         ui->lePassword->setFocus();
     }
 }
-void LoginDialog::on_btnFaceID_clicked()
-{
-    QString user = ui->leUsername->text().trimmed();
-
-    if (user.isEmpty()) {
-        QMessageBox::warning(this, "Erreur", "Veuillez saisir votre username.");
+void LoginDialog::on_btnFaceID_clicked() {
+    if (!ensureFaceServerRunning()) {
+        QMessageBox::critical(this, "Face ID indisponible",
+                              "Le serveur FaceID n'a pas pu démarrer automatiquement.\n"
+                              "Vérifiez Python + modules flask/opencv/numpy.");
         return;
     }
 
+    QString user = ui->leUsername->text().trimmed();
     FaceAuth auth;
-    // 1. Reconnaissance faciale OpenCV
-    if (auth.identifierUtilisateur(user)) {
 
-        QString errorMsg;
-        // 2. Initialisation de la session (C'est ici que le rôle est fixé)
-        if (Employe::authentifierFaceID(user, &errorMsg)) {
+    if (user.isEmpty()) {
+        // Mode autonome: on ne cherche que parmi les employés existants.
+        QStringList employeeUsernames;
+        QSqlQuery usersQuery;
+        usersQuery.prepare("SELECT USERNAME FROM EMPLOYES WHERE USERNAME IS NOT NULL ORDER BY ID_EMPLOYE");
 
-            // 3. REDIRECTION IDENTIQUE
-            // On ferme le dialogue, le main.cpp lancera MainWindow
-            this->accept();
+        if (!usersQuery.exec()) {
+            QMessageBox::critical(this, "Erreur SQL", "Impossible de charger les comptes employés.");
+            return;
+        }
 
+        while (usersQuery.next()) {
+            const QString username = usersQuery.value(0).toString().trimmed();
+            if (!username.isEmpty()) {
+                employeeUsernames.append(username);
+            }
+        }
+
+        if (employeeUsernames.isEmpty()) {
+            QMessageBox::warning(this, "Face ID", "Aucun compte employé disponible pour l'authentification faciale.");
+            return;
+        }
+
+        QString matchedUsername;
+        if (auth.identifierUtilisateurParListe(employeeUsernames, &matchedUsername)) {
+            QString errorMsg;
+            if (Employe::authentifierFaceID(matchedUsername, &errorMsg)) {
+                this->accept();
+            } else {
+                QMessageBox::critical(this, "Erreur SQL", errorMsg);
+            }
         } else {
-            QMessageBox::critical(this, "Erreur Session", errorMsg);
+            QMessageBox::critical(this, "Échec IA", "Visage non reconnu parmi les employés.");
+        }
+        return;
+    }
+
+    if (auth.identifierUtilisateur(user)) {
+        QString errorMsg;
+        if (Employe::authentifierFaceID(user, &errorMsg)) {
+            this->accept(); // Succès total !
+        } else {
+            QMessageBox::critical(this, "Erreur SQL", errorMsg);
         }
     } else {
-        QMessageBox::critical(this, "Échec", "Visage non reconnu pour " + user);
+        QMessageBox::critical(this, "Échec IA", "Visage non reconnu");
     }
 }
+
 void LoginDialog::on_Quitter_clicked()
 {
     this->reject(); // Ferme la fenêtre proprement
@@ -206,50 +468,105 @@ void LoginDialog::on_Quitter_clicked()
 
 void LoginDialog::on_btnForgotPass_clicked()
 {
-    bool ok;
-
-    // 1. Vérification de l'identité
-    QString username = QInputDialog::getText(this, "Récupération", "Nom d'utilisateur :", QLineEdit::Normal, "", &ok);
+    bool ok = false;
+    const QString username = QInputDialog::getText(
+        this, "Recuperation securisee", "Nom d'utilisateur :", QLineEdit::Normal, "", &ok
+    ).trimmed();
     if (!ok || username.isEmpty()) return;
 
-    QString cin = QInputDialog::getText(this, "Vérification", "Numéro de CIN :", QLineEdit::Normal, "", &ok);
-    if (!ok || cin.isEmpty()) return;
-
-    QSqlQuery query;
-    query.prepare("SELECT NOM FROM EMPLOYES WHERE USERNAME = :user AND CIN = :cin");
-    query.bindValue(":user", username);
-    query.bindValue(":cin", cin);
-
-    if (query.exec() && query.next()) {
-        // 2. Nouveau mot de passe (même règle de force que la création de compte)
-        QString newPass;
-        for (;;) {
-            newPass = QInputDialog::getText(this, "Succès",
-                                            "Identité confirmée. Entrez un mot de passe fort (min. 10 car., "
-                                            "minuscules, majuscules, chiffres, caractère spécial) :",
-                                            QLineEdit::Password, "", &ok);
-            if (!ok || newPass.isEmpty())
-                return;
-            if (Employe::motDePasseAcceptable(newPass))
-                break;
-            QMessageBox::warning(this, "Mot de passe trop faible",
-                                 "Le mot de passe doit atteindre au moins le niveau « Fort » "
-                                 "(comme à la création de compte employé). Réessayez.");
-        }
-
-        QByteArray hashedPass = QCryptographicHash::hash(newPass.toUtf8(), QCryptographicHash::Sha256).toHex();
-
-        QSqlQuery updateQuery;
-        updateQuery.prepare("UPDATE EMPLOYES SET PASSWORD_HASH = :pass WHERE USERNAME = :user");
-        updateQuery.bindValue(":pass", QString(hashedPass));
-        updateQuery.bindValue(":user", username);
-
-        if (updateQuery.exec()) {
-            QMessageBox::information(this, "Succès", "Mot de passe mis à jour avec succès !");
-        } else {
-            QMessageBox::critical(this, "Erreur", "Impossible de mettre à jour la base de données.");
-        }
-    } else {
-        QMessageBox::critical(this, "Erreur", "Username ou CIN incorrect.");
+    QSqlQuery profileQuery;
+    profileQuery.prepare(
+        "SELECT NOM, PRENOM, CIN, EMAIL, PASSWORD_HASH "
+        "FROM EMPLOYES WHERE UPPER(TRIM(USERNAME)) = UPPER(TRIM(:user))"
+    );
+    profileQuery.bindValue(":user", username);
+    if (!profileQuery.exec() || !profileQuery.next()) {
+        QMessageBox::critical(this, "Acces refuse",
+                              "Identite invalide. Verification impossible pour ce compte.");
+        return;
     }
+
+    const QString nom = profileQuery.value(0).toString().trimmed();
+    const QString prenom = profileQuery.value(1).toString().trimmed();
+    const QString cinBase = profileQuery.value(2).toString().trimmed();
+    const QString emailBase = profileQuery.value(3).toString().trimmed();
+    const QString ancienHash = profileQuery.value(4).toString().trimmed();
+    const QString nomComplet = (nom + " " + prenom).trimmed();
+
+    const QString cinSaisi = QInputDialog::getText(
+        this, "Verification 1/3", "Numero CIN :", QLineEdit::Normal, "", &ok
+    ).trimmed();
+    if (!ok || cinSaisi.isEmpty()) return;
+
+    const QString emailSaisi = QInputDialog::getText(
+        this, "Verification 2/3", "Adresse email professionnelle :", QLineEdit::Normal, "", &ok
+    ).trimmed();
+    if (!ok || emailSaisi.isEmpty()) return;
+
+    if (cinSaisi != cinBase || emailSaisi.compare(emailBase, Qt::CaseInsensitive) != 0) {
+        QMessageBox::critical(this, "Acces refuse",
+                              "Les informations de verification ne correspondent pas.");
+        return;
+    }
+
+    if (!verifierEmailParCode(emailBase, this)) {
+        return;
+    }
+
+    QString newPass;
+    for (;;) {
+        newPass = QInputDialog::getText(
+                      this,
+                      "Nouveau mot de passe",
+                      "Entrez un mot de passe fort (min. 10 car., maj/min, chiffre, special) :",
+                      QLineEdit::Password, "", &ok
+                  );
+        if (!ok || newPass.isEmpty()) return;
+
+        if (!Employe::motDePasseAcceptable(newPass)) {
+            QMessageBox::warning(this, "Mot de passe faible",
+                                 "Le mot de passe doit atteindre au moins le niveau Fort.");
+            continue;
+        }
+
+        const QString confirmation = QInputDialog::getText(
+                                         this,
+                                         "Confirmation",
+                                         "Confirmez le nouveau mot de passe :",
+                                         QLineEdit::Password, "", &ok
+                                     );
+        if (!ok) return;
+        if (newPass != confirmation) {
+            QMessageBox::warning(this, "Confirmation invalide",
+                                 "Les deux mots de passe sont differents.");
+            continue;
+        }
+
+        const QString newHash = QString(
+            QCryptographicHash::hash(newPass.toUtf8(), QCryptographicHash::Sha256).toHex()
+        );
+        if (!ancienHash.isEmpty() && newHash == ancienHash) {
+            QMessageBox::warning(this, "Mot de passe invalide",
+                                 "Le nouveau mot de passe doit etre different de l'ancien.");
+            continue;
+        }
+        break;
+    }
+
+    const QString newHash = QString(QCryptographicHash::hash(newPass.toUtf8(), QCryptographicHash::Sha256).toHex());
+    QSqlQuery updateQuery;
+    updateQuery.prepare("UPDATE EMPLOYES SET PASSWORD_HASH = :pass WHERE UPPER(TRIM(USERNAME)) = UPPER(TRIM(:user))");
+    updateQuery.bindValue(":pass", newHash);
+    updateQuery.bindValue(":user", username);
+
+    if (!updateQuery.exec()) {
+        QMessageBox::critical(this, "Erreur SQL",
+                              "Impossible de mettre a jour le mot de passe:\n" + updateQuery.lastError().text());
+        return;
+    }
+
+    notifierAdminsChangementMdp(username, nomComplet, emailBase, this);
+    QMessageBox::information(this, "Succes",
+                             "Mot de passe mis a jour avec succes.\n"
+                             "Une notification de securite a ete envoyee aux administrateurs.");
 }

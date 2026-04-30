@@ -53,8 +53,8 @@ bool Inventory::ajouter(QString *err) const
     QSqlQuery q;
     q.prepare(
         "INSERT INTO PRODUCT "
-        "(ID_PRODUCT, SKU, QT_AV, STATUS, IDEMP, NAME, PRICE, TYPE, QT_RS, THRESHOLD, UNIT, ZONE, SHELF, DESCR) "
-        "VALUES (:id, :sku, :qt, :status, (SELECT NVL(MIN(ID_EMPLOYE), 1) FROM EMPLOYES), :name, :price, :type, :qtr, :thr, :unit, :zone, :shelf, :desc)"
+        "(ID_PRODUCT, SKU, QT_AV, STATUS, IDEMP, NAME, PRICE, TYPE, QT_RS, THRESHOLD, UNIT, ZONE, SHELF, DESCR, USE_COUNT) "
+        "VALUES (:id, :sku, :qt, :status, (SELECT NVL(MIN(ID_EMPLOYE), 1) FROM EMPLOYES), :name, :price, :type, :qtr, :thr, :unit, :zone, :shelf, :desc, :usecount)"
     );
     q.bindValue(":id",     newId);
     q.bindValue(":sku",    m_sku);
@@ -76,6 +76,7 @@ bool Inventory::ajouter(QString *err) const
 
 
     q.bindValue(":desc",   m_description);
+    q.bindValue(":usecount", 0);
 
 
     if (!q.exec()) {
@@ -99,6 +100,7 @@ bool Inventory::ajouter(QString *err) const
              }
 
              alter.exec("ALTER TABLE PRODUCT ADD DESCR VARCHAR2(2000)");
+             alter.exec("ALTER TABLE PRODUCT ADD USE_COUNT NUMBER DEFAULT 0");
 
              // Finally try adding IDEMP if missing
              alter.exec("ALTER TABLE PRODUCT ADD IDEMP NUMBER");
@@ -150,6 +152,7 @@ bool Inventory::modifier(const QString &idProduct,
         if (e.contains("ORA-00904") || e.contains("ORA-01722")) {
              QSqlQuery alter;
              alter.exec("ALTER TABLE PRODUCT ADD DESCR VARCHAR2(2000)");
+             alter.exec("ALTER TABLE PRODUCT ADD USE_COUNT NUMBER DEFAULT 0");
              if (q.exec()) return true;
         }
         setErr(err, q.lastError().text());
@@ -164,7 +167,6 @@ bool Inventory::supprimer(const QString &idProduct,
                            const QString &sku,
                            QString *err)
 {
-    Q_UNUSED(sku)
     QSqlQuery q;
     q.prepare("DELETE FROM PRODUCT WHERE ID_PRODUCT=:id");
     q.bindValue(":id",  idProduct);
@@ -193,6 +195,8 @@ static void fillRow(const QSqlQuery &q, Inventory::Row &r) {
     if (rec.indexOf("SHELF")       >= 0) r.shelf       = q.value("SHELF").toString();
     if (rec.indexOf("DESCR")       >= 0) r.description = q.value("DESCR").toString();
     if (rec.indexOf("DESCRIPTION") >= 0) r.description = q.value("DESCRIPTION").toString(); 
+    if (rec.indexOf("USE_COUNT") >= 0) r.useCount = q.value("USE_COUNT").toInt();
+    else r.useCount = 0;
 }
 
 // ── READ ALL ─────────────────────────────────────────────────────────────────
@@ -296,6 +300,30 @@ bool Inventory::chercher(QVector<Row> &out, const QString &keyword, const QStrin
         }
     }
 
+    while (q.next()) {
+        Row r;
+        fillRow(q, r);
+        out.push_back(r);
+    }
+    return true;
+}
+
+// ── THRESHOLD ALERTS ─────────────────────────────────────────────────────────
+bool Inventory::checkThresholdAlerts(QVector<Row> &out, QString *err)
+{
+    out.clear();
+    QSqlQuery q;
+    // Produit en alerte : quantité disponible <= seuil
+    // On exclut les produits à seuil 0 (non configuré)
+    if (!q.exec(
+            "SELECT * FROM PRODUCT "
+            "WHERE NVL(THRESHOLD, 0) > 0 "
+            "AND NVL(QT_AV, 0) <= NVL(THRESHOLD, 0) "
+            "ORDER BY SKU"
+            )) {
+        setErr(err, q.lastError().text());
+        return false;
+    }
     while (q.next()) {
         Row r;
         fillRow(q, r);

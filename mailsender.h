@@ -14,7 +14,8 @@ public:
                      const QString &contenu,
                      QString &erreur,
                      const QString &nomExpediteurAffiche = QString(),
-                     const QString &adresseExpediteurAffiche = QString());
+                     const QString &adresseExpediteurAffiche = QString(),
+                     bool contenuHtml = false);
 
 private:
     QString encoderBase64(const QString &text) const;

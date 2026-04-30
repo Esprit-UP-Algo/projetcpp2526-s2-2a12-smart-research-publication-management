@@ -1,74 +1,106 @@
 #include "faceauth.h"
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
 #include <QHttpMultiPart>
-#include <QHttpPart>
+#include <QNetworkReply>
 #include <QEventLoop>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QBuffer>
 #include <QDebug>
 
-// CORRECTION : Définition du constructeur
-FaceAuth::FaceAuth() {}
+FaceAuth::FaceAuth() {
+}
 
-bool FaceAuth::identifierUtilisateur(const QString& employeeID) {
+QByteArray FaceAuth::capturerImageVisage() const
+{
     cv::VideoCapture cap(0);
-    if (!cap.isOpened()) return false;
+    if (!cap.isOpened()) {
+        qDebug() << "Erreur: Caméra inaccessible.";
+        return QByteArray();
+    }
 
     cv::Mat frame;
-    for(int i = 0; i < 30; i++) {
-        cap >> frame;
-        if (frame.empty()) continue;
-        cv::flip(frame, frame, 1);
-        cv::imshow("Scan FaceID - Cadrez votre visage", frame);
-        if (cv::waitKey(30) >= 0) break;
-    }
+    for(int i = 0; i < 10; i++) cap >> frame; // Stabilisation rapide
+    cap.release();
     cv::destroyAllWindows();
 
     if (frame.empty()) {
-        cap.release();
-        return false;
+        return QByteArray();
     }
 
-    // Encodage JPG
     std::vector<uchar> buf;
     cv::imencode(".jpg", frame, buf);
-    QByteArray imageData(reinterpret_cast<const char*>(buf.data()), static_cast<int>(buf.size()));
+    return QByteArray(reinterpret_cast<const char*>(buf.data()), static_cast<int>(buf.size()));
+}
 
-    // Envoi HTTP
-    QNetworkAccessManager manager;
-    QEventLoop loop;
+bool FaceAuth::verifierAvecImage(const QByteArray& imageData, const QString& username) const
+{
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-
-    QHttpPart idPart;
-    idPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"id\""));
-    idPart.setBody(employeeID.toUtf8());
 
     QHttpPart imagePart;
     imagePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"face\"; filename=\"face.jpg\""));
-    imagePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("image/jpeg"));
     imagePart.setBody(imageData);
 
-    multiPart->append(idPart);
-    multiPart->append(imagePart);
+    QHttpPart namePart;
+    namePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"username\""));
+    namePart.setBody(username.toUtf8());
 
+    multiPart->append(imagePart);
+    multiPart->append(namePart);
+
+    QNetworkAccessManager manager;
+    QEventLoop loop;
     QNetworkRequest request(QUrl("http://127.0.0.1:5000/verify"));
+
     QNetworkReply *reply = manager.post(request, multiPart);
     multiPart->setParent(reply);
 
     QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
     loop.exec();
 
-    bool isVerified = false;
+    bool result = false;
     if (reply->error() == QNetworkReply::NoError) {
-        QJsonDocument json = QJsonDocument::fromJson(reply->readAll());
-        isVerified = json.object().value("verified").toBool();
-        qDebug() << "FaceID Score Result:" << isVerified;
+        QJsonObject json = QJsonDocument::fromJson(reply->readAll()).object();
+        result = json.value("verified").toBool();
+        qDebug() << "Réponse IA Vortex pour" << username << ":" << result;
     } else {
-        qDebug() << "Erreur Réseau:" << reply->errorString();
+        qDebug() << "Serveur Vortex non détecté:" << reply->errorString();
+        result = false;
     }
 
     reply->deleteLater();
-    cap.release();
-    return isVerified;
+    return result;
+}
+
+bool FaceAuth::identifierUtilisateur(const QString& username)
+{
+    const QByteArray imageData = capturerImageVisage();
+    if (imageData.isEmpty()) {
+        qDebug() << "FaceID: capture caméra impossible.";
+        return false;
+    }
+    return verifierAvecImage(imageData, username);
+}
+
+bool FaceAuth::identifierUtilisateurParListe(const QStringList& usernames, QString *matchedUsername)
+{
+    if (matchedUsername) {
+        matchedUsername->clear();
+    }
+
+    const QByteArray imageData = capturerImageVisage();
+    if (imageData.isEmpty()) {
+        qDebug() << "FaceID: capture caméra impossible (mode autonome).";
+        return false;
+    }
+
+    for (const QString &username : usernames) {
+        if (verifierAvecImage(imageData, username)) {
+            if (matchedUsername) {
+                *matchedUsername = username;
+            }
+            return true;
+        }
+    }
+
+    return false;
 }

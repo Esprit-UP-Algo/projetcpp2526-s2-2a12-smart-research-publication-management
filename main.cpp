@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "logindialog.h"
 #include "connection.h"
+#include "arduino.h"
+#include "rfidhandler.h"
 #include <QApplication>
 #include <QMessageBox>
 #include <QFile>
@@ -14,7 +16,7 @@ int main(int argc, char *argv[])
     // Charger le thème QSS selon la préférence sauvegardée
     QSettings settings("SmartResearchLab", "Theme");
     bool darkMode = settings.value("darkMode", false).toBool();
-    QString themeFile = darkMode ? ":/theme/style.qss" : ":/theme/style_light.qss";
+    QString themeFile = darkMode ? ":/theme/style_dark.qss" : ":/theme/style_light.qss";
     QFile styleFile(themeFile);
     if(styleFile.open(QFile::ReadOnly)) {
         QString styleSheet = QLatin1String(styleFile.readAll());
@@ -30,20 +32,40 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    // 2) Boucle de cycle de vie (Login <-> MainWindow)
+    // 2) Arduino + RfidHandler — actifs AVANT le login, pendant toute la session
+    Arduino arduino;
+    int retArduino = arduino.connect_arduino();
+    switch (retArduino) {
+    case  0: qDebug() << "[Arduino] Connecté sur" << arduino.getarduino_port_name(); break;
+    case  1: qDebug() << "[Arduino] Trouvé mais port occupé —" << arduino.getarduino_port_name(); break;
+    case -1: qDebug() << "[Arduino] Non détecté — pointage RFID désactivé"; break;
+    }
+    // RfidHandler traite les cartes dès maintenant, même sans utilisateur connecté
+    RfidHandler rfidHandler(&arduino);
+
+    // 3) Boucle de cycle de vie (Login <-> MainWindow)
     bool restart = true;
     while (restart) {
         restart = false;
-        
+
         LoginDialog login;
         if (login.exec() != QDialog::Accepted) {
-            // Si l'utilisateur annule ou ferme la fenêtre de login
             break;
         }
 
-        // 3) Ouverture de la fenêtre principale
-        // On n'instancie MainWindow qu'après la réussite du login pour économiser les ressources
-        MainWindow w;
+        // 4) Ouverture de la fenêtre principale
+        MainWindow w(&arduino);
+
+        // Quand un pointage RFID se produit, rafraîchir le tableau employés dans l'UI
+        QObject::connect(&rfidHandler, &RfidHandler::pointageEffectue,
+                         &w, &MainWindow::onPointageRfid);
+
+        QObject::connect(&rfidHandler, &RfidHandler::skuRecu,
+                         &w, &MainWindow::traiter_sku);
+
+        QObject::connect(&rfidHandler, &RfidHandler::inputSkuRecu,
+                         &w, &MainWindow::afficher_input_sku);
+
         
         // Connecter le signal de déconnexion pour demander le redémarrage (Login)
         QObject::connect(&w, &MainWindow::logoutRequested, [&restart]() {
@@ -58,6 +80,5 @@ int main(int argc, char *argv[])
 
     // 4) Nettoyage avant fermeture
     c->closeConnection();
-
     return 0;
 }

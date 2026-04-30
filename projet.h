@@ -18,7 +18,7 @@ public:
         QString dateFinReelle;
         QString statut;
         QString priorite;
-        int     idemp = 0;
+        int     idemp;
     };
 
     Projet() = default;

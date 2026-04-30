@@ -13,16 +13,17 @@ public:
         QString name;
         QString sku;
         QString type;
-        int     qtAv      = 0;
-        int     qtRs      = 0;
-        int     threshold = 0;
+        int     qtAv;
+        int     qtRs;
+        int     threshold;
         QString unit;
-        double  price     = 0.0;
+        double  price;
         QString status;
         QString zone;
         QString shelf;
         QString description;
-        int     idemp     = 0;
+        int     useCount;
+        int     idemp;
     };
 
     // ── Constructor ───────────────────────────────────────────────────────────
@@ -60,6 +61,8 @@ public:
                          const QString &type,
                          const QString &orderBy = "SKU",
                          QString *err = nullptr);
+    // Dans la section "Search / filter", après chercher(...)
+    static bool checkThresholdAlerts(QVector<Row> &outAlerts, QString *err = nullptr);
 
 private:
     QString m_idProduct;

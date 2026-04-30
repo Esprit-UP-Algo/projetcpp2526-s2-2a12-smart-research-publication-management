@@ -3,7 +3,6 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QVariant>
-#include <QtMath>
 
 static void setErr(QString *err, const QString& msg) {
     if (err) *err = msg;
@@ -40,7 +39,7 @@ bool Finance::ajouter(QString *err) const
     q.bindValue(":id", newId);
     q.bindValue(":code", m_code);
     q.bindValue(":type", m_type);
-    q.bindValue(":montant", qRound(m_montant * 100.0) / 100.0);
+    q.bindValue(":montant", m_montant);
     q.bindValue(":cat", m_categorie);
     q.bindValue(":desc", m_description);
     q.bindValue(":dt", m_dateTransaction);
@@ -82,7 +81,7 @@ bool Finance::modifier(const QString& idFinance,
 
     q.bindValue(":code", code);
     q.bindValue(":type", type);
-    q.bindValue(":montant", qRound(montant * 100.0) / 100.0);
+    q.bindValue(":montant", montant);
     q.bindValue(":cat", categorie);
     q.bindValue(":desc", description);
     q.bindValue(":dt", dateTransaction);

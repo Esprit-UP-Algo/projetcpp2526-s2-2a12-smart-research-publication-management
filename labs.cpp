@@ -154,9 +154,10 @@ bool Labs::chargerTout(QVector<Row> &out, QString *err)
 {
     out.clear();
     QSqlQuery q;
+    // RESTE est une colonne virtuelle Oracle (MONTANT - MONTANT_PAYE), on peut la sélectionner directement
     q.prepare("SELECT IDLABO, NOMLABO, RESPONSABLE, NUMERO, LOCALISATION, "
               "DISPONIBILITE, SPECIALITE, RESULTAT, PAIEMENT, "
-              "MONTANT, MONTANT_PAYE, (MONTANT - MONTANT_PAYE) "
+              "MONTANT, MONTANT_PAYE, RESTE "
               "FROM LABS ORDER BY IDLABO DESC");
 
     if (!q.exec()) {
@@ -188,7 +189,7 @@ bool Labs::getById(const QString& idLabo, Row &outRow, QString *err)
     QSqlQuery q;
     q.prepare("SELECT IDLABO, NOMLABO, RESPONSABLE, NUMERO, LOCALISATION, "
               "DISPONIBILITE, SPECIALITE, RESULTAT, PAIEMENT, "
-              "MONTANT, MONTANT_PAYE, (MONTANT - MONTANT_PAYE) "
+              "MONTANT, MONTANT_PAYE, RESTE "
               "FROM LABS WHERE IDLABO = :id");
     q.bindValue(":id", idLabo);
 

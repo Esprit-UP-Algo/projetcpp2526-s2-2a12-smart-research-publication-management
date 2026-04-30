@@ -1,5 +1,0 @@
-C:/Users/MSI/Desktop/arduii/FinancialManagment-branch/build/CMakeFiles/SmartResearchPublicationManagement.dir
-C:/Users/MSI/Desktop/arduii/FinancialManagment-branch/build/CMakeFiles/edit_cache.dir
-C:/Users/MSI/Desktop/arduii/FinancialManagment-branch/build/CMakeFiles/rebuild_cache.dir
-C:/Users/MSI/Desktop/arduii/FinancialManagment-branch/build/CMakeFiles/SmartResearchPublicationManagement_autogen_timestamp_deps.dir
-C:/Users/MSI/Desktop/arduii/FinancialManagment-branch/build/CMakeFiles/SmartResearchPublicationManagement_autogen.dir
