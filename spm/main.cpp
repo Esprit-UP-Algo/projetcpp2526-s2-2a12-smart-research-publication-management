@@ -32,16 +32,26 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    // 2) Arduino + RfidHandler — actifs AVANT le login, pendant toute la session
-    Arduino arduino;
-    int retArduino = arduino.connect_arduino();
-    switch (retArduino) {
-    case  0: qDebug() << "[Arduino] Connecté sur" << arduino.getarduino_port_name(); break;
-    case  1: qDebug() << "[Arduino] Trouvé mais port occupé —" << arduino.getarduino_port_name(); break;
-    case -1: qDebug() << "[Arduino] Non détecté — pointage RFID désactivé"; break;
+    // 2) Arduino RFID (carte 1) + Arduino Keypad (carte 2)
+    Arduino arduinoRfid;
+    int retRfid = arduinoRfid.connect_arduino();
+    switch (retRfid) {
+    case  0: qDebug() << "[Arduino RFID] Connecté sur" << arduinoRfid.getarduino_port_name(); break;
+    case  1: qDebug() << "[Arduino RFID] Port occupé —" << arduinoRfid.getarduino_port_name(); break;
+    case -1: qDebug() << "[Arduino RFID] Non détecté"; break;
     }
-    // RfidHandler traite les cartes dès maintenant, même sans utilisateur connecté
-    RfidHandler rfidHandler(&arduino);
+
+    Arduino arduinoKeypad;
+    int retKeypad = arduinoKeypad.connect_arduino(arduinoRfid.getarduino_port_name());
+    switch (retKeypad) {
+    case  0: qDebug() << "[Arduino Keypad] Connecté sur" << arduinoKeypad.getarduino_port_name(); break;
+    case  1: qDebug() << "[Arduino Keypad] Port occupé —" << arduinoKeypad.getarduino_port_name(); break;
+    case -1: qDebug() << "[Arduino Keypad] Non détecté"; break;
+    }
+
+    // RfidHandler : écoute l'Arduino RFID + attache le Keypad
+    RfidHandler rfidHandler(&arduinoRfid);
+    rfidHandler.attachKeypad(&arduinoKeypad);
 
     // 3) Boucle de cycle de vie (Login <-> MainWindow)
     bool restart = true;
@@ -54,11 +64,19 @@ int main(int argc, char *argv[])
         }
 
         // 4) Ouverture de la fenêtre principale
-        MainWindow w(&arduino);
+        // MainWindow reçoit l'Arduino Keypad pour écrire MOTOR/SKU_OK/QTY
+        MainWindow w(&arduinoKeypad);
 
         // Quand un pointage RFID se produit, rafraîchir le tableau employés dans l'UI
         QObject::connect(&rfidHandler, &RfidHandler::pointageEffectue,
                          &w, &MainWindow::onPointageRfid);
+
+        // Keypad : SKU scanné → vérification inventaire + moteur
+        QObject::connect(&rfidHandler, &RfidHandler::skuRecu,
+                         &w, &MainWindow::traiter_sku);
+        // Keypad : saisie en cours → aperçu dans la barre de recherche
+        QObject::connect(&rfidHandler, &RfidHandler::inputSkuRecu,
+                         &w, &MainWindow::afficher_input_sku);
         
         // Connecter le signal de déconnexion pour demander le redémarrage (Login)
         QObject::connect(&w, &MainWindow::logoutRequested, [&restart]() {

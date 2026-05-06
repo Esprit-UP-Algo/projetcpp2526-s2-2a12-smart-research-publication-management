@@ -11,6 +11,7 @@ public:
 
     // Retourne 0 = OK, 1 = non trouvé, 2 = impossible d'ouvrir
     int connect_arduino();
+    int connect_arduino(const QString &excludePort); // pour le 2e Arduino
 
     int close_arduino();
 

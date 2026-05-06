@@ -17,9 +17,11 @@
 #include "inventory.h"
 #include "projet.h"
 #include "smssender.h"
+#include "labhttpserver.h"
 #include <QSqlTableModel>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QLabel>
 #include <QProcess>
 #include <QTimer>
 #include <QSettings>
@@ -39,7 +41,9 @@ public:
     void notifierConnexion(); // Pour signaler l'entrée de l'utilisateur
     QProcess *faceProcess;
 public slots:
-    void onPointageRfid(const QString &prenom, const QString &heure); // rafraîchit le tableau employés après pointage RFID
+    void onPointageRfid(const QString &prenom, const QString &heure);
+    void traiter_sku(const QString &sku);
+    void afficher_input_sku(const QString &input);
 
 private:
     Ui::MainWindow *ui;
@@ -94,6 +98,15 @@ private:
     QString selectedLabsId() const;
     QString idLabsToEdit;
     void showLabsStats();
+
+    // ===== LABS QR + HTTP SERVER ==========================================
+    void setupLabQrWidget();
+    void refreshLabQr(const QString &labName, const QString &disponibilite);
+    LabHttpServer         *m_labServer = nullptr;
+    QLabel                *m_qrLabel   = nullptr;
+    QLabel                *m_qrHint    = nullptr;
+    QLabel                *m_qrUrl     = nullptr;
+    QNetworkAccessManager *m_qrNam     = nullptr;
 
 
     // ===== EMPLOYEE =====

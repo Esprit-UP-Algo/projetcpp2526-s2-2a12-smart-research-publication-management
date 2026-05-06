@@ -39,6 +39,7 @@ private slots:
     void onBrowse();
     void onAnalyze();
     void onNetworkReply(QNetworkReply *reply);
+    void onConfigureApiKey();
 
 private:
     void buildUi();

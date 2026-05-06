@@ -21,6 +21,9 @@
 #include <QTemporaryFile>
 #include <QScrollArea>
 #include <QStyle>
+#include <QInputDialog>
+#include <QSslConfiguration>
+#include <QPdfDocument>
 
 // ════════════════════════════════════════════════════════════════════════════
 //  Constructeur / UI
@@ -125,7 +128,7 @@ void OcrScannerDialog::buildUi()
     fileLayout->addWidget(m_btnBrowse);
     root->addWidget(cardFile);
 
-    // ── Sélecteur de langue ──────────────────────────────────────────────────
+    // ── Sélecteur de langue + bouton clé API ────────────────────────────────
     auto *langRow = new QHBoxLayout();
     langRow->setSpacing(10);
     auto *lblLang = new QLabel("🌐  Langue du document :", this);
@@ -136,8 +139,17 @@ void OcrScannerDialog::buildUi()
     m_comboLang->addItem("🇫🇷  Français",  "fre");
     m_comboLang->addItem("🇸🇦  العربية",   "ara");
     m_comboLang->setFixedHeight(30);
+
+    auto *btnKey = new QPushButton("🔑", this);
+    btnKey->setObjectName("btnBrowse");
+    btnKey->setFixedSize(32, 30);
+    btnKey->setToolTip("Configurer la clé API OCR.Space\n"
+                       "Clé gratuite sur : ocr.space/ocrapi/freekey");
+    connect(btnKey, &QPushButton::clicked, this, &OcrScannerDialog::onConfigureApiKey);
+
     langRow->addWidget(lblLang);
     langRow->addWidget(m_comboLang, 1);
+    langRow->addWidget(btnKey);
     root->addLayout(langRow);
 
     // ── Bouton analyser + barre de progression ───────────────────────────────
@@ -150,11 +162,40 @@ void OcrScannerDialog::buildUi()
     m_btnAnalyze->setEnabled(false);
     connect(m_btnAnalyze, &QPushButton::clicked, this, &OcrScannerDialog::onAnalyze);
 
+    auto *btnDemo = new QPushButton("🎭  Mode démonstration", this);
+    btnDemo->setObjectName("btnBrowse");
+    btnDemo->setToolTip("Remplit avec des données exemple (sans appel API)");
+    connect(btnDemo, &QPushButton::clicked, this, [this]() {
+        OcrResult demo;
+        demo.amount    = 247.50;
+        demo.hasAmount = true;
+        demo.date      = QDate(2026, 4, 8);
+        demo.hasDate   = true;
+        demo.type      = "Depense";
+        demo.category  = "Fournitures";
+        demo.description = "FACTURE INTERNE — DEP-ESP-2026";
+        demo.rawText   = "FACTURE INTERNE\nDate : 08/04/2026\nMontant TTC : 247,50 DT\nType : Dépense\nCatégorie : Fournitures";
+        demo.success   = true;
+        m_result = demo;
+        m_txtRaw->setPlainText(demo.rawText);
+        displayResult(demo);
+        m_lblStatus->setObjectName("statusOk");
+        m_lblStatus->setText("✔  Données de démonstration chargées — cliquez sur « Remplir ».");
+        m_lblStatus->style()->unpolish(m_lblStatus);
+        m_lblStatus->style()->polish(m_lblStatus);
+        m_btnAccept->setEnabled(true);
+    });
+
     m_lblStatus = new QLabel("Sélectionnez une image pour commencer.", this);
     m_lblStatus->setObjectName("statusInfo");
     m_lblStatus->setAlignment(Qt::AlignCenter);
 
-    root->addWidget(m_btnAnalyze);
+    auto *analyzeRow = new QHBoxLayout();
+    analyzeRow->setSpacing(8);
+    analyzeRow->addWidget(m_btnAnalyze, 3);
+    analyzeRow->addWidget(btnDemo, 1);
+
+    root->addLayout(analyzeRow);
     root->addWidget(m_progress);
     root->addWidget(m_lblStatus);
 
@@ -271,7 +312,9 @@ void OcrScannerDialog::sendOcrRequest(const QString &filePath)
     m_lblStatus->style()->unpolish(m_lblStatus);
     m_lblStatus->style()->polish(m_lblStatus);
 
-    const QString apiKey = m_settings.value("ocrApiKey", "helloworld").toString();
+    QString apiKey = m_settings.value("ocrApiKey", "K87415250588957").toString();
+    if (apiKey.isEmpty() || apiKey == "helloworld")
+        apiKey = "K87415250588957";
 
     // ── Prétraitement : redimensionner si l'image dépasse 800 KB ─────────────
     QByteArray imageData;
@@ -280,18 +323,38 @@ void OcrScannerDialog::sendOcrRequest(const QString &filePath)
 
     const QString ext = QFileInfo(filePath).suffix().toLower();
     if (ext == "pdf") {
-        // PDF : envoyer directement (taille vérifiée)
-        QFile f(filePath);
-        if (!f.open(QIODevice::ReadOnly)) {
+        // PDF → rendu de la 1ère page en JPEG via QPdfDocument::render() (synchrone)
+        QPdfDocument pdfDoc;
+        const QPdfDocument::Error err = pdfDoc.load(filePath);
+        if (err != QPdfDocument::Error::None) {
             setAnalyzing(false);
             m_lblStatus->setObjectName("statusErr");
-            m_lblStatus->setText("Impossible d'ouvrir le fichier.");
+            m_lblStatus->setText(QString("Impossible d'ouvrir le PDF (erreur %1).").arg(int(err)));
             m_lblStatus->style()->unpolish(m_lblStatus);
             m_lblStatus->style()->polish(m_lblStatus);
             return;
         }
-        imageData = f.readAll();
-        mimeType  = "application/pdf";
+        // Rendu à 150 DPI (A4 ≈ 1240 × 1754 px)
+        const QSizeF pageSizePt = pdfDoc.pagePointSize(0);
+        const qreal  dpi        = 150.0;
+        const QSize  renderSize(
+            qRound(pageSizePt.width()  / 72.0 * dpi),
+            qRound(pageSizePt.height() / 72.0 * dpi));
+
+        const QImage pageImg = pdfDoc.render(0, renderSize);
+        if (pageImg.isNull()) {
+            setAnalyzing(false);
+            m_lblStatus->setObjectName("statusErr");
+            m_lblStatus->setText("Échec du rendu PDF.");
+            m_lblStatus->style()->unpolish(m_lblStatus);
+            m_lblStatus->style()->polish(m_lblStatus);
+            return;
+        }
+        QBuffer buf(&imageData);
+        buf.open(QIODevice::WriteOnly);
+        pageImg.save(&buf, "JPEG", 85);
+        mimeType = "image/jpeg";
+        filename = QFileInfo(filePath).baseName() + "_p1.jpg";
     } else {
         // Image : charger, redimensionner si nécessaire
         QImage img(filePath);
@@ -347,8 +410,8 @@ void OcrScannerDialog::sendOcrRequest(const QString &filePath)
     const QByteArray langParam = (langCode == "auto")
                                      ? QByteArray("eng")
                                      : langCode.toUtf8();
-    // L'arabe est mieux géré par le moteur 1 (Tesseract/RTL)
-    const QByteArray engineParam = (langCode == "ara") ? "1" : "2";
+    // Engine 1 (Tesseract) = gratuit. Engine 2/3 = PRO uniquement.
+    const QByteArray engineParam = "1";
 
     addField("language",           langParam);
     addField("isOverlayRequired",  "false");
@@ -369,6 +432,9 @@ void OcrScannerDialog::sendOcrRequest(const QString &filePath)
     QNetworkRequest request(QUrl("https://api.ocr.space/parse/image"));
     request.setRawHeader("apikey", apiKey.toUtf8());
     request.setHeader(QNetworkRequest::UserAgentHeader, "SmartResearchLab-OCR/1.0");
+    QSslConfiguration ssl = QSslConfiguration::defaultConfiguration();
+    ssl.setProtocol(QSsl::TlsV1_2OrLater);
+    request.setSslConfiguration(ssl);
 
     QNetworkReply *reply = m_nam->post(request, multiPart);
     multiPart->setParent(reply);
@@ -383,10 +449,26 @@ void OcrScannerDialog::onNetworkReply(QNetworkReply *reply)
     setAnalyzing(false);
 
     if (reply->error() != QNetworkReply::NoError) {
+        const int httpCode = reply->attribute(
+            QNetworkRequest::HttpStatusCodeAttribute).toInt();
+        const QByteArray body = reply->readAll();
+
+        QString msg;
+        if (httpCode == 401 || httpCode == 403) {
+            msg = QString("⚠  Clé API invalide ou expirée (HTTP %1).\n"
+                          "Cliquez sur 🔑 pour entrer votre clé gratuite : ocr.space/ocrapi/freekey")
+                      .arg(httpCode);
+        } else if (httpCode > 0) {
+            msg = QString("⚠  Erreur HTTP %1 — %2").arg(httpCode).arg(QString::fromUtf8(body).left(120));
+        } else {
+            msg = "⚠  Pas de connexion au serveur OCR. Vérifiez votre réseau.";
+        }
         m_lblStatus->setObjectName("statusErr");
-        m_lblStatus->setText("⚠  Erreur réseau : " + reply->errorString());
+        m_lblStatus->setText(msg);
+        m_lblStatus->setWordWrap(true);
         m_lblStatus->style()->unpolish(m_lblStatus);
         m_lblStatus->style()->polish(m_lblStatus);
+        if (!body.isEmpty()) m_txtRaw->setPlainText(QString::fromUtf8(body));
         return;
     }
 
@@ -575,6 +657,26 @@ void OcrScannerDialog::displayResult(const OcrResult &r)
 // ════════════════════════════════════════════════════════════════════════════
 //  Helpers
 // ════════════════════════════════════════════════════════════════════════════
+void OcrScannerDialog::onConfigureApiKey()
+{
+    const QString current = m_settings.value("ocrApiKey", "K87415250588957").toString();
+    bool ok = false;
+    const QString key = QInputDialog::getText(
+        this,
+        "Clé API OCR.Space",
+        "Entrez votre clé API gratuite\n(inscription sur ocr.space/ocrapi/freekey) :",
+        QLineEdit::Normal,
+        current,
+        &ok);
+    if (ok && !key.trimmed().isEmpty()) {
+        m_settings.setValue("ocrApiKey", key.trimmed());
+        m_lblStatus->setObjectName("statusOk");
+        m_lblStatus->setText("✔  Clé API enregistrée. Vous pouvez relancer l'analyse.");
+        m_lblStatus->style()->unpolish(m_lblStatus);
+        m_lblStatus->style()->polish(m_lblStatus);
+    }
+}
+
 void OcrScannerDialog::setAnalyzing(bool busy)
 {
     m_btnAnalyze->setEnabled(!busy);

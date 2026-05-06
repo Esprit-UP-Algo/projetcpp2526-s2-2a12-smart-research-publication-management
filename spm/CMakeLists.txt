@@ -23,6 +23,7 @@ find_package(Qt6 REQUIRED COMPONENTS
     Multimedia
     MultimediaWidgets
     SerialPort
+    Pdf
 )
 
 set(OpenCV_DIR "C:/OpenCV-MinGW-Build-OpenCV-4.5.5-x64/x64/mingw/lib")
@@ -83,6 +84,10 @@ set(PROJECT_SOURCES
     tilemapwidget.cpp
     tilemapwidget.h
 
+    # QR Code + Serveur HTTP
+    labhttpserver.cpp
+    labhttpserver.h
+
     # Ressources
     resources.qrc
 )
@@ -107,6 +112,7 @@ target_link_libraries(SmartResearchPublicationManagement
         Qt6::Multimedia
         Qt6::MultimediaWidgets
         Qt6::SerialPort
+        Qt6::Pdf
         ${OpenCV_LIBS}
 )
 

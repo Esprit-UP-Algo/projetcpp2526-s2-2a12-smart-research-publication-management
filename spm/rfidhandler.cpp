@@ -6,15 +6,49 @@
 #include <QTime>
 #include <QDebug>
 
-RfidHandler::RfidHandler(Arduino *arduino, QObject *parent)
-    : QObject(parent), A(arduino)
+RfidHandler::RfidHandler(Arduino *rfidArduino, QObject *parent)
+    : QObject(parent), A(rfidArduino)
 {
     if (A && A->getserial() && A->getserial()->isOpen()) {
         connect(A->getserial(), SIGNAL(readyRead()), this, SLOT(traiter_rfid()));
-        qDebug() << "[RfidHandler] Actif sur" << A->getarduino_port_name()
-                 << "— pointage RFID prêt (avant login)";
+        qDebug() << "[RfidHandler] RFID actif sur" << A->getarduino_port_name();
     } else {
-        qDebug() << "[RfidHandler] Arduino non connecté — pointage RFID désactivé";
+        qDebug() << "[RfidHandler] Arduino RFID non connecté";
+    }
+}
+
+void RfidHandler::attachKeypad(Arduino *keypadArduino)
+{
+    AKeypad = keypadArduino;
+    if (AKeypad && AKeypad->getserial() && AKeypad->getserial()->isOpen()) {
+        connect(AKeypad->getserial(), SIGNAL(readyRead()), this, SLOT(traiter_keypad()));
+        qDebug() << "[RfidHandler] Keypad actif sur" << AKeypad->getarduino_port_name();
+    } else {
+        qDebug() << "[RfidHandler] Arduino Keypad non connecté";
+    }
+}
+
+void RfidHandler::traiter_keypad()
+{
+    if (!AKeypad) return;
+    keypadBuffer += AKeypad->read_from_arduino();
+
+    while (keypadBuffer.contains('\n')) {
+        int idx = keypadBuffer.indexOf('\n');
+        QByteArray ligne = keypadBuffer.left(idx).trimmed();
+        keypadBuffer = keypadBuffer.mid(idx + 1);
+
+        if (ligne.isEmpty()) continue;
+
+        QString msg = QString::fromUtf8(ligne);
+
+        if (msg.startsWith("SKU:")) {
+            emit skuRecu(msg.mid(4).trimmed());
+        } else if (msg.startsWith("INPUT:")) {
+            emit inputSkuRecu(msg.mid(6).trimmed());
+        } else {
+            qDebug() << "[Keypad]" << msg;
+        }
     }
 }
 
@@ -32,7 +66,7 @@ void RfidHandler::traiter_rfid()
 
         QString message = QString::fromUtf8(ligne);
 
-        // Ignorer les messages de debug Arduino (Version, OK, etc.)
+        // Ignorer tout ce qui n'est pas un UID RFID
         if (!message.startsWith("UID:")) continue;
 
         // Parser "UID:<hex_uid>:<id_labo>"
@@ -78,7 +112,7 @@ void RfidHandler::traiter_rfid()
             QString heure        = QTime::currentTime().toString("HH:mm");
             QString dateAuj      = QDate::currentDate().toString("yyyy-MM-dd");
 
-            qDebug() << "[RFID] DB —"
+            qDebug() << "—"
                      << "date:" << datePointage
                      << "hArrivee:" << hArrivee << "(null:" << arriveeNull << ")"
                      << "hDepart:"  << hDepart  << "(null:" << departNull  << ")"
@@ -86,7 +120,7 @@ void RfidHandler::traiter_rfid()
 
             // Déjà pointé (arrivée et départ déjà enregistrés aujourd'hui).
             if (datePointage == dateAuj && !hArrivee.isEmpty() && !hDepart.isEmpty()) {
-                qDebug() << "[RFID] Déjà pointé (arrivée+départ) :" << prenom;
+                qDebug() << "Employée a deja pointe (arrivee+depart) :" << prenom;
                 A->write_to_arduino(QString("3:%1\n").arg(prenom).toUtf8());
             } else if (datePointage == dateAuj && !hArrivee.isEmpty() && hDepart.isEmpty()) {
                 // Enregistrer le départ (deuxième passage du jour).
@@ -100,9 +134,11 @@ void RfidHandler::traiter_rfid()
                 upd.bindValue(":id", idEmploye);
 
                 if (upd.exec()) {
-                    qDebug() << "[RFID] Départ enregistré pour" << prenom << "à" << heure;
+                    QSqlDatabase::database().commit();  // ← COMMIT Oracle obligatoire
+                    qDebug() << "Depart enregistre pour" << prenom << "à" << heure;
                     emit pointageEffectue(prenom, heure);
                 } else {
+                    QSqlDatabase::database().rollback();
                     qDebug() << "[RFID] Erreur UPDATE départ :" << upd.lastError().text();
                 }
                 A->write_to_arduino(QString("2:%1:%2\n").arg(prenom, heure).toUtf8());
@@ -122,9 +158,11 @@ void RfidHandler::traiter_rfid()
                 upd.bindValue(":id", idEmploye);
 
                 if (upd.exec()) {
-                    qDebug() << "[RFID] Arrivée enregistrée pour" << prenom << "à" << heure;
+                    QSqlDatabase::database().commit();  // ← COMMIT Oracle obligatoire
+                    qDebug() << "Arrivee enregistree pour" << prenom << "a" << heure;
                     emit pointageEffectue(prenom, heure);
                 } else {
+                    QSqlDatabase::database().rollback();
                     qDebug() << "[RFID] Erreur UPDATE arrivée :" << upd.lastError().text();
                 }
                 A->write_to_arduino(QString("1:%1:%2\n").arg(prenom, heure).toUtf8());

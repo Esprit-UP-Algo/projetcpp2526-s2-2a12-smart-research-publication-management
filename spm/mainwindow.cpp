@@ -27,6 +27,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QStyle>
+#include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QDate>
 #include <QDebug>
@@ -42,6 +43,10 @@
 #include <QUrl>
 #include "mapdialog.h"
 #include "labsexporter.h"
+#include "labhttpserver.h"
+#include <QLabel>
+#include <QNetworkRequest>
+#include <QPixmap>
 #include <QTime>
 #include <QCryptographicHash>
 #include <QtCharts/QBarSeries>
@@ -50,6 +55,7 @@
 #include <QtCharts/QValueAxis>
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
+#include <QtCharts/QHorizontalBarSeries>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlRecord>
@@ -862,9 +868,14 @@ void MainWindow::simulerPointage() {
             upd.bindValue(":d", dateAujourdhui);
 
             if(upd.exec()) {
-                ui->label_feedback->setText("👋 DÉPART ENREGISTRÉ : " + query.value("PRENOM").toString());
-                ui->label_feedback->setStyleSheet("color: blue; font-weight: bold;");
-            }
+                    QSqlDatabase::database().commit();  // ← COMMIT Oracle obligatoire
+                    ui->label_feedback->setText("👋 DÉPART ENREGISTRÉ : " + query.value("PRENOM").toString());
+                    ui->label_feedback->setStyleSheet("color: blue; font-weight: bold;");
+                } else {
+                    QSqlDatabase::database().rollback();
+                    ui->label_feedback->setText("❌ ERREUR: " + upd.lastError().text());
+                    ui->label_feedback->setStyleSheet("color: red; font-weight: bold;");
+                }
         } else {
             ui->label_feedback->setText("⚠️ DÉJÀ POINTÉ POUR AUJOURD'HUI");
             ui->label_feedback->setStyleSheet("color: orange; font-weight: bold;");
@@ -887,9 +898,14 @@ void MainWindow::simulerPointage() {
             ins.bindValue(":cin", cinSaisi);
 
             if (ins.exec()) {
-                ui->label_feedback->setText("✅ ARRIVÉE ENREGISTRÉE : " + checkExist.value("PRENOM").toString());
-                ui->label_feedback->setStyleSheet("color: green; font-weight: bold;");
-            }
+                    QSqlDatabase::database().commit();  // ← COMMIT Oracle obligatoire
+                    ui->label_feedback->setText("✅ ARRIVÉE ENREGISTRÉE : " + checkExist.value("PRENOM").toString());
+                    ui->label_feedback->setStyleSheet("color: green; font-weight: bold;");
+                } else {
+                    QSqlDatabase::database().rollback();
+                    ui->label_feedback->setText("❌ ERREUR: " + ins.lastError().text());
+                    ui->label_feedback->setStyleSheet("color: red; font-weight: bold;");
+                }
         } else {
             ui->label_feedback->setText("❌ CIN INCONNU");
             ui->label_feedback->setStyleSheet("color: red; font-weight: bold;");
@@ -941,7 +957,9 @@ void MainWindow::traiter_rfid()
         // Utilise les tables existantes : EMPLOYES + LABS (via IDEMP)
         // L'employé doit avoir la carte ET être responsable de ce labo
         q.prepare(
-            "SELECT e.ID_EMPLOYE, e.PRENOM "
+            "SELECT e.ID_EMPLOYE, e.PRENOM, "
+            "       e.HEURE_ARRIVEE, e.HEURE_DEPART, "
+            "       TO_CHAR(e.DATE_POINTAGE, 'YYYY-MM-DD') AS DATE_POINTAGE "
             "FROM HICHEM.EMPLOYES e "
             "JOIN HICHEM.LABS l ON l.IDEMP = e.ID_EMPLOYE "
             "WHERE e.UID_CARTE = :uid AND l.IDLABO = :labo"
@@ -957,28 +975,58 @@ void MainWindow::traiter_rfid()
 
         if (q.next()) {
             // ── Accès autorisé ───────────────────────────────────────────────
-            QString idEmploye = q.value("ID_EMPLOYE").toString();
-            QString prenom    = q.value("PRENOM").toString();
-            QString heure     = QTime::currentTime().toString("HH:mm");
-            QString date      = QDate::currentDate().toString("yyyy-MM-dd");
+            QString idEmploye    = q.value("ID_EMPLOYE").toString();
+            QString prenom       = q.value("PRENOM").toString();
+            QString hArrivee     = q.value("HEURE_ARRIVEE").toString().trimmed();
+            QString hDepart      = q.value("HEURE_DEPART").toString().trimmed();
+            QString datePointage = q.value("DATE_POINTAGE").toString().trimmed();
+            QString heure        = QTime::currentTime().toString("HH:mm");
+            QString dateAuj      = QDate::currentDate().toString("yyyy-MM-dd");
 
-            // Enregistrer le pointage dans la base
+            // NOTE: Ce handler (MainWindow::traiter_rfid) n'est normalement pas
+            // connecté au port série — c'est RfidHandler qui gère le RFID.
+            // S'il est quand même actif, on applique la même logique arrivée/départ.
             QSqlQuery upd;
-            upd.prepare(
-                "UPDATE HICHEM.EMPLOYES "
-                "SET DATE_POINTAGE    = TO_DATE(:d, 'YYYY-MM-DD'), "
-                "    HEURE_ARRIVEE    = :h, "
-                "    STATUT_JOURNALIER = 'Présent' "
-                "WHERE ID_EMPLOYE = :id"
-            );
-            upd.bindValue(":d",  date);
-            upd.bindValue(":h",  heure);
-            upd.bindValue(":id", idEmploye);
 
-            if (upd.exec()) {
-                qDebug() << "[RFID] Pointage enregistré pour" << prenom << "à" << heure;
+            if (datePointage == dateAuj && !hArrivee.isEmpty() && hDepart.isEmpty()) {
+                // Deuxième scan → enregistrer le DÉPART
+                upd.prepare(
+                    "UPDATE HICHEM.EMPLOYES "
+                    "SET HEURE_DEPART = :h "
+                    "WHERE ID_EMPLOYE = :id"
+                );
+                upd.bindValue(":h",  heure);
+                upd.bindValue(":id", idEmploye);
+                if (upd.exec()) {
+                    QSqlDatabase::database().commit();
+                    qDebug() << "[RFID/MW] Départ enregistré pour" << prenom << "à" << heure;
+                } else {
+                    QSqlDatabase::database().rollback();
+                    qDebug() << "[RFID/MW] Erreur UPDATE départ :" << upd.lastError().text();
+                }
+            } else if (datePointage != dateAuj || hArrivee.isEmpty()) {
+                // Premier scan du jour → enregistrer l'ARRIVÉE
+                upd.prepare(
+                    "UPDATE HICHEM.EMPLOYES "
+                    "SET DATE_POINTAGE     = TO_DATE(:d, 'YYYY-MM-DD'), "
+                    "    HEURE_ARRIVEE     = :h, "
+                    "    HEURE_DEPART      = NULL, "
+                    "    STATUT_JOURNALIER = 'Présent' "
+                    "WHERE ID_EMPLOYE = :id"
+                );
+                upd.bindValue(":d",  dateAuj);
+                upd.bindValue(":h",  heure);
+                upd.bindValue(":id", idEmploye);
+                if (upd.exec()) {
+                    QSqlDatabase::database().commit();
+                    qDebug() << "[RFID/MW] Arrivée enregistrée pour" << prenom << "à" << heure;
+                } else {
+                    QSqlDatabase::database().rollback();
+                    qDebug() << "[RFID/MW] Erreur UPDATE arrivée :" << upd.lastError().text();
+                }
             } else {
-                qDebug() << "[RFID] Erreur UPDATE pointage :" << upd.lastError().text();
+                // Déjà pointé arrivée + départ aujourd'hui → ignorer
+                qDebug() << "[RFID/MW] Déjà pointé (arrivée+départ) :" << prenom;
             }
 
             // Envoyer la confirmation à l'Arduino : "1:Prenom:HH:MM\n"
@@ -1003,14 +1051,111 @@ void MainWindow::traiter_rfid()
 }
 
 // ─── Slot appelé par RfidHandler quand un pointage RFID réussit ──────────────
-// Rafraîchit le tableau employés dans l'interface
+// Rafraîchit le tableau employés et navigue vers la page Employés
 void MainWindow::onPointageRfid(const QString &prenom, const QString &heure)
 {
     qDebug() << "[MainWindow] Pointage RFID reçu :" << prenom << "à" << heure;
+
+    // Rafraîchir le tableau
     model->setQuery(
         "SELECT CIN, NOM, PRENOM, USERNAME, DATE_POINTAGE, "
         "HEURE_ARRIVEE, HEURE_DEPART, STATUT_JOURNALIER FROM EMPLOYES"
     );
+
+    // Amener la fenêtre au premier plan
+    raise();
+    activateWindow();
+    showNormal();
+
+    // Naviguer vers la page Employés
+    goEmployee();
+
+    // Ajouter une notification dans la cloche
+    ajouterNotification("POINTAGE RFID", prenom + " — " + heure);
+}
+
+// ─── SKU reçu depuis le Keypad Arduino ───────────────────────────────────────
+void MainWindow::traiter_sku(const QString &sku)
+{
+    QString formattedSku = sku.trimmed().toUpper();
+    if (formattedSku.length() == 6 && !formattedSku.contains("-"))
+        formattedSku.insert(3, "-");
+
+    QSqlQuery q;
+    q.prepare("SELECT * FROM PRODUCT WHERE UPPER(TRIM(SKU)) = :sku");
+    q.bindValue(":sku", formattedSku);
+    if (!q.exec()) {
+        QMessageBox::critical(this, "Erreur SQL", q.lastError().text());
+        return;
+    }
+
+    goInventaire();
+
+    if (q.next()) {
+        ui->InventorySearch->setText(formattedSku);
+        applyInventoryFilter();
+
+        // 1. Confirmer le SKU sur l'OLED
+        if (A && A->getserial() && A->getserial()->isOpen())
+            A->write_to_arduino(("SKU_OK:" + formattedSku + "\n").toUtf8());
+
+        // 2. Lancer le moteur après 3 secondes
+        QTimer::singleShot(3000, this, [this]() {
+            if (A && A->getserial() && A->getserial()->isOpen())
+                A->write_to_arduino("MOTOR\n");
+        });
+
+        // 3. Après 10 secondes : incrémenter QT_AV + afficher sur OLED
+        QTimer::singleShot(10000, this, [this, formattedSku]() {
+            QSqlQuery q2;
+            q2.prepare("SELECT QT_AV FROM PRODUCT WHERE UPPER(TRIM(SKU)) = :sku");
+            q2.bindValue(":sku", formattedSku);
+            if (!q2.exec() || !q2.next()) return;
+
+            int qteAvant = q2.value(0).toInt();
+            int qteApres = qteAvant + 1;
+
+            QSqlQuery upd;
+            upd.prepare("UPDATE PRODUCT SET QT_AV = :qte WHERE UPPER(TRIM(SKU)) = :sku");
+            upd.bindValue(":qte", qteApres);
+            upd.bindValue(":sku", formattedSku);
+            if (!upd.exec()) return;
+
+            if (A && A->getserial() && A->getserial()->isOpen()) {
+                QString msgOled = QString("QTY:%1:%2:%3\n").arg(formattedSku).arg(qteAvant).arg(qteApres);
+                A->write_to_arduino(msgOled.toUtf8());
+            }
+
+            ui->InventorySearch->setText(formattedSku);
+            applyInventoryFilter();
+        });
+
+        QMessageBox msg(this);
+        msg.setWindowTitle("Inventaire");
+        msg.setIcon(QMessageBox::Information);
+        msg.setText("Code valide !");
+        msg.setInformativeText("Le moteur va tourner, puis la quantité sera mise à jour.");
+        msg.setStyleSheet("QMessageBox{font-size:18px;min-width:480px;} QPushButton{min-width:100px;min-height:36px;}");
+        msg.exec();
+    } else {
+        ui->InventorySearch->setText(formattedSku);
+        QMessageBox err(this);
+        err.setWindowTitle("Inventaire");
+        err.setIcon(QMessageBox::Warning);
+        err.setText("Code SKU invalide !");
+        err.setInformativeText("SKU non trouvé : " + formattedSku);
+        err.setStyleSheet("QMessageBox{font-size:18px;min-width:480px;} QPushButton{min-width:100px;min-height:36px;}");
+        err.exec();
+    }
+}
+
+// ─── Saisie en cours sur le Keypad → aperçu dans la recherche inventaire ─────
+void MainWindow::afficher_input_sku(const QString &input)
+{
+    QString affichage = input.trimmed().toUpper();
+    if (affichage.length() > 3 && !affichage.contains("-"))
+        affichage.insert(3, "-");
+    ui->InventorySearch->setText(affichage);
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
@@ -1036,6 +1181,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
         if (!panelRect.contains(gPos) && !btnRect.contains(gPos)) {
             m_notifPanel->hide();
         }
+    }
+
+    if (obj == ui->stat_pub_3 && event->type() == QEvent::Resize) {
+        QChartView *cv = ui->stat_pub_3->findChild<QChartView*>("finChartView");
+        if (cv) cv->setGeometry(0, 0, ui->stat_pub_3->width(), ui->stat_pub_3->height());
     }
 
     if (obj == ui->aff2 && event->type() == QEvent::MouseButtonDblClick) {
@@ -1079,36 +1229,69 @@ void MainWindow::handleSessionTimeout()
 }
 
 void MainWindow::on_btn_exportt_clicked() {
-    // 1. Récupérer la date du jour et la formater (ex: 25_03_2026)
-    QString dateStr = QDate::currentDate().toString("dd_MM_yyyy");
+    QLocale localeFr(QLocale::French, QLocale::France);
+    QDate today = QDate::currentDate();
+    QString dateFichier = today.toString("dd_MM_yyyy");
+    QString dateAffichage = localeFr.toString(today, "dddd d MMMM yyyy");
 
-    // 2. Proposer le nom de fichier avec la date par défaut
-    QString defaultName = QString("Pointage_%1.csv").arg(dateStr);
-
-    QString fileName = QFileDialog::getSaveFileName(this, "Exporter Pointage", defaultName, "Excel (*.csv)");
-
-    if (fileName.isEmpty()) return;
+    QString fileName = QFileDialog::getSaveFileName(this, "Exporter Rapport du Jour",
+                       QString("Rapport_%1.xls").arg(dateFichier), "Excel (*.xls)");
 
     QFile file(fileName);
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&file);
         out.setGenerateByteOrderMark(true);
 
-        // Titres des colonnes
-        for (int i = 0; i < model->columnCount(); i++) {
-            out << model->headerData(i, Qt::Horizontal).toString() << (i == model->columnCount()-1 ? "" : ";");
-        }
-        out << "\n";
+        out << "<html><head><meta charset='UTF-8'><style>";
+        out << "body { font-family: 'Segoe UI', sans-serif; padding: 20px; }";
+        out << ".main-header { text-align: center; margin-bottom: 25px; border-bottom: 3px solid #2F5597; padding-bottom: 10px; }";
+        out << ".title { font-size: 20pt; font-weight: bold; color: #2F5597; text-transform: uppercase; }";
+        out << "table { border-collapse: collapse; width: 100%; border: 2px solid #2F5597; }";
+        out << "th { background-color: #2F5597; color: white; padding: 12px; text-align: center; border: 1px solid #ffffff; }";
+        out << "td { padding: 10px; border: 1px solid #BFBFBF; text-align: center; font-size: 10pt; }";
+        out << "tr:nth-child(even) { background-color: #D9E1F2; }";
+        out << ".status { font-weight: bold; }";
+        out << ".present { color: #008000; }";
+        out << ".absent { color: #FF0000; }";
+        out << "</style></head><body>";
 
-        // Données des lignes
-        for (int r = 0; r < model->rowCount(); r++) {
-            for (int c = 0; c < model->columnCount(); c++) {
-                out << model->index(r, c).data().toString() << (c == model->columnCount()-1 ? "" : ";");
-            }
-            out << "\n";
+        out << "<div class='main-header'>";
+        out << "  <div class='title'>RAPPORT JOURNALIER DES POINTAGES</div>";
+        out << "  <div style='font-size: 14pt; font-weight: bold;'>Date : " << dateAffichage << "</div>";
+        out << "</div>";
+
+        out << "<table><thead><tr>";
+        for (int i = 0; i < model->columnCount(); i++) {
+            out << "<th>" << model->headerData(i, Qt::Horizontal).toString().toUpper() << "</th>";
         }
+        out << "</tr></thead><tbody>";
+
+        // --- FILTRE DE DATE RÉACTIVÉ ---
+        QString dateIso = today.toString("yyyy-MM-dd");
+        QString dateSlash = today.toString("dd/MM/yyyy");
+
+        for (int r = 0; r < model->rowCount(); r++) {
+            QString dateLigne = model->index(r, 4).data().toString(); // Colonne DATE_POINTAGE
+
+            // On n'ajoute la ligne que si c'est la date d'aujourd'hui
+            if (dateLigne == dateIso || dateLigne == dateSlash) {
+                out << "<tr>";
+                for (int c = 0; c < model->columnCount(); c++) {
+                    QString val = model->index(r, c).data().toString();
+                    if (val.toLower() == "présent")
+                        out << "<td><span class='status present'>PRÉSENT</span></td>";
+                    else if (val.toLower() == "absent")
+                        out << "<td><span class='status absent'>ABSENT</span></td>";
+                    else
+                        out << "<td>" << (val.isEmpty() ? "-" : val) << "</td>";
+                }
+                out << "</tr>";
+            }
+        }
+
+        out << "</tbody></table></body></html>";
         file.close();
-        QMessageBox::information(this, "Succès", "Fichier Excel généré !");
+        QMessageBox::information(this, "Export", "Rapport du jour généré avec succès.");
     }
 }
 void MainWindow::on_btn_reset_clicked() {
@@ -2450,11 +2633,11 @@ void MainWindow::setActiveButton(QPushButton *btn)
 
 void MainWindow::initEmployeUserGuidance()
 {
-    ui->groupBox_2->setTitle(QStringLiteral("Nouvel employé"));
+    ui->groupBox_2->setTitle(QString());
     ui->groupBox_2->setToolTip(
         QStringLiteral("Étapes : 1) Complétez tous les champs obligatoires  2) Cliquez sur « Enregistrer »  "
                         "3) Un code vous est envoyé par e-mail — saisissez-le  4) Le compte est créé et un e-mail de confirmation est envoyé."));
-    ui->groupBox_6->setTitle(QStringLiteral("Modifier un employé"));
+    ui->groupBox_6->setTitle(QString());
     ui->groupBox_6->setToolTip(
         QStringLiteral("Sélectionnez un employé dans la liste, modifiez les champs puis enregistrez. "
                         "Si l’e-mail change, un code de vérification est demandé."));
@@ -2607,6 +2790,41 @@ void MainWindow::goLaboratoires()
 {
     animatePageChange(4);
     setActiveButton(ui->btnLaboratoires);
+
+    // Chercher la landing page et mettre à jour ses stats
+    for (int i = 0; i < ui->stacked_L->count(); ++i) {
+        QWidget *w = ui->stacked_L->widget(i);
+        if (w->objectName() != "labsLandingPage") continue;
+
+        // Requête stats
+        QSqlQuery q;
+        q.exec(
+            "SELECT COUNT(*), "
+            "  SUM(CASE WHEN UPPER(TRIM(DISPONIBILITE))='DISPONIBLE' THEN 1 ELSE 0 END), "
+            "  SUM(CASE WHEN UPPER(TRIM(DISPONIBILITE))='OCCUPE'     THEN 1 ELSE 0 END), "
+            "  NVL(SUM(MONTANT), 0) "
+            "FROM LABS"
+        );
+        int    total = 0, dispo = 0, occupe = 0;
+        double montant = 0.0;
+        if (q.next()) {
+            total   = q.value(0).toInt();
+            dispo   = q.value(1).toInt();
+            occupe  = q.value(2).toInt();
+            montant = q.value(3).toDouble();
+        }
+
+        auto upd = [w](const QString &name, const QString &val) {
+            if (auto *l = w->findChild<QLabel*>(name)) l->setText(val);
+        };
+        upd("lblLandTotal",   QString::number(total));
+        upd("lblLandDispo",   QString::number(dispo));
+        upd("lblLandOccupe",  QString::number(occupe));
+        upd("lblLandMontant", QString::number(montant, 'f', 0) + " DT");
+
+        ui->stacked_L->setCurrentIndex(i);
+        break;
+    }
 }
 
 void MainWindow::goProjets()
@@ -3037,9 +3255,9 @@ void MainWindow::on_BtnExportLabsDirect_clicked()
     QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
 }
 
+/* ── Maps désactivé ──────────────────────────────────────────────────────────
 void MainWindow::on_btnOpenGoogleMaps_clicked()
 {
-    // Récupérer la localisation depuis le champ aff2
     QString location = ui->aff2->text().trimmed();
 
     if (location.isEmpty()) {
@@ -3049,16 +3267,15 @@ void MainWindow::on_btnOpenGoogleMaps_clicked()
         return;
     }
 
-    // Construire l'URL Google Maps
-    QString encodedLocation = QUrl::toPercentEncoding(location);
-    QString googleMapsUrl = QString("https://www.google.com/maps/search/%1").arg(encodedLocation);
+    auto *dlg = new MapDialog(MapDialog::ViewMode, location, this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->exec();
+}
+──────────────────────────────────────────────────────────────────────────── */
 
-    // Ouvrir l'URL
-    bool opened = QDesktopServices::openUrl(QUrl(googleMapsUrl));
-
-    if (!opened) {
-        QMessageBox::warning(this, "Erreur", "Impossible d'ouvrir Google Maps.");
-    }
+void MainWindow::on_btnOpenGoogleMaps_clicked()
+{
+    // Fonctionnalité Maps désactivée
 }
 
 
@@ -3397,20 +3614,22 @@ void MainWindow::on_btnStatLabs_clicked()
     showLabsStats();
 }
 
-// ── Statistiques Montant Payé / Reste par Laboratoire ──
+// ── Statistiques Montant Payé / Reste + Résultat par Laboratoire ──
 void MainWindow::showLabsStats()
 {
     QSqlQuery query(R"(
         SELECT NOMLABO,
-               NVL(SUM(MONTANT_PAYE), 0) AS TotalPaye,
-               NVL(SUM(MONTANT - MONTANT_PAYE), 0) AS TotalReste
+               NVL(MONTANT_PAYE, 0)            AS TotalPaye,
+               NVL(MONTANT - MONTANT_PAYE, 0)  AS TotalReste,
+               NVL(RESULTAT, '—')              AS Resultat
         FROM LABS
-        GROUP BY NOMLABO
+        WHERE NVL(MONTANT - MONTANT_PAYE, 0) > 0
         ORDER BY NOMLABO
     )");
 
     QStringList categories;
     QList<double> valsPaye, valsReste;
+    QStringList   resultats;
     double maxVal = 1.0;
     bool hasData = false;
 
@@ -3421,6 +3640,7 @@ void MainWindow::showLabsStats()
         double reste = query.value(2).toDouble();
         valsPaye  << paye;
         valsReste << reste;
+        resultats << query.value(3).toString();
         if (paye  > maxVal) maxVal = paye;
         if (reste > maxVal) maxVal = reste;
     }
@@ -3431,12 +3651,11 @@ void MainWindow::showLabsStats()
         return;
     }
 
-    // ── Création des séries ──
+    // ── Séries du graphique ──
     QBarSet *setPaye  = new QBarSet("Montant Payé (DT)");
     QBarSet *setReste = new QBarSet("Reste (DT)");
-    setPaye->setColor(QColor(39, 174, 96));   // vert
-    setReste->setColor(QColor(231, 76, 60));  // rouge
-
+    setPaye->setColor(QColor(39, 174, 96));
+    setReste->setColor(QColor(231, 76, 60));
     for (int i = 0; i < valsPaye.size(); ++i) {
         *setPaye  << valsPaye[i];
         *setReste << valsReste[i];
@@ -3448,11 +3667,11 @@ void MainWindow::showLabsStats()
     series->setLabelsVisible(true);
     series->setLabelsFormat("@value DT");
 
-    // ── Création du graphique ──
     QChart *chart = new QChart();
     chart->addSeries(series);
     chart->setTitle("Montant Payé et Reste par Laboratoire");
     chart->setAnimationOptions(QChart::SeriesAnimations);
+    chart->setBackgroundBrush(QColor("#ffffff"));
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
 
@@ -3470,18 +3689,197 @@ void MainWindow::showLabsStats()
 
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->setMinimumHeight(400);
+    chartView->setMinimumHeight(300);
 
-    // ── Fenêtre de dialogue ──
+    // ── Tableau Nom / Résultat ──
+    QTableWidget *table = new QTableWidget(categories.size(), 2);
+    table->setHorizontalHeaderLabels({"Laboratoire", "Résultat"});
+    table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setAlternatingRowColors(true);
+    table->verticalHeader()->setVisible(false);
+    table->setShowGrid(false);
+    table->setMaximumHeight(180);
+    table->setStyleSheet(
+        "QTableWidget { border: 1px solid #e8e8e8; border-radius: 8px;"
+        "  font-size: 12px; font-family: 'Segoe UI'; background: #ffffff; }"
+        "QHeaderView::section { background: #f0f0f0; font-weight: 700;"
+        "  padding: 7px 12px; border: none; border-bottom: 1px solid #ddd; }"
+        "QTableWidget::item { padding: 7px 14px; }"
+        "QTableWidget::item:alternate { background: #f9f9f9; }"
+        "QTableWidget::item:selected { background: #eaf4fb; color: #1a1a2e; }"
+    );
+
+    for (int i = 0; i < categories.size(); ++i) {
+        auto *itName = new QTableWidgetItem(categories[i]);
+        itName->setFont(QFont("Segoe UI", 11));
+        itName->setIcon(QIcon());
+        table->setItem(i, 0, itName);
+        table->setRowHeight(i, 36);
+
+        const QString res = resultats[i].isEmpty() ? "—" : resultats[i];
+        auto *itRes = new QTableWidgetItem("  " + res + "  ");
+        itRes->setTextAlignment(Qt::AlignCenter);
+        itRes->setFont(QFont("Segoe UI", 10, QFont::Bold));
+
+        // Badge coloré selon la valeur du résultat
+        const QString lower = res.toLower();
+        if (lower.contains("accept") || lower.contains("valid") || lower.contains("ok")) {
+            itRes->setForeground(QColor("#1e7e34"));
+            itRes->setBackground(QColor("#d4edda"));
+        } else if (lower.contains("refus") || lower.contains("rejet") || lower.contains("échec")) {
+            itRes->setForeground(QColor("#721c24"));
+            itRes->setBackground(QColor("#f8d7da"));
+        } else if (lower.contains("cours") || lower.contains("attente") || lower.contains("pending")) {
+            itRes->setForeground(QColor("#856404"));
+            itRes->setBackground(QColor("#fff3cd"));
+        } else if (lower == "—" || res.isEmpty()) {
+            itRes->setForeground(QColor("#999999"));
+        } else {
+            itRes->setForeground(QColor("#0c5460"));
+            itRes->setBackground(QColor("#d1ecf1"));
+        }
+        table->setItem(i, 1, itRes);
+    }
+
+    // ── Top 5 Labs Prêt ──
+    QSqlQuery qTop5;
+    qTop5.exec(
+        "SELECT NOMLABO, NVL(MONTANT_PAYE,0) AS PAYE "
+        "FROM ("
+        "  SELECT NOMLABO, MONTANT_PAYE FROM LABS "
+        "  WHERE UPPER(RESULTAT) LIKE '%PR%T%' "
+        "  ORDER BY NVL(MONTANT_PAYE,0) DESC"
+        ") WHERE ROWNUM <= 5"
+    );
+
+    struct Top5Row { QString nom; double paye; };
+    QList<Top5Row> top5;
+    while (qTop5.next())
+        top5.append({ qTop5.value(0).toString(), qTop5.value(1).toDouble() });
+
+    // ── Tableau Top 5 (même style que résultat par labo) ──
+    QTableWidget *tableTop5 = nullptr;
+    if (!top5.isEmpty()) {
+        const QStringList rankLabels = { "🥇 1er", "🥈 2e", "🥉 3e", "  4e", "  5e" };
+        const QList<QColor> rankFg  = {
+            QColor("#b8860b"), QColor("#707070"),
+            QColor("#8B4513"), QColor("#444444"), QColor("#444444")
+        };
+        const QList<QColor> rankBg  = {
+            QColor("#fff8dc"), QColor("#f5f5f5"),
+            QColor("#fdf0e0"), QColor("#ffffff"), QColor("#f9f9f9")
+        };
+
+        tableTop5 = new QTableWidget(top5.size(), 3);
+        tableTop5->setHorizontalHeaderLabels({ "Rang", "Laboratoire", "Montant Payé (DT)" });
+        tableTop5->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+        tableTop5->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+        tableTop5->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+        tableTop5->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        tableTop5->setSelectionBehavior(QAbstractItemView::SelectRows);
+        tableTop5->verticalHeader()->setVisible(false);
+        tableTop5->setShowGrid(false);
+        tableTop5->setAlternatingRowColors(false);
+        tableTop5->setStyleSheet(
+            "QTableWidget { border: 1px solid #e8e8e8; border-radius: 8px;"
+            "  font-size: 12px; font-family: 'Segoe UI'; background: #ffffff; }"
+            "QHeaderView::section { background: #f0f0f0; font-weight: 700;"
+            "  padding: 7px 12px; border: none; border-bottom: 1px solid #ddd; }"
+            "QTableWidget::item { padding: 7px 14px; }"
+            "QTableWidget::item:selected { background: #eaf4fb; color: #1a1a2e; }"
+        );
+
+        for (int i = 0; i < top5.size(); ++i) {
+            tableTop5->setRowHeight(i, 36);
+
+            // Colonne rang
+            auto *itRank = new QTableWidgetItem(rankLabels[i]);
+            itRank->setTextAlignment(Qt::AlignCenter);
+            itRank->setFont(QFont("Segoe UI", 10, QFont::Bold));
+            itRank->setForeground(rankFg[i]);
+            itRank->setBackground(rankBg[i]);
+            tableTop5->setItem(i, 0, itRank);
+
+            // Colonne nom
+            auto *itNom = new QTableWidgetItem(top5[i].nom);
+            itNom->setFont(QFont("Segoe UI", 11, i < 3 ? QFont::Bold : QFont::Normal));
+            itNom->setBackground(rankBg[i]);
+            tableTop5->setItem(i, 1, itNom);
+
+            // Colonne montant
+            auto *itPaye = new QTableWidgetItem(
+                QString::number(top5[i].paye, 'f', 3) + " DT");
+            itPaye->setTextAlignment(Qt::AlignCenter);
+            itPaye->setFont(QFont("Segoe UI", 10, QFont::Bold));
+            itPaye->setForeground(rankFg[i]);
+            itPaye->setBackground(rankBg[i]);
+            tableTop5->setItem(i, 2, itPaye);
+        }
+    }
+
+    // ── Dialogue principal ──
     QDialog dlg(this);
-    dlg.setWindowTitle("Statistiques Laboratoires — Montant Payé / Reste");
-    dlg.resize(1000, 650);
+    dlg.setWindowTitle("Statistiques Laboratoires");
+    dlg.resize(tableTop5 ? 1200 : 1000, 780);
+    dlg.setStyleSheet(
+        "QDialog { background: #f7f7f7; font-family: 'Segoe UI'; }"
+        "QLabel#dlgTitle  { font-size: 17px; font-weight: 900; color: #1a1a2e; }"
+        "QLabel#secTitle  { font-size: 12px; font-weight: 700; color: #555555; }"
+        "QLabel#top5Title { font-size: 12px; font-weight: 700; color: #b8860b; }"
+        "QFrame#sep       { color: #e0e0e0; }"
+        "QPushButton { border-radius: 6px; padding: 6px 20px; font-size: 12px; }"
+    );
 
-    QVBoxLayout *layout = new QVBoxLayout(&dlg);
-    layout->setContentsMargins(10, 10, 10, 10);
-    layout->addWidget(chartView, 1);
+    auto *layout = new QVBoxLayout(&dlg);
+    layout->setContentsMargins(18, 14, 18, 14);
+    layout->setSpacing(10);
 
-    QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Close, &dlg);
+    auto *lblTitle = new QLabel("Statistiques des Laboratoires", &dlg);
+    lblTitle->setObjectName("dlgTitle");
+    lblTitle->setAlignment(Qt::AlignCenter);
+    layout->addWidget(lblTitle);
+
+    layout->addWidget(chartView, 3);
+
+    auto *sep = new QFrame(&dlg);
+    sep->setObjectName("sep");
+    sep->setFrameShape(QFrame::HLine);
+    layout->addWidget(sep);
+
+    // ── Ligne basse : résultats | séparateur | Top 5 ──
+    auto *bottomRow = new QHBoxLayout();
+    bottomRow->setSpacing(14);
+
+    // Colonne gauche — résultat par labo
+    auto *leftCol = new QVBoxLayout();
+    leftCol->setSpacing(4);
+    auto *lblSec = new QLabel("Résultat par laboratoire", &dlg);
+    lblSec->setObjectName("secTitle");
+    leftCol->addWidget(lblSec);
+    leftCol->addWidget(table);
+    bottomRow->addLayout(leftCol, 3);
+
+    if (tableTop5) {
+        auto *vsep = new QFrame(&dlg);
+        vsep->setFrameShape(QFrame::VLine);
+        vsep->setStyleSheet("color: #ddd;");
+        bottomRow->addWidget(vsep);
+
+        auto *rightCol = new QVBoxLayout();
+        rightCol->setSpacing(4);
+        auto *lblTop5 = new QLabel("Top 5  —  Résultat Prêt", &dlg);
+        lblTop5->setObjectName("top5Title");
+        rightCol->addWidget(lblTop5);
+        rightCol->addWidget(tableTop5);
+        bottomRow->addLayout(rightCol, 3);
+    }
+
+    layout->addLayout(bottomRow, 2);
+
+    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Close, &dlg);
     connect(buttons, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
     layout->addWidget(buttons);
 
@@ -3497,7 +3895,7 @@ void MainWindow::on_retour_stat_3_clicked()        { ui->stacked_L->setCurrentIn
 void MainWindow::on_retour_stat_9_clicked()        { ui->stacked_L->setCurrentIndex(0); }
 void MainWindow::on_retour_stat_8_clicked()        { ui->stacked_L->setCurrentIndex(0); }
 
-// ── Maps ──
+/* ── Maps désactivé ──────────────────────────────────────────────────────────
 void MainWindow::on_btnPasteLocation_clicked()
 {
     QClipboard *clipboard = QApplication::clipboard();
@@ -3509,23 +3907,21 @@ void MainWindow::on_btnPasteLocation_clicked()
 }
 void MainWindow::on_btnAjouterPub_4_clicked()
 {
-    // MAP DÉSACTIVÉ
-    // auto *dlg = new MapDialog(MapDialog::PickMode, QString(), this);
-    // connect(dlg, &MapDialog::coordinatesSelected, this, [this](const QString &coords) {
-    //     ui->LabLocation_5->setText(coords);
-    // });
-    // dlg->setAttribute(Qt::WA_DeleteOnClose);
-    // dlg->exec();
+    auto *dlg = new MapDialog(MapDialog::PickMode, QString(), this);
+    connect(dlg, &MapDialog::coordinatesSelected, this, [this](const QString &coords) {
+        ui->LabLocation_5->setText(coords);
+    });
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->exec();
 }
 void MainWindow::on_btnAjouterPub_5_clicked()
 {
-    // MAP DÉSACTIVÉ
-    // auto *dlg = new MapDialog(MapDialog::PickMode, QString(), this);
-    // connect(dlg, &MapDialog::coordinatesSelected, this, [this](const QString &coords) {
-    //     ui->LabLocation_3->setText(coords);
-    // });
-    // dlg->setAttribute(Qt::WA_DeleteOnClose);
-    // dlg->exec();
+    auto *dlg = new MapDialog(MapDialog::PickMode, QString(), this);
+    connect(dlg, &MapDialog::coordinatesSelected, this, [this](const QString &coords) {
+        ui->LabLocation_3->setText(coords);
+    });
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->exec();
 }
 void MainWindow::on_btnmapl_3_clicked()
 {
@@ -3536,6 +3932,13 @@ void MainWindow::on_btnmapl_3_clicked()
                              "3. Cliquez sur les coordonnées pour les copier.\n"
                              "4. Revenez ici et collez (Ctrl+V) dans le champ Localisation.");
 }
+──────────────────────────────────────────────────────────────────────────── */
+
+// ── Maps désactivé ──
+void MainWindow::on_btnPasteLocation_clicked()  { /* désactivé */ }
+void MainWindow::on_btnAjouterPub_4_clicked()   { /* désactivé */ }
+void MainWindow::on_btnAjouterPub_5_clicked()   { /* désactivé */ }
+void MainWindow::on_btnmapl_3_clicked()         { /* désactivé */ }
 // Inventory - Navigation
 // ====================== AJOUT ======================
 void MainWindow::handleInventoryAdd()
@@ -4587,6 +4990,7 @@ Finance::Row MainWindow::selectedFinanceRowFromTable(bool *ok) const
 
 void MainWindow::initFinanceUi()
 {
+    ui->stat_pub_3->installEventFilter(this);
     ui->FormCode->setReadOnly(true);
     ui->FormCode_2->setReadOnly(true);
     // Date de transaction verrouillée dans modifier (non modifiable après création)
@@ -4758,15 +5162,15 @@ void MainWindow::updateFinanceStats()
 {
     const int idx = ui->comboBox_3->currentIndex();
 
-    // Récupérer ou créer le QChartView dans la page statsF
-    QChartView *cv = ui->statsF->findChild<QChartView*>("finChartView");
+    // Récupérer ou créer le QChartView – enfant de stat_pub_3 (pas statsF)
+    // pour ne pas couvrir le combo et le bouton Retour en dessous
+    QChartView *cv = ui->stat_pub_3->findChild<QChartView*>("finChartView");
     if (!cv) {
-        cv = new QChartView(ui->statsF);
+        cv = new QChartView(ui->stat_pub_3);
         cv->setObjectName("finChartView");
-        cv->setGeometry(ui->stat_pub_3->geometry());
+        cv->setGeometry(0, 0, ui->stat_pub_3->width(), ui->stat_pub_3->height());
         cv->setRenderHint(QPainter::Antialiasing);
         cv->show();
-        ui->stat_pub_3->hide();
     }
 
     // ── Palette multicolore pour les barres ─────────────────────────────
@@ -6585,7 +6989,6 @@ QString MainWindow::callCloudPublicationAssistant(const QString &question, const
     }
 
     // Configuration OpenRouter 100 % dans le code (chatbot Publications) — collez votre clé ci-dessous.
-    static const QString kOpenRouterApiKey = QStringLiteral("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");
     static const QString kOpenRouterModel = QStringLiteral("openrouter/auto");
     static const QString kOpenRouterUrl = QStringLiteral("https://openrouter.ai/api/v1/chat/completions");
 
@@ -8980,6 +9383,393 @@ void MainWindow::initLabsUi()
     connect(ui->TableLabReserveProducts, &QTableWidget::itemSelectionChanged,
             this, &MainWindow::updateLabReserveSpinMax);
 
+    // Démarrage du serveur HTTP + widget QR
+    setupLabQrWidget();
+
+    // ═══════════════════════════════════════════════════════════
+    //  Landing page — ajoutée dynamiquement dans stacked_L
+    // ═══════════════════════════════════════════════════════════
+    {
+        auto *lp = new QWidget();
+        lp->setObjectName("labsLandingPage");
+        lp->setStyleSheet(
+            "QWidget#labsLandingPage {"
+            "  background: qlineargradient(x1:0,y1:0,x2:1,y2:1,"
+            "    stop:0 #f0fff8, stop:1 #e3f2fd);"
+            "}"
+        );
+
+        auto *root = new QVBoxLayout(lp);
+        root->setContentsMargins(50, 30, 50, 30);
+        root->setSpacing(20);
+        root->setAlignment(Qt::AlignVCenter);
+
+        // ── Icône + titre ─────────────────────────────────────
+        auto *lblIcon = new QLabel("🔬", lp);
+        lblIcon->setAlignment(Qt::AlignCenter);
+        lblIcon->setStyleSheet("font-size: 56px; background: transparent;");
+        root->addWidget(lblIcon);
+
+        auto *lblTitle = new QLabel("Gestion des Laboratoires", lp);
+        lblTitle->setAlignment(Qt::AlignCenter);
+        lblTitle->setStyleSheet(
+            "font-size: 28px; font-weight: 900; color: #0B2E1F;"
+            "background: transparent; letter-spacing: 0.5px;"
+        );
+        root->addWidget(lblTitle);
+
+        auto *lblSub = new QLabel("Vue d'ensemble en temps réel de vos laboratoires", lp);
+        lblSub->setAlignment(Qt::AlignCenter);
+        lblSub->setStyleSheet(
+            "font-size: 13px; color: #5a7a6a; background: transparent; margin-bottom: 4px;"
+        );
+        root->addWidget(lblSub);
+
+        // ── Ligne de séparation ───────────────────────────────
+        auto *sep = new QFrame(lp);
+        sep->setFrameShape(QFrame::HLine);
+        sep->setStyleSheet("color: #b2dfdb; margin: 0 100px;");
+        root->addWidget(sep);
+
+        // ── Cards ─────────────────────────────────────────────
+        auto *cardsRow = new QHBoxLayout();
+        cardsRow->setSpacing(16);
+
+        struct CardDef { QString valName; QString icon; QString label; QString valColor; QString bgColor; QString borderColor; };
+        const QList<CardDef> cardDefs = {
+            { "lblLandTotal",   "🏛",  "Total\nLabos",     "#0d6efd", "#e8f0fe", "#c2d4fc" },
+            { "lblLandDispo",   "✅",  "Disponibles",      "#198754", "#e8f5e9", "#a8d5b5" },
+            { "lblLandOccupe",  "⏳",  "Occupés",          "#e67e22", "#fff8e1", "#ffd180" },
+            { "lblLandMontant", "💰",  "Montant Total\n(DT)", "#6f42c1", "#f3e8ff", "#d9b8f7" },
+        };
+
+        for (const auto &cd : std::as_const(cardDefs)) {
+            auto *card = new QFrame(lp);
+            card->setStyleSheet(QString(
+                "QFrame {"
+                "  background: %1;"
+                "  border-radius: 18px;"
+                "  border: 1.5px solid %2;"
+                "}"
+            ).arg(cd.bgColor, cd.borderColor));
+            card->setMinimumHeight(140);
+            card->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+            auto *cl = new QVBoxLayout(card);
+            cl->setContentsMargins(16, 18, 16, 18);
+            cl->setSpacing(6);
+            cl->setAlignment(Qt::AlignCenter);
+
+            auto *icoLbl = new QLabel(cd.icon, card);
+            icoLbl->setAlignment(Qt::AlignCenter);
+            icoLbl->setStyleSheet("font-size: 30px; background: transparent;");
+            cl->addWidget(icoLbl);
+
+            auto *valLbl = new QLabel("—", card);
+            valLbl->setObjectName(cd.valName);
+            valLbl->setAlignment(Qt::AlignCenter);
+            valLbl->setStyleSheet(QString(
+                "font-size: 30px; font-weight: 900; color: %1; background: transparent;"
+            ).arg(cd.valColor));
+            cl->addWidget(valLbl);
+
+            auto *descLbl = new QLabel(cd.label, card);
+            descLbl->setAlignment(Qt::AlignCenter);
+            descLbl->setStyleSheet(
+                "font-size: 11px; font-weight: 600; color: #555; background: transparent;"
+            );
+            cl->addWidget(descLbl);
+
+            cardsRow->addWidget(card, 1);
+        }
+        root->addLayout(cardsRow);
+
+        // ── Boutons ───────────────────────────────────────────
+        auto *btnsRow = new QHBoxLayout();
+        btnsRow->setSpacing(14);
+        btnsRow->setAlignment(Qt::AlignCenter);
+
+        auto *btnGerer = new QPushButton("   Gérer les Laboratoires", lp);
+        btnGerer->setMinimumHeight(46);
+        btnGerer->setMinimumWidth(230);
+        btnGerer->setCursor(Qt::PointingHandCursor);
+        btnGerer->setStyleSheet(
+            "QPushButton {"
+            "  background: qlineargradient(x1:0,y1:0,x2:1,y2:0,"
+            "    stop:0 #18A06A, stop:1 #0d8a5e);"
+            "  color: white; border: none; border-radius: 13px;"
+            "  font-size: 14px; font-weight: 800; padding: 11px 30px;"
+            "}"
+            "QPushButton:hover  { background: #0f9460; }"
+            "QPushButton:pressed{ background: #0a6b49; }"
+        );
+        connect(btnGerer, &QPushButton::clicked, this, [this]() {
+            ui->stacked_L->setCurrentIndex(0);
+        });
+
+        auto *btnStat = new QPushButton("   Voir les Statistiques", lp);
+        btnStat->setMinimumHeight(46);
+        btnStat->setMinimumWidth(210);
+        btnStat->setCursor(Qt::PointingHandCursor);
+        btnStat->setStyleSheet(
+            "QPushButton {"
+            "  background: transparent;"
+            "  color: #18A06A; border: 2px solid #18A06A;"
+            "  border-radius: 13px; font-size: 14px; font-weight: 700;"
+            "  padding: 11px 30px;"
+            "}"
+            "QPushButton:hover  { background: rgba(24,160,106,0.10); }"
+            "QPushButton:pressed{ background: rgba(24,160,106,0.20); }"
+        );
+        connect(btnStat, &QPushButton::clicked, this, [this]() {
+            showLabsStats();
+        });
+
+        auto *btnTop5 = new QPushButton("   Top 5 Labs Prêt", lp);
+        btnTop5->setMinimumHeight(46);
+        btnTop5->setMinimumWidth(200);
+        btnTop5->setCursor(Qt::PointingHandCursor);
+        btnTop5->setStyleSheet(
+            "QPushButton {"
+            "  background: transparent;"
+            "  color: #6f42c1; border: 2px solid #6f42c1;"
+            "  border-radius: 13px; font-size: 14px; font-weight: 700;"
+            "  padding: 11px 30px;"
+            "}"
+            "QPushButton:hover  { background: rgba(111,66,193,0.10); }"
+            "QPushButton:pressed{ background: rgba(111,66,193,0.20); }"
+        );
+        connect(btnTop5, &QPushButton::clicked, this, [this]() {
+            // ── Requête Top 5 Labs avec résultat "Prêt" ──
+            QSqlQuery q;
+            q.exec(
+                "SELECT NOMLABO, NVL(MONTANT_PAYE,0) AS PAYE "
+                "FROM ("
+                "  SELECT NOMLABO, MONTANT_PAYE "
+                "  FROM LABS "
+                "  WHERE UPPER(RESULTAT) LIKE '%PR%T%' "
+                "  ORDER BY NVL(MONTANT_PAYE,0) DESC "
+                ") WHERE ROWNUM <= 5"
+            );
+
+            QStringList noms;
+            QList<double> payes;
+            while (q.next()) {
+                noms  << q.value(0).toString();
+                payes << q.value(1).toDouble();
+            }
+
+            if (noms.isEmpty()) {
+                QMessageBox::information(this, "Top 5 Labs Prêt",
+                    "Aucun laboratoire avec le résultat « Prêt » trouvé.");
+                return;
+            }
+
+            // ── Série barres horizontales ──
+            auto *barSet = new QBarSet("Montant Payé (DT)");
+            barSet->setColor(QColor("#6f42c1"));
+            barSet->setBorderColor(QColor("#5a32a3"));
+            for (double v : std::as_const(payes)) *barSet << v;
+
+            auto *series = new QHorizontalBarSeries();
+            series->append(barSet);
+            series->setLabelsVisible(true);
+            series->setLabelsFormat("@value DT");
+            series->setLabelsPosition(QAbstractBarSeries::LabelsOutsideEnd);
+
+            auto *chart = new QChart();
+            chart->addSeries(series);
+            chart->setTitle("🏆  Top 5 Laboratoires — Résultat Prêt");
+            chart->setAnimationOptions(QChart::SeriesAnimations);
+            chart->setBackgroundBrush(QColor("#faf8ff"));
+            chart->setBackgroundRoundness(12);
+            chart->legend()->setVisible(false);
+
+            // Axe Y = noms des labs
+            auto *axisY = new QBarCategoryAxis();
+            axisY->append(noms);
+            axisY->setLabelsFont(QFont("Segoe UI", 10, QFont::Bold));
+            chart->addAxis(axisY, Qt::AlignLeft);
+            series->attachAxis(axisY);
+
+            // Axe X = montants
+            double maxPaye = payes.isEmpty() ? 1.0 : *std::max_element(payes.cbegin(), payes.cend());
+            auto *axisX = new QValueAxis();
+            axisX->setRange(0, maxPaye + maxPaye * 0.15);
+            axisX->setLabelFormat("%.0f");
+            axisX->setTitleText("Montant Payé (DT)");
+            axisX->setTitleFont(QFont("Segoe UI", 9, QFont::Bold));
+            axisX->setGridLineColor(QColor("#e8e0f8"));
+            chart->addAxis(axisX, Qt::AlignBottom);
+            series->attachAxis(axisX);
+
+            auto *chartView = new QChartView(chart);
+            chartView->setRenderHint(QPainter::Antialiasing);
+            chartView->setBackgroundBrush(QColor("#faf8ff"));
+
+            // ── Tableau récap sous le graphique ──
+            auto *table = new QTableWidget(noms.size(), 2);
+            table->setHorizontalHeaderLabels({"Laboratoire", "Montant Payé (DT)"});
+            table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+            table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+            table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+            table->verticalHeader()->setVisible(false);
+            table->setShowGrid(false);
+            table->setAlternatingRowColors(true);
+            table->setMaximumHeight(160);
+            table->setStyleSheet(
+                "QTableWidget { border:1px solid #e0d4f8; border-radius:8px;"
+                "  font-size:12px; background:#ffffff; }"
+                "QHeaderView::section { background:#f0e8ff; font-weight:700;"
+                "  padding:6px 12px; border:none; border-bottom:1px solid #d4b8f8; color:#6f42c1; }"
+                "QTableWidget::item { padding:6px 12px; }"
+                "QTableWidget::item:alternate { background:#faf5ff; }"
+            );
+            for (int i = 0; i < noms.size(); ++i) {
+                const QString medal = (i==0?"🥇 ": i==1?"🥈 ": i==2?"🥉 ": "   ");
+                auto *itName = new QTableWidgetItem(medal + noms[i]);
+                itName->setFont(QFont("Segoe UI", 11, i < 3 ? QFont::Bold : QFont::Normal));
+                table->setItem(i, 0, itName);
+                table->setRowHeight(i, 34);
+
+                auto *itVal = new QTableWidgetItem(
+                    QString::number(payes[i], 'f', 3) + " DT");
+                itVal->setTextAlignment(Qt::AlignCenter);
+                itVal->setFont(QFont("Segoe UI", 10, QFont::Bold));
+                itVal->setForeground(QColor("#6f42c1"));
+                table->setItem(i, 1, itVal);
+            }
+
+            // ── Dialog ──
+            QDialog dlg(this);
+            dlg.setWindowTitle("Top 5 Laboratoires — Résultat Prêt");
+            dlg.resize(720, 580);
+            dlg.setStyleSheet(
+                "QDialog { background:#faf8ff; font-family:'Segoe UI'; }"
+                "QLabel#t5Title { font-size:17px; font-weight:900; color:#3d1580; }"
+                "QLabel#t5Sub   { font-size:11px; color:#7c5cbf; }"
+            );
+
+            auto *vl = new QVBoxLayout(&dlg);
+            vl->setContentsMargins(20, 16, 20, 14);
+            vl->setSpacing(10);
+
+            auto *lbT = new QLabel("🏆  Top 5 Laboratoires — Résultat Prêt", &dlg);
+            lbT->setObjectName("t5Title");
+            lbT->setAlignment(Qt::AlignCenter);
+            vl->addWidget(lbT);
+
+            auto *lbS = new QLabel(
+                QString("Classés par montant payé décroissant · %1 lab(s) éligibles affichés")
+                    .arg(noms.size()), &dlg);
+            lbS->setObjectName("t5Sub");
+            lbS->setAlignment(Qt::AlignCenter);
+            vl->addWidget(lbS);
+
+            vl->addWidget(chartView, 3);
+
+            auto *sep2 = new QFrame(&dlg);
+            sep2->setFrameShape(QFrame::HLine);
+            sep2->setStyleSheet("color:#ddd;");
+            vl->addWidget(sep2);
+
+            vl->addWidget(table, 1);
+
+            auto *bb = new QDialogButtonBox(QDialogButtonBox::Close, &dlg);
+            connect(bb, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+            vl->addWidget(bb);
+
+            dlg.exec();
+        });
+
+        btnsRow->addWidget(btnGerer);
+        btnsRow->addWidget(btnStat);
+        btnsRow->addWidget(btnTop5);
+        root->addLayout(btnsRow);
+
+        root->addStretch(1);
+        ui->stacked_L->addWidget(lp);
+    }
+}
+
+// ====================== QR Code + HTTP Server ======================
+
+void MainWindow::setupLabQrWidget()
+{
+    // ── Démarrage du serveur HTTP ─────────────────────────────────────────
+    m_labServer = new LabHttpServer(this);
+    if (!m_labServer->start(8080)) {
+        qDebug() << "[QR] Port 8080 occupé, essai 8081";
+        m_labServer->start(8081);
+    }
+    qDebug() << "[QR] Serveur démarré sur" << m_labServer->localUrl();
+
+    // ── Récupérer les widgets définis dans le .ui ─────────────────────────
+    m_qrLabel = ui->affichierL->findChild<QLabel*>("labQrDisplay");
+    m_qrHint  = ui->affichierL->findChild<QLabel*>("labQrHint");
+    m_qrUrl   = ui->affichierL->findChild<QLabel*>("labQrUrl");
+
+    // ── Style du panel QR ─────────────────────────────────────────────────
+    if (auto *frame = ui->affichierL->findChild<QFrame*>("qrPanelFrame"))
+        frame->setStyleSheet(
+            "QFrame#qrPanelFrame {"
+            "  background: white;"
+            "  border: 1.5px solid #e0e4ea;"
+            "  border-radius: 14px;"
+            "}");
+
+    if (auto *frame = ui->affichierL->findChild<QFrame*>("PopupLabsForm_4"))
+        frame->setStyleSheet(
+            "QFrame#PopupLabsForm_4 {"
+            "  background: white;"
+            "  border: 1.5px solid #e0e4ea;"
+            "  border-radius: 14px;"
+            "}");
+
+    // ── Network manager dédié au téléchargement du QR ────────────────────
+    m_qrNam = new QNetworkAccessManager(this);
+}
+
+void MainWindow::refreshLabQr(const QString &labName, const QString &disponibilite)
+{
+    if (!m_labServer || !m_labServer->isRunning()) return;
+
+    const QString url = m_labServer->localUrl();
+
+    // Mise à jour visuelle de l'URL
+    if (m_qrUrl)
+        m_qrUrl->setText(url);
+
+    // Badge couleur selon disponibilité
+    const bool dispo = disponibilite.compare("Disponible", Qt::CaseInsensitive) == 0;
+    if (m_qrHint) {
+        const QString bg  = dispo ? "#eafaf1" : "#fdedec";
+        const QString fg  = dispo ? "#1e8449"  : "#c0392b";
+        const QString brd = dispo ? "#a9dfbf"  : "#f5b7b1";
+        m_qrHint->setStyleSheet(
+            QString("background:%1; color:%2; border:1.5px solid %3;"
+                    "border-radius:8px; font-size:13px; font-weight:bold; padding:6px;")
+                .arg(bg, fg, brd));
+        m_qrHint->setText(dispo ? "✅  DISPONIBLE" : "🔴  OCCUPÉ");
+    }
+
+    // Téléchargement de l'image QR via api.qrserver.com
+    const QString qrApiUrl = QString(
+        "https://api.qrserver.com/v1/create-qr-code/?size=165x165&data=%1&format=png&margin=4")
+        .arg(QString::fromUtf8(QUrl::toPercentEncoding(url)));
+
+    QNetworkRequest req{QUrl(qrApiUrl)};
+    req.setHeader(QNetworkRequest::UserAgentHeader, "SRPM-Qt-App/1.0");
+
+    QNetworkReply *reply = m_qrNam->get(req);
+    connect(reply, &QNetworkReply::finished, this, [this, reply, labName]() {
+        reply->deleteLater();
+        if (reply->error() != QNetworkReply::NoError || !m_qrLabel) return;
+        QPixmap pix;
+        if (pix.loadFromData(reply->readAll()) && !pix.isNull())
+            m_qrLabel->setPixmap(pix.scaled(
+                m_qrLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    });
 }
 
 // ====================== Réservation produit (labs → inventaire) ======================
@@ -9124,6 +9914,7 @@ void MainWindow::on_btnLabReserveBack_clicked()
     ui->stacked_L->setCurrentIndex(0);
 }
 
+/* ── Maps désactivé ──────────────────────────────────────────────────────────
 void MainWindow::onMapLocationSelected(const QString& title)
 {
     if (title.contains(",") && title.contains(QRegularExpression("\\d"))) {
@@ -9131,6 +9922,12 @@ void MainWindow::onMapLocationSelected(const QString& title)
         ui->LabLocation_5->setText(title);
         QMessageBox::information(this, "Localisation", "Position capturée : " + title);
     }
+}
+──────────────────────────────────────────────────────────────────────────── */
+
+void MainWindow::onMapLocationSelected(const QString& title)
+{
+    Q_UNUSED(title); // désactivé
 }
 // ====================== PAGE 2 – AJOUT ======================
 void MainWindow::on_BtnPopupResetLabs_3_clicked()
@@ -9534,15 +10331,36 @@ void MainWindow::on_btnAjouterPub_3_clicked()
     }
     if (!ui->TableLabs_2->item(r, 0)) return;
 
-    ui->aff1->setText(ui->TableLabs_2->item(r, 1)->text()); // Nom
-        ui->aff5->setText(ui->TableLabs_2->item(r, 2)->text()); // Responsable
-        ui->aff6->setText(ui->TableLabs_2->item(r, 3)->text()); // Numéro
-        ui->aff2->setText(ui->TableLabs_2->item(r, 4)->text()); // Localisation
+    const QString labNom    = ui->TableLabs_2->item(r, 1)->text();
+    const QString labResp   = ui->TableLabs_2->item(r, 2)->text();
+    const QString labNum    = ui->TableLabs_2->item(r, 3)->text();
+    const QString labLoc    = ui->TableLabs_2->item(r, 4)->text();
+    const QString labDispo  = ui->TableLabs_2->item(r, 5)->text();
+    const QString labSpec   = ui->TableLabs_2->item(r, 6)->text();
 
-        setComboValue(ui->aff7,   ui->TableLabs_2->item(r, 5)->text()); // Disponibilité
-        setComboValue(ui->aff3,   ui->TableLabs_2->item(r, 6)->text()); // Spécialité
-        setComboValue(ui->aff3_2, ui->TableLabs_2->item(r, 7)->text()); // Résultat
-        setComboValue(ui->aff7_2, ui->TableLabs_2->item(r, 8)->text()); // Paiement
+    ui->aff1->setText(labNom);
+    ui->aff5->setText(labResp);
+    ui->aff6->setText(labNum);
+    ui->aff2->setText(labLoc);
+
+    setComboValue(ui->aff7,   labDispo);       // Disponibilité
+    setComboValue(ui->aff3,   labSpec);        // Spécialité
+    setComboValue(ui->aff3_2, ui->TableLabs_2->item(r, 7)->text()); // Résultat
+    setComboValue(ui->aff7_2, ui->TableLabs_2->item(r, 8)->text()); // Paiement
+
+    // ── Mettre à jour le serveur HTTP et le QR code ───────────────────────
+    if (m_labServer) {
+        LabStatusData d;
+        d.id            = ui->TableLabs_2->item(r, 0)->text().toInt();
+        d.nom           = labNom;
+        d.responsable   = labResp;
+        d.numero        = labNum;
+        d.localisation  = labLoc;
+        d.disponibilite = labDispo;
+        d.specialite    = labSpec;
+        m_labServer->setLab(d);
+        refreshLabQr(labNom, labDispo);
+    }
 
         // Montants financiers en lecture seule sur la page d'affichage
         if (ui->TableLabs_2->item(r, 9))

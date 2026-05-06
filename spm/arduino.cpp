@@ -65,6 +65,49 @@ int Arduino::connect_arduino()
     return -1; // Arduino non disponible
 }
 
+// ─── Connexion sur le 2e port (en excluant un port déjà utilisé) ─────────────
+int Arduino::connect_arduino(const QString &excludePort)
+{
+    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
+        if (!info.hasVendorIdentifier() || !info.hasProductIdentifier()) continue;
+        if (info.portName() == excludePort) continue;
+
+        quint16 vid = info.vendorIdentifier();
+        quint16 pid = info.productIdentifier();
+
+        bool isArduino =
+            (vid == 0x2341 && pid == 0x0043) ||
+            (vid == 0x2341 && pid == 0x0001) ||
+            (vid == 0x1A86 && pid == 0x7523) ||
+            (vid == 0x1A86 && pid == 0x55D4) ||
+            (vid == 0x10C4 && pid == 0xEA60);
+
+        if (isArduino) {
+            arduino_is_available = true;
+            arduino_port_name    = info.portName();
+            qDebug() << "[Arduino2] Détecté :" << info.description()
+                     << "sur" << arduino_port_name;
+            break;
+        }
+    }
+
+    qDebug() << "[Arduino2] Port :" << arduino_port_name;
+
+    if (arduino_is_available) {
+        serial->setPortName(arduino_port_name);
+        if (serial->open(QSerialPort::ReadWrite)) {
+            serial->setBaudRate(QSerialPort::Baud9600);
+            serial->setDataBits(QSerialPort::Data8);
+            serial->setParity(QSerialPort::NoParity);
+            serial->setStopBits(QSerialPort::OneStop);
+            serial->setFlowControl(QSerialPort::NoFlowControl);
+            return 0;
+        }
+        return 1;
+    }
+    return -1;
+}
+
 // ─── Déconnexion ──────────────────────────────────────────────────────────────
 int Arduino::close_arduino()
 {

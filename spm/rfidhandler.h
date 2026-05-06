@@ -15,18 +15,23 @@ class RfidHandler : public QObject
     Q_OBJECT
 
 public:
-    explicit RfidHandler(Arduino *arduino, QObject *parent = nullptr);
+    explicit RfidHandler(Arduino *rfidArduino, QObject *parent = nullptr);
+    void attachKeypad(Arduino *keypadArduino);
 
 signals:
-    // Émis après un pointage réussi → MainWindow peut rafraîchir le tableau
     void pointageEffectue(const QString &prenom, const QString &heure);
+    void skuRecu(const QString &sku);
+    void inputSkuRecu(const QString &input);
 
 private slots:
     void traiter_rfid();
+    void traiter_keypad();
 
 private:
-    Arduino   *A;
+    Arduino   *A        = nullptr;  // Arduino RFID
+    Arduino   *AKeypad  = nullptr;  // Arduino Keypad
     QByteArray rfidBuffer;
+    QByteArray keypadBuffer;
 };
 
 #endif // RFIDHANDLER_H
