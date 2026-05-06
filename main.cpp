@@ -43,7 +43,6 @@ int main(int argc, char *argv[])
     // RfidHandler traite les cartes dès maintenant, même sans utilisateur connecté
     RfidHandler rfidHandler(&arduino);
 
-    // 3) Boucle de cycle de vie (Login <-> MainWindow)
     bool restart = true;
     while (restart) {
         restart = false;
@@ -52,10 +51,8 @@ int main(int argc, char *argv[])
         if (login.exec() != QDialog::Accepted) {
             break;
         }
-
         // 4) Ouverture de la fenêtre principale
         MainWindow w(&arduino);
-
         // Quand un pointage RFID se produit, rafraîchir le tableau employés dans l'UI
         QObject::connect(&rfidHandler, &RfidHandler::pointageEffectue,
                          &w, &MainWindow::onPointageRfid);
@@ -73,11 +70,9 @@ int main(int argc, char *argv[])
         });
         w.notifierConnexion();
         w.show();
-
         // Boucle d'événements principale pour la fenêtre MainWindow
         a.exec(); 
     }
-
     // 4) Nettoyage avant fermeture
     c->closeConnection();
     return 0;
