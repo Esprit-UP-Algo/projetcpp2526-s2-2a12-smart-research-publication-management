@@ -11,7 +11,6 @@ static void setErr(QString *err, const QString &msg) {
     if (err) *err = msg;
 }
 
-// ── Constructor ───────────────────────────────────────────────────────────────
 Inventory::Inventory(QString name, QString sku, QString type, int qtAv, int qtRs,
                      int threshold, QString unit, double price, QString status,
                      QString zone, QString shelf, QString description)
@@ -44,7 +43,6 @@ bool Inventory::nextId(int &outId, QString *err)
     return false;
 }
 
-// ── CREATE ───────────────────────────────────────────────────────────────────
 bool Inventory::ajouter(QString *err) const
 {
     int newId = 0;
@@ -107,7 +105,6 @@ bool Inventory::ajouter(QString *err) const
 
              if (q.exec()) return true;
         }
-
         setErr(err, q.lastError().text());
         return false;
     }
