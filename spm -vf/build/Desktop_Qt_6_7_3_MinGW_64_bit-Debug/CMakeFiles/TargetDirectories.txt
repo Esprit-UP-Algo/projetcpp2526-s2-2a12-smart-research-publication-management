@@ -1,5 +1,0 @@
-C:/Users/hicham/Desktop/Projet_C++_git/Integration-branch/SmartResearchPublicationManagementt/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/SmartResearchPublicationManagement.dir
-C:/Users/hicham/Desktop/Projet_C++_git/Integration-branch/SmartResearchPublicationManagementt/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
-C:/Users/hicham/Desktop/Projet_C++_git/Integration-branch/SmartResearchPublicationManagementt/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
-C:/Users/hicham/Desktop/Projet_C++_git/Integration-branch/SmartResearchPublicationManagementt/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/SmartResearchPublicationManagement_autogen_timestamp_deps.dir
-C:/Users/hicham/Desktop/Projet_C++_git/Integration-branch/SmartResearchPublicationManagementt/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/SmartResearchPublicationManagement_autogen.dir

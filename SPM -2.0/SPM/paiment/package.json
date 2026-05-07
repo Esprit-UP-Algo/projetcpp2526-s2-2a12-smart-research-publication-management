@@ -1,9 +1,0 @@
-{
-  "name": "paiment-localhost",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Site local de paiement en ligne",
-  "scripts": {
-    "start": "node server.js"
-  }
-}
