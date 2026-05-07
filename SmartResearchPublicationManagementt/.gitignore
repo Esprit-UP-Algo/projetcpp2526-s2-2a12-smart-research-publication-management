@@ -1,0 +1,10 @@
+build/
+.vscode/
+.qtcreator/
+*.pro.user
+*.o
+*.obj
+*.exe
+*.zip
+*.rar
+*.crdownload

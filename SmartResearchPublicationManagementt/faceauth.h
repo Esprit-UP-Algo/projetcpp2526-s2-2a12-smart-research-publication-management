@@ -3,13 +3,19 @@
 
 #include <opencv2/opencv.hpp>
 #include <QString>
+#include <QStringList>
+#include <QByteArray>
 
 class FaceAuth {
 public:
 
-    FaceAuth(); // <-- Vérifie que cette ligne est bien là !
-    bool identifierUtilisateur(const QString& employeeID);
+    FaceAuth();
+    bool identifierUtilisateur(const QString& username);
+    bool identifierUtilisateurParListe(const QStringList& usernames, QString *matchedUsername);
+    bool enregistrerUtilisateur(const QString& username);
 private:
+    QByteArray capturerImageVisage();
+    bool verifierAvecImage(const QByteArray& imageData, const QString& username) const;
     cv::CascadeClassifier faceCascade;
 };
 
